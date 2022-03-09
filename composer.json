@@ -15,5 +15,8 @@
         }
     ],
     "minimum-stability": "stable",
-    "require": {}
+    "require": {
+        "mustache/mustache": "~2.5",
+        "vlucas/phpdotenv": "^4.2"
+    }
 }
