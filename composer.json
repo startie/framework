@@ -1,0 +1,19 @@
+{
+    "name": "startie/framework",
+    "description": "Simple PHP framework",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Startie\\Framework\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Kirill Devope",
+            "email": "mail@devope.ru"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {}
+}
