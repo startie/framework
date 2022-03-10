@@ -1,11 +1,12 @@
 <?php
 
-class Errors 
+namespace Startie;
+
+class Errors
 {
     public static function init()
     {
-        if(Access::is('developers') || Access::is('admins'))
-        {
+        if (Access::is('developers') || Access::is('admins')) {
             # Report all PHP errors
             error_reporting(E_ALL);
 
@@ -33,11 +34,10 @@ class Errors
     #   @param int $errline номер строки, в которой произошла ошибка
     #   @return boolean
     #
-   
+
     public static function errorHandler($errno, $errstr, $errfile, $errline)
     {
-        if (error_reporting() & $errno)
-        {
+        if (error_reporting() & $errno) {
             $errors = array(
                 E_ERROR => 'E_ERROR',
                 E_WARNING => 'E_WARNING',
@@ -59,7 +59,7 @@ class Errors
             # Make own error message
             $errurl = $_SERVER['SCRIPT_NAME'] . "?" . $_SERVER['QUERY_STRING'];
 
-            if(!is_int($errline)){
+            if (!is_int($errline)) {
                 $errline = 0;
             };
 
@@ -68,19 +68,19 @@ class Errors
 
             $appLogId = AppLogs::create([
                 'insert' => [
-                  ['createdAt', '`UTC_TIMESTAMP()`'],
-                  ['UserId', $CurrentUserId, 'INT'],
-                  ['line', $errline, 'INT'],
-                  ['file', $errfile, 'STR'],
-                  ['url', $errurl, 'STR'],
-                  ['message', $errors[$errno] . ': ' . $errstr, 'STR'],
-                  ['type', 'errors', 'STR'],
-                  ['object', 'php', 'STR'],
+                    ['createdAt', '`UTC_TIMESTAMP()`'],
+                    ['UserId', $CurrentUserId, 'INT'],
+                    ['line', $errline, 'INT'],
+                    ['file', $errfile, 'STR'],
+                    ['url', $errurl, 'STR'],
+                    ['message', $errors[$errno] . ': ' . $errstr, 'STR'],
+                    ['type', 'errors', 'STR'],
+                    ['object', 'php', 'STR'],
                 ]
             ]);
 
             return $appLogId;
-        } 
+        }
 
         # Do not run internal PHP errors handler
         return true;
@@ -89,21 +89,19 @@ class Errors
     public static function shutdownFunction()
     {
         # If there was an error and it was fatal
-        if ($error = error_get_last() AND $error['type'] & ( E_ERROR | E_PARSE | E_COMPILE_ERROR | E_CORE_ERROR))
-        
-        {
+        if ($error = error_get_last() and $error['type'] & (E_ERROR | E_PARSE | E_COMPILE_ERROR | E_CORE_ERROR)) {
             # Clean buffer & don't show default error message
             ob_end_clean();
 
             # Forming error message
-            if (Config::$stage == 'PRODUCTION' && $_ENV['MODE_DEV'] == 0){
+            if (Config::$stage == 'PRODUCTION' && $_ENV['MODE_DEV'] == 0) {
                 $msg = "Send your administrator url of this page ";
             } else {
                 $msg = "<br> " . $error['message'] . " " . $error['file'] . " [" . $error['line'] . "]";
             }
 
             # Show error message
-            if($_ENV['MODE_DEV']){
+            if ($_ENV['MODE_DEV']) {
                 echo "
                 <div style='margin: 50px'>
                     <h3 style='font-family: Arial;'>Error</h3>
@@ -117,11 +115,7 @@ class Errors
                     echo "<div style='text-align: center; font-family: Arial; position: absolute;'><h3>Error</h3> Undefined</div>";
                 }
             }
-        }
-        
-        else
-        
-        {
+        } else {
             # Send & turn off the buffer
             ob_end_flush();
         }
