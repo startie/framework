@@ -1,5 +1,7 @@
 <?php
 
+namespace Startie;
+
 class Favicon
 {
 	public static function href($filename)

@@ -1,5 +1,7 @@
 <?php
 
+namespace Startie;
+
 class Model
 {
 	#
@@ -7,7 +9,7 @@ class Model
 	#		VARS
 	#
 	#
-	
+
 	public static $testModeMessage = "Test mode: no write to db";
 	public static $excludeFunctions;
 
@@ -15,7 +17,7 @@ class Model
 	{
 		$envindex = 'DB_EXCLUDE_FUNCTIONS';
 
-		if($_ENV[$envindex]){
+		if ($_ENV[$envindex]) {
 			self::$excludeFunctions = explode(",", $_ENV[$envindex]);
 		}
 	}
@@ -25,16 +27,16 @@ class Model
 	#		CORE
 	#
 	#
-	
+
 	#
 	#	Description:
 	# 	returns INT – id of created row
-	
+
 	public static function create($p)
-	{		
+	{
 		#
 		#	Vars
-		
+
 		$debug = 0;
 		$die = 0;
 		$test = 0;
@@ -46,7 +48,7 @@ class Model
 
 		#
 		#	Form
-		
+
 		$sql = "";
 		$sql .= " INSERT INTO ";
 		$sql .= get_called_class();
@@ -54,15 +56,14 @@ class Model
 
 		#
 		#	Debug
-		
+
 		Db::debug($debug, "Debugging '" . get_called_class() . "' model");
 		Db::debugStart($debug, $p);
 
 		#
 		#	State
-		 
-		try
-		{	
+
+		try {
 			#
 			#	Prepare
 
@@ -72,41 +73,39 @@ class Model
 			#	Bind
 
 			Model::bindInsert($sth, $sql, $insert);
-			
+
 			#
 			#	Debug
 
 			Db::debugContinue($debug, $sth);
 			Db::debugEnd($debug, $sql);
-			if($test){
+			if ($test) {
 				Dump::e("Test mode (create): no write to db");
 			}
 
 			#
 			#	Execute
-			
-			if($die) die();
-			if(!$test){
+
+			if ($die) die();
+			if (!$test) {
 				$sth->execute();
 				$lastInsertedId = DB::$h->lastInsertId();
 				return $lastInsertedId;
 			}
-		} 
-		
-		catch (PDOException $e) {	
+		} catch (PDOException $e) {
 			AppLogs::generateFromPdoException($e);
-		} 
+		}
 	}
 
 	#
 	#	Description:
 	# 	returns ARRAY – array of arrays (entities)
-	
+
 	public static function read($p = [])
 	{
 		#
 		#	Vars
-		
+
 		$select = ['*'];
 		$from = get_called_class();
 		$debug = 0;
@@ -118,7 +117,7 @@ class Model
 
 		#
 		#	Form
-		
+
 		$sql = "\n";
 		Model::__select($sql, $select);
 		Model::__from($sql, $from);
@@ -130,14 +129,14 @@ class Model
 		Model::__limit($sql, $limit);
 		Model::__offset($sql, $offset);
 		$sql .= "";
-		
+
 		#
 		#	Exclude functions
 
 		# Env settings
-		if(self::$excludeFunctions){
+		if (self::$excludeFunctions) {
 			# Param
-			if($excludeFunctions){
+			if ($excludeFunctions) {
 				#Dump::make($sql);
 				foreach (self::$excludeFunctions as $excludeFunction) {
 					$sql = str_replace($excludeFunction, "", $sql);
@@ -148,15 +147,14 @@ class Model
 
 		#
 		#	Debug
-		
+
 		Db::debug($debug, "Debugging '" . get_called_class() . "' model");
 		Db::debugStart($debug, $p);
 
-		try	
-		{	
+		try {
 			#
 			#	Prepare
-			
+
 			$sth = DB::$h->prepare($sql);
 
 			#
@@ -170,24 +168,20 @@ class Model
 
 			Db::debugContinue($debug, $sth);
 			Db::debugEnd($debug, $sql);
-			if($test) {
+			if ($test) {
 				Dump::e("Test mode (read): no write to db");
 			}
 
 			#
 			#	Execute
-				
-			if($die) die();
-			if(!$test){
+
+			if ($die) die();
+			if (!$test) {
 				$sth->execute();
 				$result = $sth->fetchAll(PDO::FETCH_ASSOC);
-				return $result;	
-			} 
-			
-		} 
-		
-		catch (PDOException $e)
-		{	
+				return $result;
+			}
+		} catch (PDOException $e) {
 			AppLogs::generateFromPdoException($e);
 		}
 	}
@@ -195,7 +189,7 @@ class Model
 	#
 	#	Description:
 	#	returns INT – count of affected rows
-	
+
 	public static function update($p)
 	{
 		#
@@ -209,15 +203,15 @@ class Model
 
 		#
 		#	Checks
-		
-		if(!isset($where)){
+
+		if (!isset($where)) {
 			Dump::made("Dangerous: no where for update");
 			die();
 		}
 
 		#
 		#	Form
-				
+
 		$sql = "";
 		$sql .= " UPDATE " . get_called_class();
 		Model::_set($sql, $set);
@@ -225,23 +219,22 @@ class Model
 
 		#
 		#	Debug
-		
+
 		Db::debug($debug, "Debugging '" . get_called_class() . "' model");
 		Db::debugStart($debug, $p);
 
 		#
 		#	State
 
-		try 
-		{	
+		try {
 			#
 			#	Prepare
-				
+
 			$sth = DB::$h->prepare($sql);
 
 			#
 			#	Bind
-			
+
 			Model::bindSet($sth, $sql, $set);
 			Model::bindClause($sth, $sql, $where);
 			Model::bindClause($sth, $sql, $having);
@@ -251,23 +244,20 @@ class Model
 
 			Db::debugContinue($debug, $sth);
 			Db::debugEnd($debug, $sql);
-			if($test){
+			if ($test) {
 				Dump::e("Test mode (update): no write to db");
 			}
 
 			#
 			#	Execute
 
-			if($die) die();
-			if(!$test){
+			if ($die) die();
+			if (!$test) {
 				$sth->execute();
 				$affectedRowsCount = $sth->rowCount();
 				return $affectedRowsCount;
-			} 
-		} 
-		
-		catch (PDOException $e) 
-		{	
+			}
+		} catch (PDOException $e) {
 			AppLogs::generateFromPdoException($e);
 		}
 	}
@@ -275,12 +265,12 @@ class Model
 	#
 	#	Description:
 	#	returns INT – count of affected rows
-	
+
 	public static function delete($p)
 	{
 		#
 		#	Vars
-		
+
 		$debug = 0;
 		$die = 0;
 		$test = 0;
@@ -289,25 +279,24 @@ class Model
 
 		#
 		#	Form
-		
+
 		$sql = "";
 		$sql .= "\nDELETE\nFROM " . get_called_class() . " \n";
 		Model::__where($sql, $where);
 
 		#
 		#	Debug
-		
+
 		Db::debug($debug, "Debugging '" . get_called_class() . "' model");
 		Db::debugStart($debug, $p);
 
 		#
 		#	State
 
-		try 
-		{	
+		try {
 			#
 			#	Prepare
-				
+
 			$sth = DB::$h->prepare($sql);
 
 			#
@@ -320,23 +309,20 @@ class Model
 
 			Db::debugContinue($debug, $sth);
 			Db::debugEnd($debug, $sql);
-			if($test) {
+			if ($test) {
 				Dump::e("Test mode (delete): no write to db");
 			}
 
 			#
 			#	Execute
-			
-			if($die) die();
-			if(!$test){
+
+			if ($die) die();
+			if (!$test) {
 				$sth->execute();
 				$affectedRowsCount = $sth->rowCount();
 				return $affectedRowsCount;
 			}
-		} 
-		
-		catch (PDOException $e) 
-		{	
+		} catch (PDOException $e) {
 			AppLogs::generateFromPdoException($e);
 		}
 	}
@@ -350,12 +336,12 @@ class Model
 	#
 	#	Description:
 	# 	returns INT – sum count
-	
+
 	public static function count($p, $customSelect = null)
 	{
 		#
 		#	Vars
-		
+
 		$select = ['*'];
 		$from = get_called_class();
 		$debug = 0;
@@ -369,7 +355,7 @@ class Model
 
 		$sql = "\n\n";
 		$sql .= " SELECT ";
-		if($customSelect){
+		if ($customSelect) {
 			#Dump::made($customSelect);
 			$sql .= "count($customSelect) as count";
 		} else {
@@ -385,59 +371,54 @@ class Model
 		Model::__limit($sql, $limit);
 		Model::__offset($sql, $offset);
 		$sql .= "\n";
-		
+
 		#
 		#	Debug
-		
+
 		Db::debug($debug, "Debugging '" . get_called_class() . "' model");
 		Db::debugStart($debug, $p);
-		
+
 		#
 		#	State
-		
-		try	
-		{	
+
+		try {
 			#
 			#	Prepare
-				
+
 			$sth = DB::$h->prepare($sql);
 
 			#
 			#	Bind
-			
+
 			Model::bindClause($sth, $sql, $where);
-			
+
 			#
 			#	Debug
 
 			Db::debugContinue($debug, $sth);
 			Db::debugEnd($debug, $sql);
-			if($test) {
+			if ($test) {
 				Dump::e("Test mode (count): no write to db");
 			}
 
 			#
 			#	Execute
-			
-			if($die) die();
-			if(!$test)
-			{
+
+			if ($die) die();
+			if (!$test) {
 				$sth->execute();
 				$result = $sth->fetchAll(PDO::FETCH_ASSOC);
-				if(!$result){
+				if (!$result) {
 					return 0;
 				} else {
 					return $result[0]["count"];
 				}
-			}			
-		} 
-		
-		catch (PDOException $e) 
-		{	
+			}
+		} catch (PDOException $e) {
 			AppLogs::generateFromPdoException($e);
 		}
 	}
-	
+
 	#
 	#	Description:
 	# 	returns BOOLEAN – exists entity with param or not
@@ -446,7 +427,7 @@ class Model
 	{
 		#
 		#	Vars
-		
+
 		$select = ['*'];
 		$from = get_called_class();
 		$debug = 0;
@@ -457,7 +438,7 @@ class Model
 
 		#
 		#	Form
-		
+
 		$sql = "\n\n";
 		$sql .= " SELECT ";
 		$sql .= "count(*)";
@@ -471,26 +452,25 @@ class Model
 		Model::__limit($sql, $limit);
 		Model::__offset($sql, $offset);
 		$sql .= "";
-		
+
 		#
 		#	Debug
-		
+
 		Db::debug($debug, "Debugging '" . get_called_class() . "' model");
 		Db::debugStart($debug, $p);
-		
+
 		#
 		#	State
-		
-		try	
-		{	
+
+		try {
 			#
 			#	Prepare
-				
+
 			$sth = DB::$h->prepare($sql);
 
 			#
 			#	Bind
-			
+
 			Model::bindClause($sth, $sql, $where);
 
 			#
@@ -499,29 +479,24 @@ class Model
 
 			Db::debugContinue($debug, $sth);
 			Db::debugEnd($debug, $sql);
-			if($test){
+			if ($test) {
 				Dump::e("Test mode (is): no write to db");
 			}
-		
+
 			#
 			#	Execute
-				
-			if($die) die();
-			if(!$test)
-			{
- 				$sth->execute();
+
+			if ($die) die();
+			if (!$test) {
+				$sth->execute();
 				$result = $sth->fetchAll(PDO::FETCH_ASSOC);
-				if($result[0]["count(*)"]){
-					return true;	
+				if ($result[0]["count(*)"]) {
+					return true;
 				} else {
-					return false;	
+					return false;
 				}
 			}
-			
-		} 
-		
-		catch (PDOException $e) 
-		{	
+		} catch (PDOException $e) {
 			AppLogs::generateFromPdoException($e);
 		}
 	}
@@ -531,7 +506,7 @@ class Model
 	#		SHORTCUTS
 	#
 	#
-	
+
 	public static function id($id, $debug = 0)
 	{
 		return self::read([
@@ -550,9 +525,9 @@ class Model
 	#	], 
 
 	public static function field(
-		$where, 
-		$options = ['limit' => 1, 'debug' => 0, 'die' => 0, 'test' => 0])
-	{
+		$where,
+		$options = ['limit' => 1, 'debug' => 0, 'die' => 0, 'test' => 0]
+	) {
 		extract($options);
 
 		$result = self::read([
@@ -563,7 +538,7 @@ class Model
 			'test' => $test,
 		]);
 
-		if(count($result) == 1 && $limit == 1){
+		if (count($result) == 1 && $limit == 1) {
 			return $result[0];
 		} else {
 			return $result;
@@ -593,34 +568,33 @@ class Model
 		# Получаем конфиг типов данных из текущей модели
 		$types = static::$types;
 
-		foreach (array_keys($_POST) as $i => $var) 
-		{
+		foreach (array_keys($_POST) as $i => $var) {
 			# Если данная переменная есть в исключениях использовать её значение из исключения, иначе из POST
 			$value = (!empty($exceptions[$var])) ? $exceptions[$var] : $_POST[$var];
-			
+
 			# Получаем тип данных у переменной
 			$fieldType = NULL;
 			foreach ($types as $type => $fields) {
 				foreach ($fields as $i => $field) {
-					if($var == $field) $fieldType = $type;
+					if ($var == $field) $fieldType = $type;
 				}
 			}
 
-			if(empty($fieldType)){
+			if (empty($fieldType)) {
 				foreach ($types as $type => $fields) {
 					foreach ($fields as $i => $field) {
-						if($field == "*") $fieldType = $type;
+						if ($field == "*") $fieldType = $type;
 					}
 				}
 			}
 
 			# Обрабатываем checkbox
-			if($value == "on" && $fieldType == "INT"){
+			if ($value == "on" && $fieldType == "INT") {
 				$value = 1;
 			}
 
 			# Обрабатываем пустую строку, которая должна быть числом
-			if($value == "" && $fieldType == "INT"){
+			if ($value == "" && $fieldType == "INT") {
 				$value = NULL;
 			}
 
@@ -637,22 +611,20 @@ class Model
 		# ]
 		# 
 		# Подойдёт для вставки в методы create и update
-		
+
 		return $rows;
 	}
 
 	public static function wherify($final, $source, $configs)
 	{
-		if(isset($source))
-		{
-			foreach ($configs as $c => $config) 
-			{				
+		if (isset($source)) {
+			foreach ($configs as $c => $config) {
 				$field = $config[0];
 				$index = $config[1];
 				$type = $config[2];
 				$value = $source[$index];
 
-				if(isset($value) && $value != ""){
+				if (isset($value) && $value != "") {
 					$final[$field] = [[$value, $type]];
 				}
 			}
@@ -665,11 +637,10 @@ class Model
 	#	Description:
 	#	check if there is value in $global with $g(index)
 	#	then add this value to $where with $w(index)
-	
+
 	public static function isWhereInput($where, $global, $type, $gindex, $windex)
 	{
-		if(Input::is($global, $gindex))
-		{
+		if (Input::is($global, $gindex)) {
 			$global = strtolower($global);
 			$where[$windex] = [
 				[call_user_func('Input::' . $global, $gindex, $type), $type]
@@ -682,11 +653,9 @@ class Model
 	{
 		$fieldsNeeded = [];
 
-		foreach ($selectFields as $fieldExpr) 
-		{
+		foreach ($selectFields as $fieldExpr) {
 			$isNeeded = strpos($fieldExpr, ucfirst($table) . ".");
-			if($isNeeded === 0 || $isNeeded > 0)
-			{
+			if ($isNeeded === 0 || $isNeeded > 0) {
 				$pattern = "/[\S\s]*" . $table . "\.[\S\s]*as /";
 				$fieldExpr = preg_replace($pattern, "", $fieldExpr);
 				$pattern = "/[\s]/";
@@ -700,8 +669,7 @@ class Model
 
 		$newEntity = [];
 
-		foreach ($fieldsNeeded as &$fieldName) 
-		{
+		foreach ($fieldsNeeded as &$fieldName) {
 			$newEntity[$fieldName] = $e[$fieldName];
 		}
 
@@ -727,7 +695,7 @@ class Model
 	#		FORM HELPERS
 	#
 	#
-	
+
 	public static function __select(&$sql, $select)
 	{
 		$sql .= " ";
@@ -753,10 +721,9 @@ class Model
 	public static function __join(&$sql, $join)
 	{
 		$sql .= " ";
-		if(isset($join)){
-			foreach ($join as $tableName => $joinParams)
-			{
-				if($joinParams[2]){
+		if (isset($join)) {
+			foreach ($join as $tableName => $joinParams) {
+				if ($joinParams[2]) {
 					$joinType = strtoupper($joinParams[2]);
 				} else {
 					$joinType = "INNER";
@@ -778,66 +745,68 @@ class Model
 		$sql .= "{$type} \t 1 = 1 ";
 		$sql .= "\n";
 
-		if(isset($params))
-		{
-			foreach ($params as $columnName => $columnValuesArr) 
-			{
+		if (isset($params)) {
+			foreach ($params as $columnName => $columnValuesArr) {
 				$sql .= "\t AND ( ";
-				foreach ($columnValuesArr as $i => $columnValueData) 
-				{
+				foreach ($columnValuesArr as $i => $columnValueData) {
 					# $columnValueData[0] == sign + value (sv)
 					# $columnValueData[1] == type (t)
-							 
+
 					# Get sign
 					$signHolder = $columnValueData[0];
-					if 		(strpos($signHolder, '<=') !== false) 	{ $sign = '<='; }
-					else if (strpos($signHolder, '>=') !== false) 	{ $sign = '>='; }
-					else if (strpos($signHolder, '<') !== false) 	{ $sign = '<';  }
-					else if (strpos($signHolder, '>') !== false) 	{ $sign = '>';  } 
-					else if (strpos($signHolder, '!') !== false) 	{ $sign = '<>';  } 
-					else if (strpos($signHolder, '=') !== false) 	{ $sign = '=';  }
-					else 											{ $sign = '=';  };
+					if (strpos($signHolder, '<=') !== false) {
+						$sign = '<=';
+					} else if (strpos($signHolder, '>=') !== false) {
+						$sign = '>=';
+					} else if (strpos($signHolder, '<') !== false) {
+						$sign = '<';
+					} else if (strpos($signHolder, '>') !== false) {
+						$sign = '>';
+					} else if (strpos($signHolder, '!') !== false) {
+						$sign = '<>';
+					} else if (strpos($signHolder, '=') !== false) {
+						$sign = '=';
+					} else {
+						$sign = '=';
+					};
 
 					# A. With backticks – do not make binding
-					if (strpos($columnValueData[0], '`') !== false)
-					{
+					if (strpos($columnValueData[0], '`') !== false) {
 						#Dump::make($sign);
 						# Delete backticks
 						$v = preg_replace('/`/', '', $columnValueData[0]);
 						# A. When has LIKE, REGEXP, IN, IS NULL, IS NOT NULL
-						if(
-							strrpos($v, 'LIKE') !== false || 
-							strrpos($v, 'REGEXP') !== false || 
+						if (
+							strrpos($v, 'LIKE') !== false ||
+							strrpos($v, 'REGEXP') !== false ||
 							strrpos($v, 'IN') !== false ||
-							strrpos($v, 'IS NULL') !== false || 
+							strrpos($v, 'IS NULL') !== false ||
 							strrpos($v, 'IS NOT NULL') !== false ||
 							$v == ''
-						){
+						) {
 							$sql .=  $columnName . " " . $v;
 							$sql .= " OR ";
-						} 
+						}
 
 						# B. When has not 
 						else {
 
 							# C. When with > or < 
-							if(strpos($v, '<') !== false || strpos($v, '>') !== false){
+							if (strpos($v, '<') !== false || strpos($v, '>') !== false) {
 								$sql .=  "$columnName $v";
 								$sql .= " OR ";
-							} 
+							}
 
 							# D. When without > or < 
 							else {
-								$sql .=  $columnName . " = ". $v;
+								$sql .=  $columnName . " = " . $v;
 								$sql .= " OR ";
 							}
-							
 						}
 					}
 
 					# B. Without backticks – make binding
-					else 
-					{
+					else {
 						#Dump::make($sign . "mb");
 						# Если наша колонка будет указана с именеем таблицы через точку, то точка помешает, её и удаляем
 						$filteredColumnName = str_replace('.', '', $columnName);
@@ -848,7 +817,6 @@ class Model
 						#Dump::make($sign);
 						#Dump::make("':$filteredColumnName$i' is waiting for bind...\n");
 					}
-
 				}
 				# Delete trailing "OR ("
 				$sql = substr($sql, 0, -4);
@@ -859,13 +827,19 @@ class Model
 		$sql .= " ";
 	}
 
-	public static function __where(&$sql, $params){ return self::__clause($sql, $params, "WHERE"); }
-	public static function __having(&$sql, $params){ return self::__clause($sql, $params, "HAVING"); }
+	public static function __where(&$sql, $params)
+	{
+		return self::__clause($sql, $params, "WHERE");
+	}
+	public static function __having(&$sql, $params)
+	{
+		return self::__clause($sql, $params, "HAVING");
+	}
 
 	public static function __group(&$sql, $group)
 	{
-		if(isset($group) && !empty($group)){
-			
+		if (isset($group) && !empty($group)) {
+
 			$sql .= "\n";
 			$sql .= "GROUP BY";
 
@@ -879,8 +853,8 @@ class Model
 
 	public static function __order(&$sql, $order)
 	{
-		if(isset($order)){
-			
+		if (isset($order)) {
+
 			$sql .= "\n";
 			$sql .= "ORDER BY";
 
@@ -894,7 +868,7 @@ class Model
 
 	public static function __limit(&$sql, $limit)
 	{
-		if(isset($limit)){
+		if (isset($limit)) {
 			$sql .= "\n";
 			$sql .= "LIMIT  " . $limit . " ";
 			$sql .= "\n\n";
@@ -903,7 +877,7 @@ class Model
 
 	public static function __offset(&$sql, $offset)
 	{
-		if(isset($offset)){
+		if (isset($offset)) {
 			$sql .= "\n";
 			$sql .= "OFFSET  " . $offset . " ";
 			$sql .= "\n\n";
@@ -914,15 +888,13 @@ class Model
 	{
 		$sql .= " ";
 		$sql .= "SET ";
-		foreach ($set as $i => $data) 
-		{
+		foreach ($set as $i => $data) {
 			$col = $data[0];
 			$val = $data[1];
 			$type = $data[2];
-					
+
 			# With backticks
-			if (Schema::hasBt($val)) 
-			{
+			if (Schema::hasBt($val)) {
 				# delete backticks
 				$valClean = preg_replace('/`/', '', $val);
 
@@ -932,8 +904,7 @@ class Model
 			}
 
 			# Without backticks
-			else 
-			{
+			else {
 				$sql .= "{$col} = :{$col}{$i}";
 				$sql .= ",";
 				$sql .= " "; # required
@@ -943,13 +914,12 @@ class Model
 	}
 
 	public static function __insert(&$sql, $insert)
-	{	
+	{
 		#
 		# 	Fields
-		
+
 		$sql .= " ( ";
-		foreach ($insert as $insertArr) 
-		{	
+		foreach ($insert as $insertArr) {
 			$col = $insertArr[0];
 			$sql .= "`{$col}`";
 			$sql .= ",";
@@ -960,30 +930,27 @@ class Model
 
 		#
 		# 	Values
-		
+
 		$sql .= " VALUES ";
 		$sql .= " ( ";
 
-		foreach ($insert as $data)
-		{
+		foreach ($insert as $data) {
 			$col = $data[0];
 			$val = $data[1];
 			$type = $data[2];
-			
+
 			# With backticks
-			if (Schema::hasBt($val)) 
-			{
+			if (Schema::hasBt($val)) {
 				# delete backticks
 				$valClean = preg_replace('/`/', '', $val);
 
 				$sql .= " {$valClean}";
 				$sql .= ",";
 				$sql .= " "; # required
-			} 
+			}
 
 			# Without backticks
-			else 
-			{
+			else {
 				$sql .= " :{$col}";
 				$sql .= ",";
 				$sql .= " "; # required
@@ -998,33 +965,29 @@ class Model
 	#		BIND HELPERS
 	#
 	#
-	
+
 	public static function bindSet(&$sth, &$sql, $set)
 	{
-		if(isset($set))
-		{
-			foreach ($set as $i => &$data)
-			{
-				$col = $data[0]; 
-				$val = $data[1]; 
+		if (isset($set)) {
+			foreach ($set as $i => &$data) {
+				$col = $data[0];
+				$val = $data[1];
 				$type = $data[2];
 				$bindExpr = ":{$col}{$i}";
 
 				#
 				# 	With backticks
-				
-				if (Schema::hasBt($val)) 
-				{
+
+				if (Schema::hasBt($val)) {
 					# do nothing
 				}
 
 				#
 				# 	Without backticks
-				
-				else 
-				{
+
+				else {
 					# bind type
-					if($type){
+					if ($type) {
 						$typeConst = constant('PDO::PARAM_' . mb_strtoupper($type));
 						$sth->bindValue($bindExpr, $val, $typeConst);
 					} else {
@@ -1034,18 +997,16 @@ class Model
 
 				#
 				# 	Replace placeholders for debugging
-				
-				$sql = str_replace($bindExpr, '"'.$val.'"', $sql);
+
+				$sql = str_replace($bindExpr, '"' . $val . '"', $sql);
 			}
-		}	
+		}
 	}
 
 	public static function bindInsert(&$sth, &$sql, $insert)
 	{
-		if(isset($insert))
-		{
-			foreach ($insert as $i => $data) 
-			{				
+		if (isset($insert)) {
+			foreach ($insert as $i => $data) {
 				$col = $data[0];
 				$val = $data[1];
 				$type = $data[2];
@@ -1053,17 +1014,16 @@ class Model
 
 				#
 				# 	With backticks
-				
-				if (Schema::hasBt($val)) 
-				{
+
+				if (Schema::hasBt($val)) {
 					# do nothing
 				}
 
 				#
 				# 	Without backticks
-				
+
 				else {
-					if($type){
+					if ($type) {
 						$typeConst = constant('PDO::PARAM_' . mb_strtoupper($type));
 						$sth->bindValue($bindExpr, $val, $typeConst);
 					} else {
@@ -1073,8 +1033,8 @@ class Model
 
 				#
 				# 	Replace placeholders for debugging
-				
-				$sql = str_replace($bindExpr, '"'.$val.'"', $sql);
+
+				$sql = str_replace($bindExpr, '"' . $val . '"', $sql);
 			}
 		}
 	}
@@ -1082,50 +1042,43 @@ class Model
 	# for 'where' and 'having'
 	public static function bindClause(&$sth, &$sql, $where)
 	{
-		if(isset($where))
-		{
-			foreach ($where as $columnName => $columnValuesArr)
-			{
-				foreach ($columnValuesArr as $i => $data) 
-				{
+		if (isset($where)) {
+			foreach ($where as $columnName => $columnValuesArr) {
+				foreach ($columnValuesArr as $i => $data) {
 					$signAndValue = $data[0];
 					$type = $data[1];
 
 					# If we have type
-					if(isset($type))
-					{
+					if (isset($type)) {
 						$valFiltered = preg_replace('/[><=!]/i', '', $signAndValue);
 						#Dump::make("Have type. Value will be = $valFiltered");
 						#echo ':' . $columnName . $i . "\n"; 
-						
+
 						$filteredColumnName = str_replace('.', '', $columnName);
 						$typeConst = constant('PDO::PARAM_' . mb_strtoupper($type));
 						$sth->bindValue(":{$filteredColumnName}{$i}", $valFiltered, $typeConst);
 						#Dump::make("':$filteredColumnName$i' binded with $valFiltered \n");
-						
+
 						# Replace placeholders for debugging
 						$needle = ":{$filteredColumnName}{$i}";
-						$replace = '"'.$valFiltered.'"';
+						$replace = '"' . $valFiltered . '"';
 						$pos = strpos($sql, $needle);
 						if ($pos !== false) {
-						    $sql = substr_replace($sql, $replace, $pos, strlen($needle));
+							$sql = substr_replace($sql, $replace, $pos, strlen($needle));
 						}
-
-					} 
+					}
 
 					# If we don't have type
-					else 
-					{
+					else {
 						# Если есть бэктиксы
 						# - to support `< UNIX_TIMESTAMP()`
-						if(Schema::hasBt($signAndValue)){
-							break(1);
+						if (Schema::hasBt($signAndValue)) {
+							break (1);
 						}
 
 						# Если нет ни LIKE ни бэктиксов одновременно
 						# - to support IS NULL
-						if(strrpos($signAndValue, 'LIKE') === false && strpos($signAndValue, '`') === false)
-						{
+						if (strrpos($signAndValue, 'LIKE') === false && strpos($signAndValue, '`') === false) {
 							# Work
 							$valFiltered = ltrim(preg_replace('/[><=!]/i', '', $signAndValue));
 							$filteredColumnName = str_replace('.', '', $columnName);
@@ -1133,17 +1086,16 @@ class Model
 							$sth->bindValue(":{$filteredColumnName}{$i}", $valFiltered);
 							#Dump::make("Column will be = :$filteredColumnName$i");
 							#die();		
-							
+
 							# Replace placeholders for debugging
 							$needle = ":{$filteredColumnName}{$i}";
-							$replace = '"'.$valFiltered.'"';
+							$replace = '"' . $valFiltered . '"';
 							$pos = strpos($sql, $needle);
 							if ($pos !== false) {
-							    $sql = substr_replace($sql, $replace, $pos, strlen($needle));
-							}							
+								$sql = substr_replace($sql, $replace, $pos, strlen($needle));
+							}
 						}
 					}
-
 				}
 			}
 		}

@@ -1,40 +1,45 @@
 <?php
 
-class Dump 
-{	   
+namespace Startie;
+
+class Dump
+{
     public static function checkAccess()
     {
-    	return Access::is('developers') || $_ENV['MODE_DEV'];
+        return Access::is('developers') || $_ENV['MODE_DEV'];
     }
-    
-    public static function e($var){
-    	echo "<pre>";
-		echo $var;
-		echo "</pre>";
+
+    public static function e($var)
+    {
+        echo "<pre>";
+        echo $var;
+        echo "</pre>";
     }
 
     #
     #   For JS network console
     #
-    
-    public static function __pre($var, $msg="")
+
+    public static function __pre($var, $msg = "")
     {
-        if( Dump::checkAccess() ){
+        if (Dump::checkAccess()) {
             var_dump($var);
             echo $msg . "\n";
         }
     }
 
-    public static function __make($result, $die=0, $msg="", $trace=0)
+    public static function __make($result, $die = 0, $msg = "", $trace = 0)
     {
-        if( Dump::checkAccess() ){
-            Dump::__pre($result, $msg . $backTrace);
-            if($trace){Dump::pre(debug_backtrace());}
-            if($die) die();
+        if (Dump::checkAccess()) {
+            Dump::__pre($result, $msg);
+            if ($trace) {
+                Dump::pre(debug_backtrace());
+            }
+            if ($die) die();
         }
     }
 
-    public static function __made($result, $msg="", $trace=0)
+    public static function __made($result, $msg = "", $trace = 0)
     {
         Dump::__make($result, 1, $msg, $trace);
         die();
@@ -43,10 +48,10 @@ class Dump
     #
     #   For simple debug
     #
-    
-    public static function _pre($var, $msg="")
+
+    public static function _pre($var, $msg = "")
     {
-        if( Dump::checkAccess() ){
+        if (Dump::checkAccess()) {
             echo "<pre>";
             echo $msg . "\n";
             var_dump($var);
@@ -54,7 +59,7 @@ class Dump
         }
     }
 
-    public static function _make($result, $die=0, $msg="", $trace=0)
+    public static function _make($result, $die = 0, $msg = "", $trace = 0)
     {
         $backTrace = "";
         $backTrace .= "<mark>";
@@ -63,14 +68,16 @@ class Dump
         $backTrace .= "</mark>";
         $backTrace .= "<br>";
 
-        if( Dump::checkAccess() ){
+        if (Dump::checkAccess()) {
             Dump::_pre($result, $msg . $backTrace);
-            if($trace){Dump::pre(debug_backtrace());}
-            if($die) die();
+            if ($trace) {
+                Dump::pre(debug_backtrace());
+            }
+            if ($die) die();
         }
     }
 
-    public static function _made($result, $msg="", $trace=0)
+    public static function _made($result, $msg = "", $trace = 0)
     {
         Dump::_make($result, 1, $msg, $trace);
         die();
@@ -79,10 +86,10 @@ class Dump
     #
     #   For complex debug
     #
-    
-    public static function pre($var, $msg="")
+
+    public static function pre($var, $msg = "")
     {
-        if( Dump::checkAccess() ){
+        if (Dump::checkAccess()) {
             echo "<pre>";
             echo $msg . "\n";
             self::var_dump($var);
@@ -90,19 +97,17 @@ class Dump
         }
     }
 
-	public static function make($result, $die=0, $msg="", $trace=0)
-	{
+    public static function make($result, $die = 0, $msg = "", $trace = 0)
+    {
         $backTrace = "";
         $backTrace .= "<mark>";
 
         $backTraceArr = debug_backtrace();
         $backTraceArr = array_reverse($backTraceArr);
-        for ($i=0; $i < count($backTraceArr); $i++) 
-        { 
-            if(
+        for ($i = 0; $i < count($backTraceArr); $i++) {
+            if (
                 strpos($backTraceArr[$i]['file'], "Framework/Core/Dump") === false
-            )
-            {
+            ) {
                 $line = $backTraceArr[$i]['line'];
                 $file = $backTraceArr[$i]['file'];
                 $backTrace .= "[$line]";
@@ -110,55 +115,57 @@ class Dump
             }
         }
 
-		$backTrace .= "</mark>";
+        $backTrace .= "</mark>";
 
-		if( Dump::checkAccess() ){
-			Dump::pre($result, $msg . $backTrace);
-            if($trace){Dump::pre(debug_backtrace());}
-			if($die) die();
-		}
-	}
+        if (Dump::checkAccess()) {
+            Dump::pre($result, $msg . $backTrace);
+            if ($trace) {
+                Dump::pre(debug_backtrace());
+            }
+            if ($die) die();
+        }
+    }
 
-	public static function made($result, $msg="", $trace=0)
-	{
-		Dump::make($result, 1, $msg, $trace);
+    public static function made($result, $msg = "", $trace = 0)
+    {
+        Dump::make($result, 1, $msg, $trace);
         die();
-	}
+    }
 
-	public static function start($var)
-	{
-		if( Dump::checkAccess() ){
-			echo "<pre>";
-			self::var_dump($var);
-			echo "<br>";
-		}
-	}
+    public static function start($var)
+    {
+        if (Dump::checkAccess()) {
+            echo "<pre>";
+            self::var_dump($var);
+            echo "<br>";
+        }
+    }
 
-	public static function next($var)
-	{
-		if( Dump::checkAccess() ){
-			self::var_dump($var);
-			echo "<br>";
-		}
-	}
+    public static function next($var)
+    {
+        if (Dump::checkAccess()) {
+            self::var_dump($var);
+            echo "<br>";
+        }
+    }
 
-	public static function end($var)
-	{
-		if(Dump::checkAccess()){
-			self::var_dump($var);
-			echo "</pre>";
-		}
-	}
+    public static function end($var)
+    {
+        if (Dump::checkAccess()) {
+            self::var_dump($var);
+            echo "</pre>";
+        }
+    }
 
     #
     #   Complex core
     #
 
-	public static function var_dump($var, $return = false, $expandLevel = 1)
+    public static function var_dump($var, $return = false, $expandLevel = 1)
     {
         self::$hasArray = false;
-        $toggScript = 
-        '
+        $toggScript =
+            '
             var colToggle = function(toggID) 
             {
                 var img = document.getElementById(toggID);
@@ -198,8 +205,8 @@ class Dump
                 };
         ';
 
-        $imgScript = 
-        '
+        $imgScript =
+            '
             var setImg = function(objID,imgID,addStyle) {
                 var imgStore = [
                     "data:image/png;base64,' . self::$icon_collapse . '", 
@@ -223,12 +230,12 @@ class Dump
         if (self::$hasArray) {
             $html = $jsCode . $html;
         }
-        if (! $return) {
+        if (!$return) {
             echo $html;
         }
         return $html;
     }
-    
+
     /**
      * Display a variable's contents using nice HTML formatting (Without
      * the <pre> tag) and will properly display the values of variables
@@ -247,38 +254,32 @@ class Dump
             $setStyle = 'display:inline;';
         } elseif ($expLevel == 0) {
             $setImg = 1;
-            $setStyle='display:none;';
+            $setStyle = 'display:none;';
         } elseif ($expLevel < 0) {
             $setImg = 0;
             $setStyle = 'display:inline;';
         }
         if (is_bool($var)) {
             $html .= '
-            	<span style="color:'.self::$color2.';">
+            	<span style="color:' . self::$color2 . ';">
             		bool (' . (($var) ? 'true' : 'false') . ')
-            	</span>'
-            ;
+            	</span>';
         } elseif (is_int($var)) {
-            $html .= '<span style="color:'.self::$color2.';">int</span><span style="color:#999;">(</span><strong>' . $var . '</strong><span style="color:#999;">)</span>';
+            $html .= '<span style="color:' . self::$color2 . ';">int</span><span style="color:#999;">(</span><strong>' . $var . '</strong><span style="color:#999;">)</span>';
         } elseif (is_float($var)) {
-            $html .= '<span style="color:'.self::$color2.';">float</span><span style="color:#999;">(</span><strong>' . $var . '</strong><span style="color:#999;">)</span>';
-        } 
-
-        elseif (is_string($var)) 
-        {
-            $html .= '<strong>"' . self::htmlentities($var) . '"</strong> <span style="color:'.self::$color2.';">string(' . strlen($var) . ')</span>';
-        } 
-
-        elseif (is_null($var)) {
+            $html .= '<span style="color:' . self::$color2 . ';">float</span><span style="color:#999;">(</span><strong>' . $var . '</strong><span style="color:#999;">)</span>';
+        } elseif (is_string($var)) {
+            $html .= '<strong>"' . self::htmlentities($var) . '"</strong> <span style="color:' . self::$color2 . ';">string(' . strlen($var) . ')</span>';
+        } elseif (is_null($var)) {
             $html .= '<strong>NULL</strong>';
         } elseif (is_resource($var)) {
-            $html .= '<span style="color:'.self::$color2.';">resource</span>("' . get_resource_type($var) . '") <strong>"' . $var . '"</strong>';
+            $html .= '<span style="color:' . self::$color2 . ';">resource</span>("' . get_resource_type($var) . '") <strong>"' . $var . '"</strong>';
         } elseif (is_array($var)) {
             // Check for recursion
             if ($depth > 0) {
                 foreach ($done as $prev) {
                     if ($prev === $var) {
-                        $html .= '<span style="color:'.self::$color.';">array</span>(' . count($var) . ') *RECURSION DETECTED*';
+                        $html .= '<span style="color:' . self::$color . ';">array</span>(' . count($var) . ') *RECURSION DETECTED*';
                         return $html;
                     }
                 }
@@ -287,9 +288,9 @@ class Dump
             }
             self::$hasArray = true;
             $uuid = 'include-php-' . uniqid() . mt_rand(1, 1000000);
-            $html .= (!empty($var) ? ' <img id="' . $uuid . '" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D" onclick="javascript:colToggle(this.id);" /><script>setImg("' . $uuid . '",'.$setImg.',1);</script>' : '') . '<span style="color:'.self::$color.';">array</span>(' . count($var) . ')';
-            if (! empty($var)) {
-                $html .= ' <span id="' . $uuid . '-collapsable" style="'.$setStyle.'"><br />[<br />';
+            $html .= (!empty($var) ? ' <img id="' . $uuid . '" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D" onclick="javascript:colToggle(this.id);" /><script>setImg("' . $uuid . '",' . $setImg . ',1);</script>' : '') . '<span style="color:' . self::$color . ';">array</span>(' . count($var) . ')';
+            if (!empty($var)) {
+                $html .= ' <span id="' . $uuid . '-collapsable" style="' . $setStyle . '"><br />[<br />';
                 $indent = 4;
                 $longest_key = 0;
                 foreach ($var as $key => $value) {
@@ -320,15 +321,15 @@ class Dump
             // Check for recursion
             foreach ($done as $prev) {
                 if ($prev === $var) {
-                    $html .= '<span style="color:'.self::$color.';">object</span>(' . get_class($var) . ') *RECURSION DETECTED*';
+                    $html .= '<span style="color:' . self::$color . ';">object</span>(' . get_class($var) . ') *RECURSION DETECTED*';
                     return $html;
                 }
             }
             // Keep track of variables we have already processed to detect recursion
             $done[] = &$var;
-            self::$hasArray=true;
+            self::$hasArray = true;
             $uuid = 'include-php-' . uniqid() . mt_rand(1, 1000000);
-            $html .= ' <img id="' . $uuid . '" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D" onclick="javascript:colToggle(this.id);" /><script>setImg("' . $uuid . '",'.$setImg.',1);</script><span style="color:'.self::$color.';">object</span>(' . get_class($var) . ') <span id="' . $uuid . '-collapsable" style="'.$setStyle.'"><br />[<br />';
+            $html .= ' <img id="' . $uuid . '" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D" onclick="javascript:colToggle(this.id);" /><script>setImg("' . $uuid . '",' . $setImg . ',1);</script><span style="color:' . self::$color . ';">object</span>(' . get_class($var) . ') <span id="' . $uuid . '-collapsable" style="' . $setStyle . '"><br />[<br />';
             $varArray = (array) $var;
             $indent = 4;
             $longest_key = 0;
@@ -368,7 +369,7 @@ class Dump
         return $html;
     }
 
- 	/**
+    /**
      * Convert entities, while preserving already-encoded entities.
      *
      * @param  string $string The text to be converted
@@ -390,7 +391,7 @@ class Dump
         return htmlentities($string, ENT_QUOTES, self::mbInternalEncoding());
     }
 
-	/**
+    /**
      * Wrapper to prevent errors if the user doesn't have the mbstring
      * extension installed.
      *
@@ -409,7 +410,7 @@ class Dump
 
     public static $color = "#005BFF";
     public static $color2 = "#999";
-    
+
     public static $css = "
         margin-bottom: 18px;
         border: 1px solid #e1e1e8;
@@ -425,7 +426,7 @@ class Dump
         font-family: Menlo, Monaco, Consolas, Courier New, monospace;
         margin-bottom: 0!important;
     ";
-    
+
     /**
      * A collapse icon, using in the dump_var function to allow collapsing
      * an array or object
@@ -433,7 +434,7 @@ class Dump
      * @var string
      */
     public static $icon_collapse = 'iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAMAAADXT/YiAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2RpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo3MjlFRjQ2NkM5QzJFMTExOTA0MzkwRkI0M0ZCODY4RCIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDpFNzFDNDQyNEMyQzkxMUUxOTU4MEM4M0UxRDA0MUVGNSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpFNzFDNDQyM0MyQzkxMUUxOTU4MEM4M0UxRDA0MUVGNSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IFdpbmRvd3MiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo3NDlFRjQ2NkM5QzJFMTExOTA0MzkwRkI0M0ZCODY4RCIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo3MjlFRjQ2NkM5QzJFMTExOTA0MzkwRkI0M0ZCODY4RCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PuF4AWkAAAA2UExURU9t2DBStczM/1h16DNmzHiW7iNFrypMvrnD52yJ4ezs7Onp6ejo6P///+Tk5GSG7D9h5SRGq0Q2K74AAAA/SURBVHjaLMhZDsAgDANRY3ZISnP/y1ZWeV+jAeuRSky6cKL4ryDdSggP8UC7r6GvR1YHxjazPQDmVzI/AQYAnFQDdVSJ80EAAAAASUVORK5CYII=';
-   
+
     /**
      * A collapse icon, using in the dump_var function to allow collapsing
      * an array or object
@@ -444,8 +445,14 @@ class Dump
     private static $hasArray = false;
 }
 
-function d($var){ Dump::make($var); }
-function dd($var){ Dump::made($var); }
+function d($var)
+{
+    Dump::make($var);
+}
+function dd($var)
+{
+    Dump::made($var);
+}
 
 # Форматирвоание взято из: https://gist.github.com/sunel/5368b7b18a84829b06e4
 

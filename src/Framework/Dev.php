@@ -1,8 +1,10 @@
 <?php
 
-class Dev 
-{    
-   public static $start = 0;
+namespace Startie;
+
+class Dev
+{
+	public static $start = 0;
 	public static $stop = 0;
 
 	#
@@ -10,12 +12,14 @@ class Dev
 	# 	$global – global's name (string)
 	#
 
-	public static function start(){
+	public static function start()
+	{
 		static::$start = 0;
 		static::$start = microtime(true);
 	}
 
-	public static function stop(){
+	public static function stop()
+	{
 		static::$stop = 0;
 		static::$stop = microtime(true);
 		$t = microtime(true) - static::$start;
@@ -24,10 +28,10 @@ class Dev
 	}
 
 	public static function renderGlobal($global)
-	{	
+	{
 		ksort($global, SORT_NATURAL | SORT_FLAG_CASE);
-		
-		if(!empty($global)) {
+
+		if (!empty($global)) {
 			Dump::pre($global);
 		} else {
 			Dump::pre([]);
@@ -36,8 +40,7 @@ class Dev
 
 	public static function globals()
 	{
-		if( Access::is('developers') )
-		{
+		if (Access::is('developers')) {
 			$globalsArr = array(
 				'$_COOKIE' => $_COOKIE,
 				'$_ENV' => $_ENV,
@@ -54,7 +57,7 @@ class Dev
 
 	public static function is()
 	{
-		if( Access::is('developers') || $_ENV['MODE_DEV']) {
+		if (Access::is('developers') || $_ENV['MODE_DEV']) {
 			return true;
 		} else {
 			return false;
@@ -66,8 +69,7 @@ class Dev
 		$search = str_replace("/", "\/", $search);
 		$replace = str_replace("/", "\/", $replace);
 		$filePath = str_replace("/", "\/", $filePath);
-		
+
 		echo "sed -i '' 's/$search/$replace/g' $filePath";
 	}
-
 }

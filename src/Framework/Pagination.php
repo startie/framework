@@ -1,5 +1,7 @@
 <?php
 
+namespace Startie;
+
 class Pagination
 {
 	function __construct($entriesPerPage, $maxPages, $align, $EntitiesCount)
@@ -9,19 +11,19 @@ class Pagination
 		$this->align = $align;
 		$this->EntitiesCount = $EntitiesCount;
 
-		if(Input::is('GET', 'page')){
+		if (Input::is('GET', 'page')) {
 			$this->page = Input::get('page', 'INT');
 		} else {
 			$this->page = 1;
 		}
 
-		if(Input::is('GET', 'per')){
+		if (Input::is('GET', 'per')) {
 			$this->per = Input::get('per', 'INT');
 		} else {
 			$this->per = $this->entriesPerPage;
 		}
 
-		if($this->page == 1){
+		if ($this->page == 1) {
 			$this->offset = 0;
 		} else {
 			$this->offset = $this->page * $this->per - $this->per;
@@ -38,12 +40,12 @@ class Pagination
 	public function offset()
 	{
 		return $this->offset;
-	} 
+	}
 
 	public function limit()
 	{
 		return $this->per;
-	} 
+	}
 
 	public function ify($params)
 	{
@@ -51,5 +53,4 @@ class Pagination
 		$params['limit'] = $this->limit();
 		return $params;
 	}
-
 }

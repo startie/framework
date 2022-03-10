@@ -1,5 +1,7 @@
 <?php
 
+namespace Startie;
+
 class Access
 {
 	public static $providers = [];

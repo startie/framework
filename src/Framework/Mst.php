@@ -1,10 +1,12 @@
 <?php
 
+namespace Startie;
+
 class Mst
 {
 	public static function ify($arr)
 	{
-		if(count($arr)){
+		if (count($arr)) {
 			# First
 			$arr[0]['first'] = 1;
 			$arr[0]['isFirst'] = 1;
@@ -12,7 +14,7 @@ class Mst
 			# Last
 			$arr[count($arr) - 1]['last'] = 1;
 			$arr[count($arr) - 1]['isLast'] = 1;
-		} 
+		}
 
 		return $arr;
 	}

@@ -1,6 +1,8 @@
 <?php
 
-class Url 
+namespace Startie;
+
+class Url
 {
 	#
 	#	Examples:
@@ -10,15 +12,15 @@ class Url
 	#		'view' => ['list']
 	#	];
 	#
- 	
- 	public static function app($name=null, $params=null)
+
+	public static function app($name = null, $params = null)
 	{
 		# Filter empty
-		$paramsFiltered;
+		$paramsFiltered = [];
 
-		if(!empty($params)){
+		if (!empty($params)) {
 			foreach ($params as $i => $param) {
-				if($param != ""){
+				if ($param != "") {
 					$paramsFiltered[$i] = $param;
 				}
 			}
@@ -26,24 +28,22 @@ class Url
 		}
 
 		# Build
-		if($params && is_array($params))
-		{
+		if ($params && is_array($params)) {
 			# 1. Parse params as array
 			$paramsThatAreArrays = [];
-			foreach ($params as $i => &$param) {				
-				if(is_array($param)){
+			foreach ($params as $i => &$param) {
+				if (is_array($param)) {
 					$paramsThatAreArrays[$i] = $param;
 					unset($params[$i]);
-  				}
+				}
 			}
-			if(!empty($paramsThatAreArrays))
-			{
-				$q = http_build_query($params);				
+			if (!empty($paramsThatAreArrays)) {
+				$q = http_build_query($params);
 				foreach ($paramsThatAreArrays as $paramName => $paramValue) {
-					
+
 					$q .= "&" . $paramName . "=" . implode(",", $paramValue);
 				}
-			} 
+			}
 
 			# 2. Parse params as simple string
 			else {
@@ -56,29 +56,28 @@ class Url
 		}
 
 		#	Clear
-		
+
 		$url = str_replace("?&", "?", $url);
 
 		return $url;
 	}
 
-	public static function controller($routeExpression, $controllerParams=null, $getParams=null)
+	public static function controller($routeExpression, $controllerParams = null, $getParams = null)
 	{
 		global $Routs;
-		$searchUrl;
+		$searchUrl = "";
 
 		# Find route config
 		foreach ($Routs as $routeUrl => $routeData) {
-			if($routeData['controller'] == $routeExpression){
+			if ($routeData['controller'] == $routeExpression) {
 				$searchUrl = $routeUrl;
 			}
 		}
 
 		# If found
-		if($searchUrl)
-		{
+		if ($searchUrl) {
 			# Find vars of route
-			$findedVars;
+			$findedVars = [];
 			preg_match_all('/\$[a-zA-Z]*/', $searchUrl, $findedVars);
 
 			$searchUrl = str_replace("$", "", $searchUrl);
@@ -88,13 +87,13 @@ class Url
 				$findedVar = str_replace("$", "", $findedVar);
 
 				# Form url by replacing matches
-				if($controllerParams[$findedVar]){
+				if ($controllerParams[$findedVar]) {
 					$searchUrl = str_replace($findedVar, $controllerParams[$findedVar], $searchUrl);
 				}
 			}
 
 			return static::app($searchUrl, $getParams);
-		} 
+		}
 
 
 		# If not
@@ -104,23 +103,23 @@ class Url
 		}
 	}
 
-	public static function c($routeExpression, $controllerParams=null, $getParams=null)
+	public static function c($routeExpression, $controllerParams = null, $getParams = null)
 	{
 		return Url::controller($routeExpression, $controllerParams, $getParams);
 	}
 
-	public static function controllerGetty($routeExpression, $params=null)
+	public static function controllerGetty($routeExpression, $params = null)
 	{
 		global $Routs;
-		$searchUrl;
+		$searchUrl = "";
 
 		foreach ($Routs as $routeUrl => $routeData) {
-			if($routeData['controller'] == $routeExpression){
+			if ($routeData['controller'] == $routeExpression) {
 				$searchUrl = $routeUrl;
 			}
 		}
 
-		return static::app($searchUrl, $getParams);
+		return static::app($searchUrl);
 	}
 
 	public static function current()
@@ -131,7 +130,7 @@ class Url
 		return $url;
 	}
 
-	public static function getQueryParams($prop=null)
+	public static function getQueryParams($prop = null)
 	{
 		$explosion = [];
 		$temp = [];
@@ -143,61 +142,61 @@ class Url
 
 
 		// Make array of explosion
-		foreach( $explosion as $param ){
-		  $var = explode('=', $param);
-		  $temp[] = $var;
+		foreach ($explosion as $param) {
+			$var = explode('=', $param);
+			$temp[] = $var;
 		}
 
 		foreach ($temp as $i => $arr) {
-		  foreach ($arr as $key) {
-		  	// Take only unque values
-		    if ( !array_key_exists($arr[0], $result) ){
-		   		// Make array with its name
-		      	$result[$arr[0]] = [];
-		    }
-		  }
-		  // Add to their array matched values
-		  $result[$arr[0]][] = $arr[1];
+			foreach ($arr as $key) {
+				// Take only unque values
+				if (!array_key_exists($arr[0], $result)) {
+					// Make array with its name
+					$result[$arr[0]] = [];
+				}
+			}
+			// Add to their array matched values
+			$result[$arr[0]][] = $arr[1];
 		}
 
-		if( isset($result[$prop])){
+		if (isset($result[$prop])) {
 			return $result[$prop];
-		} else if ( is_null($prop) ) {
+		} else if (is_null($prop)) {
 			return $result;
 		}
 	}
 
 	public static function getTitle($url)
 	{
-	  	$str = file_get_contents($url);
+		$str = file_get_contents($url);
 
-	  	if(strlen($str)>0){
-	    	$str = trim(preg_replace('/\s+/', ' ', $str)); // supports line breaks inside <title>
-	    	
-	    	$str = mb_convert_encoding($str, 'HTML-ENTITIES', "UTF-8");
+		if (strlen($str) > 0) {
+			$str = trim(preg_replace('/\s+/', ' ', $str)); // supports line breaks inside <title>
 
-	    	preg_match("/\<title\>(.*)\<\/title\>/i",$str,$title); // ignore case
+			$str = mb_convert_encoding($str, 'HTML-ENTITIES', "UTF-8");
 
-	    	$str = $title[1];
-	    	$str = mb_convert_encoding($str, 'UTF-8', 'HTML-ENTITIES');
+			preg_match("/\<title\>(.*)\<\/title\>/i", $str, $title); // ignore case
 
-	    	return $str;
-	  	}
-	  
-	  	 //  	function file_get_contents_utf8($fn) {
+			$str = $title[1];
+			$str = mb_convert_encoding($str, 'UTF-8', 'HTML-ENTITIES');
+
+			return $str;
+		}
+
+		//  	function file_get_contents_utf8($fn) {
 		//      $content = file_get_contents($fn);
 		//       return mb_convert_encoding($content, 'UTF-8', mb_detect_encoding($content, 'UTF-8, ISO-8859-1', true));
 		// }
 
 		// $str = file_get_contents_utf8($str);
-	 //  	$str = mb_convert_encoding($str, 'HTML-ENTITIES', "UTF-8");
-	 //  	Dump::made($url);
+		//  	$str = mb_convert_encoding($str, 'HTML-ENTITIES', "UTF-8");
+		//  	Dump::made($url);
 	}
 
 	public static function paramsArr($url)
 	{
 		$urlPartsString = parse_url($url)['fragment'];
-		$urlPartsArr = explode("&", $urlPartsString);	
+		$urlPartsArr = explode("&", $urlPartsString);
 		$urlParamsArr = [];
 		foreach ($urlPartsArr as $urlPart) {
 			$urlPartExplode = explode("=", $urlPart);
@@ -209,24 +208,24 @@ class Url
 
 	public static function finalize($url, $maxRequests = 10)
 	{
-	    $ch = curl_init();
+		$ch = curl_init();
 
-	    curl_setopt($ch, CURLOPT_HEADER, true);
-	    curl_setopt($ch, CURLOPT_NOBODY, true);
-	    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-	    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-	    curl_setopt($ch, CURLOPT_MAXREDIRS, $maxRequests);
-	    curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+		curl_setopt($ch, CURLOPT_HEADER, true);
+		curl_setopt($ch, CURLOPT_NOBODY, true);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+		curl_setopt($ch, CURLOPT_MAXREDIRS, $maxRequests);
+		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
 
-	    //customize user agent if you desire...
-	    curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Link Checker)');
+		//customize user agent if you desire...
+		curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Link Checker)');
 
-	    curl_setopt($ch, CURLOPT_URL, $url);
-	    curl_exec($ch);
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_exec($ch);
 
-	    $url=curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
+		$url = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
 
-	    curl_close ($ch);
-	    return $url;
+		curl_close($ch);
+		return $url;
 	}
 }

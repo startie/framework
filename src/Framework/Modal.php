@@ -27,7 +27,7 @@ class Modal
 
 		$Entity = ($class::$_);
 
-		$Modal;
+		$Modal = [];
 		$ModalAction = [];
 		$ModalAction['WindowId'] = Modal::WindowId($Entity, $action);
 		$ModalAction['ButtonClass'] = Modal::ButtonClass($Entity, $action);
@@ -38,18 +38,18 @@ class Modal
 		return $Modal;
 	}
 
-	public static function complete($item, $params
+	public static function complete(
+		$item,
+		$params
 		//  = [
 		// 	'Entity' => $Entity, 
 		// 	'action' => $action, 
 		// 	'idIndex' => $idIndex,
 		// ]
-	)
-	{
+	) {
 		$params['action'] = ucfirst($params['action']);
 		$item[$params['action'] . 'ModalButtonClass'] = self::ButtonClass($params['Entity'], $params['action']);
 		$item[$params['action'] . 'ModalId'] = self::WindowId($params['Entity'], $params['action'], $item[$params['idIndex']]);
 		return $item;
 	}
-
 }
