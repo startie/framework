@@ -1,11 +1,10 @@
 {
     "name": "startie/framework",
     "description": "Simple PHP framework",
-    "type": "library",
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Startie\\Framework\\": "src/"
+            "Startie\\": "src/Framework/"
         }
     },
     "authors": [

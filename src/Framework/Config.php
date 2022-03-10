@@ -1,21 +1,23 @@
 <?php
 
-class Config 
-{	
+namespace Startie;
+
+class Config
+{
 	public static $stage; # DEVELOPMENT, TEST, PRODUCTION
 	public static $machine; # LOCAL, REMOTE
 
 	public static function init()
 	{
-		if(isset($_ENV['MACHINE'])){
+		if (isset($_ENV['MACHINE'])) {
 			self::$machine = $_ENV['MACHINE'];
 		} else {
 			die('No "MACHINE" in .env');
 		}
 
-      if(isset($_ENV['STAGE'])){
-      	self::$stage = $_ENV['STAGE'];
-      } else {
+		if (isset($_ENV['STAGE'])) {
+			self::$stage = $_ENV['STAGE'];
+		} else {
 			die('No "STAGE" in .env');
 		}
 
@@ -34,11 +36,11 @@ class Config
 
 		$domain = $_ENV['DOMAIN'];
 		$stage = $_ENV['STAGE'];
-		
+
 		define("APP_PROTOCOL", $protocol);
-		define("URL_APP", $protocol . $server . $domain); 
+		define("URL_APP", $protocol . $server . $domain);
 		define("DIR_APP", $dirRoot);
-		
+
 		define("DB_HOST", 		$_ENV["DB_HOST"]);
 		define("DB_NAME", 		$_ENV["DB_NAME"]);
 		define("DB_USER", 		$_ENV["DB_USER"]);
@@ -55,11 +57,11 @@ class Config
 
 		$projectFolders = File::getFolders($projectDirPath);
 		#var_dump($projectFolders); die();
-				
+
 		#
 		# 	DIRS & URLS #todo 20
 		# 
-	
+
 		foreach ($projectFolders as $projectFolder) {
 
 			#var_dump($projectFolder); die();
@@ -67,14 +69,14 @@ class Config
 			#
 			# 	DIRS
 			# 
-			
+
 			$constFolderName = strtoupper($projectFolder) . "_DIR";
 			define($constFolderName, DIR_APP . $projectFolder . "/");
 
 			#
 			# 	SUBDIRS
 			# 
-			
+
 			$projectSubFolderPath = DIR_APP . $projectFolder;
 			$projectSubFolders = File::getFolders($projectSubFolderPath);
 			foreach ($projectSubFolders as $projectSubFolder) {
@@ -85,21 +87,20 @@ class Config
 			#
 			# 	URLS
 			# 
-			
+
 			$constUrlName = strtoupper($projectFolder) . "_URL";
 			define($constUrlName, URL_APP . $projectFolder . "/");
 
 			#
 			# 	SUBURL
 			# 
-			
+
 			$projectSubUrlPath = DIR_APP . $projectFolder;
 			$projectSubUrls = File::getFolders($projectSubUrlPath);
 			foreach ($projectSubUrls as $projectSubUrl) {
 				$constSubUrlName = strtoupper($projectFolder) . "_" . strtoupper($projectSubUrl) . "_URL";
 				define($constSubUrlName, URL_APP . $projectFolder . "/" . $projectSubUrl . "/");
 			}
-			
 		}
 		#die();
 	}
@@ -108,9 +109,8 @@ class Config
 	{
 		date_default_timezone_set($_ENV['DATE_DEFAULT_TIMEZONE']);
 		define('DATE_TIMEZONE', $_ENV['DATE_TIMEZONE']);
-		define('TIMEZONE',$_ENV['TIMEZONE']);
+		define('TIMEZONE', $_ENV['TIMEZONE']);
 		define('LOCALE', $_ENV['LOCALE']);
 		setlocale(LC_ALL, $_ENV['LOCALE']);
 	}
-
 }
