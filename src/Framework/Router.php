@@ -21,6 +21,11 @@ class Router
 
 	public static function init()
 	{
+		global $root;
+		global $Routs;
+		$RoutsPath = "$root/backend/Config/Routs.php";
+		require $RoutsPath;
+
 		if (!$_ENV['POWER']) {
 			die('On serivce');
 		}
@@ -31,7 +36,6 @@ class Router
 		# 	Vars
 		# 	
 
-		global $root;
 		$backend = $root . "/backend";
 		$isFinded = 0;
 		$findedRouteConfig = [];
@@ -57,7 +61,6 @@ class Router
 		#	Set up routs
 		#
 
-		global $Routs;
 		$Routs = Router::routs($Routs);
 		#Dump::made($Routs);
 
