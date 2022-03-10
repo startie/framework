@@ -41,10 +41,18 @@ class Config
 		define("URL_APP", $protocol . $server . $domain);
 		define("DIR_APP", $dirRoot);
 
-		define("DB_HOST", 		$_ENV["DB_HOST"]);
-		define("DB_NAME", 		$_ENV["DB_NAME"]);
-		define("DB_USER", 		$_ENV["DB_USER"]);
-		define("DB_PASSWORD", 	$_ENV["DB_PASSWORD"]);
+		if ($_ENV["DB_HOST"]) {
+			define("DB_HOST", 		$_ENV["DB_HOST"]);
+		}
+		if ($_ENV["DB_NAME"]) {
+			define("DB_NAME", 		$_ENV["DB_NAME"]);
+		}
+		if ($_ENV["DB_USER"]) {
+			define("DB_USER", 		$_ENV["DB_USER"]);
+		}
+		if ($_ENV["DB_PASSWORD"]) {
+			define("DB_PASSWORD", 	$_ENV["DB_PASSWORD"]);
+		}
 	}
 
 	public static function initDirsAndUrls()

@@ -1,5 +1,7 @@
 <?php
 
+namespace Startie;
+
 class Modal
 {
 	public static function ButtonClass($Entity, $action)
