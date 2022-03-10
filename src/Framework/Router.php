@@ -6,7 +6,8 @@ class Router
 {
 	public static function routs($Config)
 	{
-		$backend = dirname(dirname(__DIR__));
+		global $root;
+		$backend = $root . "/backend";
 
 		$Routs = [];
 
@@ -30,7 +31,8 @@ class Router
 		# 	Vars
 		# 	
 
-		$backend = dirname(dirname(__DIR__));
+		global $root;
+		$backend = $root . "/backend";
 		$isFinded = 0;
 		$findedRouteConfig = [];
 		$controllerParams = [];
@@ -161,8 +163,11 @@ class Router
 		if ($isFinded) {
 
 			# 4.1.1 Include bootstrap	
-			$routeType = ucfirst($findedRouteConfig['type']);
-			require "$backend/Config/Bootstrap/$routeType.php";
+			$RouteType = strtolower($findedRouteConfig['type']);
+			$BootstrapPath = "$backend/Config/Bootstrap/$RouteType.php";
+			if (file_exists($BootstrapPath)) {
+				require $BootstrapPath;
+			}
 
 			# 4.1.2 Include middles
 			if ($findedRouteConfig['middles']) {
@@ -174,7 +179,7 @@ class Router
 			};
 
 			# 4.1.3 Title for PAGE
-			if ($routeType == 'Page') {
+			if ($RouteType == 'page') {
 				if (isset($findedRouteConfig['title'])) {
 					$routeTitle = $findedRouteConfig['title'];
 					View::title($routeTitle);
@@ -182,7 +187,7 @@ class Router
 			}
 
 			# 4.1.4 Layout 'before' part for PAGE
-			if ($routeType == 'Page') {
+			if ($RouteType == 'Page') {
 				if (isset($findedRouteConfig['layout'])) {
 					$layoutName = ucfirst($findedRouteConfig['layout']);
 					require(BACKEND_DIR . 'Layouts/' . $layoutName . '/Before.php');
@@ -190,7 +195,7 @@ class Router
 			}
 
 			# 4.1.5 CSS for PAGE
-			if ($routeType == 'Page') {
+			if ($RouteType == 'page') {
 				$controllerClass = explode("::", $findedRouteConfig['controller'])[0];
 				//Dump::make($controllerClass);
 				$controllerFunction = ucfirst(explode("::", $findedRouteConfig['controller'])[1]);
@@ -227,7 +232,7 @@ class Router
 			}
 
 			# 4.1.7 Layout 'after' part for PAGE
-			if ($routeType == 'Page') {
+			if ($RouteType == 'page') {
 				if (isset($findedRouteConfig['layout'])) {
 					$layoutName = ucfirst($findedRouteConfig['layout']);
 					$layoutDirAfter = BACKEND_DIR . 'Layouts/' . $layoutName . '/After.php';
@@ -236,7 +241,7 @@ class Router
 			}
 
 			# 4.1.8 JS for PAGE
-			if ($routeType == 'Page') {
+			if ($RouteType == 'page') {
 				$controllerClass = explode("::", $findedRouteConfig['controller'])[0];
 				$controllerFunction = ucfirst(explode("::", $findedRouteConfig['controller'])[1]);
 				$hash = Asseter::getJsHash();
@@ -255,7 +260,7 @@ class Router
 			Redirect::page('');
 		}
 
-		if (Dev::is() && $routeType == 'Page') {
+		if (Dev::is() && $RouteType == 'page') {
 			echo "<div id='DevLoadCounter' class='container-fluid text-muted'>";
 			echo number_format(microtime(true) - $start_time, 2) . "s";
 			echo "</div>";

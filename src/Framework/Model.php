@@ -17,7 +17,7 @@ class Model
 	{
 		$envindex = 'DB_EXCLUDE_FUNCTIONS';
 
-		if ($_ENV[$envindex]) {
+		if (isset($_ENV[$envindex])) {
 			self::$excludeFunctions = explode(",", $_ENV[$envindex]);
 		}
 	}
