@@ -58,61 +58,17 @@ class Config
 	public static function initDirsAndUrls()
 	{
 		global $root;
-		$backend = $root . "/backend";
 
-		$backendArr = explode('/', $backend);
-		$projectDirCount = count($backendArr) - 2; #todo 21
-
-		$projectDirPath = '/' . implode('/', array_slice($backendArr, 1, $projectDirCount));
-
-		$projectFolders = File::getFolders($projectDirPath);
-		#var_dump($projectFolders); die();
-
-		#
-		# 	DIRS & URLS #todo 20
-		# 
+		$projectFolders = File::getFolders($root);
 
 		foreach ($projectFolders as $projectFolder) {
-
-			#var_dump($projectFolder); die();
-
-			#
-			# 	DIRS
-			# 
 
 			$constFolderName = strtoupper($projectFolder) . "_DIR";
 			define($constFolderName, DIR_APP . $projectFolder . "/");
 
-			#
-			# 	SUBDIRS
-			# 
-
-			$projectSubFolderPath = DIR_APP . $projectFolder;
-			$projectSubFolders = File::getFolders($projectSubFolderPath);
-			foreach ($projectSubFolders as $projectSubFolder) {
-				$constSubFolderName = strtoupper($projectFolder) . "_" . strtoupper($projectSubFolder) . "_DIR";
-				define($constSubFolderName, DIR_APP . $projectFolder . "/" . $projectSubFolder . "/");
-			}
-
-			#
-			# 	URLS
-			# 
-
 			$constUrlName = strtoupper($projectFolder) . "_URL";
 			define($constUrlName, URL_APP . $projectFolder . "/");
-
-			#
-			# 	SUBURL
-			# 
-
-			$projectSubUrlPath = DIR_APP . $projectFolder;
-			$projectSubUrls = File::getFolders($projectSubUrlPath);
-			foreach ($projectSubUrls as $projectSubUrl) {
-				$constSubUrlName = strtoupper($projectFolder) . "_" . strtoupper($projectSubUrl) . "_URL";
-				define($constSubUrlName, URL_APP . $projectFolder . "/" . $projectSubUrl . "/");
-			}
 		}
-		#die();
 	}
 
 	public static function initRegion()
