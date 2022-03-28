@@ -8,15 +8,12 @@ class Db
 
 	public function __construct()
 	{
-		try {
-			DB::$h = new PDO(
-				'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8mb4;',
-				DB_USER,
-				DB_PASSWORD
-			);
+		$dsn = 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8mb4;';
 
-			DB::$h->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		} catch (PDOException $e) {
+		try {
+			DB::$h = new \PDO($dsn, DB_USER, DB_PASSWORD);
+			DB::$h->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+		} catch (\PDOException $e) {
 			print "Error: " . $e->getMessage() . "<br/>";
 			die();
 		}

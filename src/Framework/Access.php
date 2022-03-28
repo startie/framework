@@ -38,7 +38,7 @@ class Access
 				#
 				# 	Evaluate class and method (e.g VkAccess::is)
 
-				$classMethod = $provider . 'Access::is';
+				$classMethod = 'Providers\\' . $provider . 'Access::is';
 
 				#
 				# 	Call it with param '$group', if true return true

@@ -14,17 +14,18 @@ class Errors
             // ini_set('display_errors', 1); 
             // error_reporting(~0);
         } else {
-            error_reporting(0);
+            //error_reporting(0);
+            error_reporting(E_ERROR | E_PARSE);
         }
 
         # Do not log repeated messages
         ini_set('ignore_repeated_errors', 1);
 
-        # Start remembering everything that would normally be outputted, but don't quite do anything with it yet.
+        // # Start remembering everything that would normally be outputted, but don't quite do anything with it yet.
         ob_start();
 
-        set_error_handler("Errors::errorHandler");
-        register_shutdown_function("Errors::shutdownFunction");
+        set_error_handler("Startie\Errors::errorHandler");
+        register_shutdown_function("Startie\Errors::shutdownFunction");
     }
 
     #

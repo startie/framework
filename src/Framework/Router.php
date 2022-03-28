@@ -120,7 +120,7 @@ class Router
 							}
 
 							# Form validation procedure
-							$routePartValidateClassMethodExpression = "Validate::" . $routePartType;
+							$routePartValidateClassMethodExpression = "Startie\Validate::" . $routePartType;
 
 							# Validate url part by "Validate::$routePartType()"
 							$isValid = call_user_func_array(
@@ -167,7 +167,9 @@ class Router
 
 			# 4.1.1 Include bootstrap	
 			$RouteType = strtolower($findedRouteConfig['type']);
-			$BootstrapPath = "$backend/Config/Bootstrap/$RouteType.php";
+			$RouteTypeUCFirst = ucfirst($RouteType);
+
+			$BootstrapPath = "$backend/Config/Bootstrap/$RouteTypeUCFirst.php";
 			if (file_exists($BootstrapPath)) {
 				require $BootstrapPath;
 			}
@@ -181,6 +183,7 @@ class Router
 				}
 			};
 
+
 			# 4.1.3 Title for PAGE
 			if ($RouteType == 'page') {
 				if (isset($findedRouteConfig['title'])) {
@@ -190,12 +193,16 @@ class Router
 			}
 
 			# 4.1.4 Layout 'before' part for PAGE
-			if ($RouteType == 'Page') {
+			if ($RouteType == 'page') {
 				if (isset($findedRouteConfig['layout'])) {
 					$layoutName = ucfirst($findedRouteConfig['layout']);
-					require(BACKEND_DIR . 'Layouts/' . $layoutName . '/Before.php');
+					$layoutPath = "$backend/Layouts/$layoutName/Before.php";
+					require($layoutPath);
 				}
 			}
+
+			// var_dump($findedRouteConfig);
+			// die();
 
 			# 4.1.5 CSS for PAGE
 			if ($RouteType == 'page') {
@@ -213,6 +220,7 @@ class Router
 			}
 
 			# 4.1.6 Extracting execution expression
+
 
 			# Form possible execution expression
 			$routeClassMethodExecution = Router::extractMethodFromRoute(['routeExpression' => $findedRouteConfig['controller']]);

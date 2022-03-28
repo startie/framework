@@ -2,6 +2,12 @@
 
 namespace Startie;
 
+use PDO;
+use PDOException;
+
+use Startie\Db;
+
+
 class Model
 {
 	#

@@ -110,7 +110,7 @@ class Input
 			$type = self::$inputTypeDefault;
 		};
 		return call_user_func(
-			'Sanitize::' . $type,
+			'Startie\Sanitize::' . $type,
 			$_COOKIE[$var]
 		);
 	}
@@ -121,7 +121,7 @@ class Input
 			$type = self::$inputTypeDefault;
 		};
 		return call_user_func(
-			'Sanitize::' . $type,
+			'Startie\Sanitize::' . $type,
 			$_ENV[$var]
 		);
 	}
@@ -132,7 +132,7 @@ class Input
 			$type = self::$inputTypeDefault;
 		};
 		return call_user_func(
-			'Sanitize::' . $type,
+			'Startie\Sanitize::' . $type,
 			$_FILES[$var]
 		);
 	}
@@ -143,7 +143,7 @@ class Input
 			$type = self::$inputTypeDefault;
 		};
 		return call_user_func(
-			'Sanitize::' . $type,
+			'Startie\Sanitize::' . $type,
 			$_GET[$var]
 		);
 	}
@@ -154,7 +154,7 @@ class Input
 			$type = self::$inputTypeDefault;
 		};
 		return call_user_func(
-			'Sanitize::' . $type,
+			'Startie\Sanitize::' . $type,
 			$_POST[$var]
 		);
 	}
@@ -165,7 +165,7 @@ class Input
 			$type = self::$inputTypeDefault;
 		};
 		return call_user_func(
-			'Sanitize::' . $type,
+			'Startie\Sanitize::' . $type,
 			$_REQUEST[$var]
 		);
 	}
@@ -176,7 +176,7 @@ class Input
 			$type = self::$inputTypeDefault;
 		};
 		return call_user_func(
-			'Sanitize::' . $type,
+			'Startie\Sanitize::' . $type,
 			$_SERVER[$var]
 		);
 	}
@@ -187,7 +187,7 @@ class Input
 			$type = self::$inputTypeDefault;
 		};
 		return call_user_func(
-			'Sanitize::' . $type,
+			'Startie\Sanitize::' . $type,
 			$_SESSION[$var]
 		);
 	}

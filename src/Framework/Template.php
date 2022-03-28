@@ -2,6 +2,10 @@
 
 namespace Startie;
 
+use Mustache_Engine;
+use Mustache_Loader_FilesystemLoader;
+use Startie\Input;
+
 class Template
 {
     public static function r($template, $data, $csrf = null)
@@ -13,7 +17,7 @@ class Template
 
             $m = new Mustache_Engine(array(
                 'pragmas' => [Mustache_Engine::PRAGMA_BLOCKS],
-                'loader' => new Mustache_Loader_FilesystemLoader(BACKEND_TEMPLATES_DIR, $options),
+                'loader' => new Mustache_Loader_FilesystemLoader(BACKEND_DIR . "Templates/", $options),
             ));
 
             # Csrf protection is 'on'

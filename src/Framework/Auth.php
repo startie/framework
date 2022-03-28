@@ -2,6 +2,9 @@
 
 namespace Startie;
 
+use Users; // Model from app's source
+use Startie\Session;
+
 class Auth
 {
 
