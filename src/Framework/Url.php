@@ -59,6 +59,13 @@ class Url
 
 		$url = str_replace("?&", "?", $url);
 
+		# Fix double trailing slash
+		// If penultimate and last symbols are slashes
+		if ($url[strlen($url) - 2] == "/" && $url[strlen($url) - 1] == "/") {
+			// Then cut off the last slash
+			$url = substr($url, 0, strlen($url) - 1);
+		}
+
 		return $url;
 	}
 
@@ -98,8 +105,7 @@ class Url
 
 		# If not
 		else {
-			//die('hello');
-			Dump::make("Can't find route for " . $routeExpression);
+			throw new Exception("Can't find a route for $routeExpression");
 		}
 	}
 

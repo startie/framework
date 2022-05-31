@@ -30,7 +30,7 @@ class Session
             if (Session::is($var)) {
                 return Input::session($var, $type);
             } else {
-                throw new Exception("Session item doesn't exists");
+                throw new Exception("Unable to get session's item '$var', it doesn't exists");
                 return;
             }
         }
@@ -58,3 +58,5 @@ class Session
         session_destroy();
     }
 }
+
+?>

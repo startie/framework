@@ -14,8 +14,11 @@ class Db
 			DB::$h = new \PDO($dsn, DB_USER, DB_PASSWORD);
 			DB::$h->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 		} catch (\PDOException $e) {
-			print "Error: " . $e->getMessage() . "<br/>";
-			die();
+			$message = "Error when connecting to database. Check credentionals and if your database is running.";
+			$message .= "<br/>";
+			$message .= $e->getMessage();
+			$message .= "<br/>";
+			die($message);
 		}
 	}
 

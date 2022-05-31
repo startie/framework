@@ -4,15 +4,30 @@ namespace Startie;
 
 class In
 {
-	public static function post($name, $type, $if = [], $processing = [], $replacements = [])
-	{
-		$data = Input::post($name, $type);
+	/**
+	 * 
+	 * Get a variable value from global array and make optional modifications.
+	 * 
+	 * ```php
+	 * In::e('get', 'query', 'STR', ['', NULL], ['trim']);
+	 * ```
+	 * 
+	 * @param  string $global 			A name of global array: $_GET, $_POST
+	 * @param  string $name 			A variable name.
+	 * @param  string $type 			Type for sanitizing.
+	 * @param  array $if 				Array of 3 values: 0 – value for equality check; 1 – true case substitute; 2 – false case substitute
+	 * @param  array $processing		Array of functions to call on value.
+	 * @param  array $replacements		Array of replacements.
+	 * 
+	 * @return mixed
+	 * 
+	 */
 
-		#
-		# 	$if[0] – if condition for processing
-		# 	$if[1] – true case
-		# 	$if[2] – false case 
-		#
+	public static function e($global, $name, $type, $if = [], $processing = [], $replacements = [])
+	{
+		$data = Input::$global($name, $type);
+
+		/* if */
 
 		if (!empty($if)) {
 			if ($data === $if[0]) {
@@ -26,9 +41,7 @@ class In
 			}
 		}
 
-		#
-		# 	$processing – array of functions
-		# 	
+		/* processing */
 
 		if (!empty($processing) && $data) {
 			foreach ($processing as $f) {
@@ -36,9 +49,7 @@ class In
 			}
 		}
 
-		#
-		# 	$replacements – array of replacements
-		# 
+		/* replacements */
 
 		if (!empty($replacements)) {
 			foreach ($replacements as $r) {
@@ -51,40 +62,13 @@ class In
 
 	public static function get($name, $type, $if = [], $processing = [], $replacements = [])
 	{
-		$data = Input::get($name, $type);
+		$data = In::e("get", $name, $type, $if, $processing, $replacements);
+		return $data;
+	}
 
-		#
-		# 	$if[0] – if condition for processing
-		# 	$if[1] – true case
-		# 	$if[2] – false case 
-		#
-
-		if (!empty($if)) {
-			if ($data == $if[0]) {
-				$data = $if[1];
-			}
-		}
-
-		#
-		# 	$processing – array of functions
-		# 	
-
-		if (!empty($processing) && $data) {
-			foreach ($processing as $f) {
-				$data = call_user_func($f, $data);
-			}
-		}
-
-		#
-		# 	$replacements – array of replacements
-		# 
-
-		if (!empty($replacements)) {
-			foreach ($replacements as $r) {
-				preg_replace($r[0], $r[1], $data);
-			}
-		}
-
+	public static function post($name, $type, $if = [], $processing = [], $replacements = [])
+	{
+		$data = In::e("post", $name, $type, $if, $processing, $replacements);
 		return $data;
 	}
 }

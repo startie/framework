@@ -5,8 +5,8 @@ namespace Startie;
 class Dropzone
 {
 	#
-	#	it takes entity, add to it some data-params
-	#	then it takes images of this entity and add some data-params to them
+	#	It takes entity, adds to it some data-params for requests,
+	#	then it takes images of this entity and also adds  some data-params to them.
 	#
 
 	public static function init(
@@ -16,11 +16,14 @@ class Dropzone
 		$imagesIndex,
 		$imagesParams
 	) {
-		#	class
+		#	(1) $e
+
+		#	(2) class
+
 
 		$e['Dropzone']['class'] = $class;
 
-		# 	dropzone params
+		# 	(3) dropzone params
 
 		$e['Dropzone']['params'] = [];
 		$paramsStr = "";
@@ -32,11 +35,11 @@ class Dropzone
 		}
 		$e['Dropzone']['params'] = $paramsStr;
 
-		# 	images params
+		# 	(4, 5) images params
 
 		$e[$imagesIndex] = self::initImages($e[$imagesIndex], $imagesParams);
 
-		#
+		# 	return
 
 		return $e;
 	}

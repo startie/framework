@@ -45,9 +45,28 @@ class Router
 		# 	1. Parse url
 		# 
 
-		# Get 'url' param
+		# Get 'url' param from apache
 		$url = Php::input('GET', 'url', 'str');
 
+		# Get 'url' param from server request uri
+		if (!$url) {
+			if ($_SERVER['REQUEST_URI'] === "/") {
+				$url = "/";
+			} else {
+				if (strpos($_SERVER['REQUEST_URI'], '?') != false) {
+					$questionMarkPos = strpos($_SERVER['REQUEST_URI'], '?');
+					$url = mb_substr($_SERVER['REQUEST_URI'], 1, $questionMarkPos - 1);
+				} else {
+					$url = mb_substr($_SERVER['REQUEST_URI'], 1);
+				}
+			}
+
+			if (!$url) {
+				die('url param for router not found. apache is running?');
+			}
+		}
+
+		# parse from url
 		$urlParts = Router::explodeUrl(['url' => $url]);
 		$urlPartsCount = count($urlParts);
 
@@ -221,24 +240,19 @@ class Router
 
 			# 4.1.6 Extracting execution expression
 
-
-			# Form possible execution expression
 			$routeClassMethodExecution = Router::extractMethodFromRoute(['routeExpression' => $findedRouteConfig['controller']]);
-			#Dump::make($findedRouteConfig);
-			#Dump::make($routeClassMethodExecution);
+			$routeClassMethodArr = explode("::", $routeClassMethodExecution);
+			$routeControllerClass = $routeClassMethodArr[0];
+			$routeControllerMethod = $routeClassMethodArr[1];
+
+			if (!method_exists($routeControllerClass, $routeControllerMethod)) {
+				throw new Exception("Controller method '$routeClassMethodExecution' doesn't exsists");
+			}
 
 			# If we don't have params
 			if (empty($controllerParams)) {
-				# Call controller method
 				call_user_func($routeClassMethodExecution);
-			}
-
-			# If we have params
-			if (!empty($controllerParams)) {
-				# Cut as excess the string: '(...)'
-				$routeClassMethodExecution = explode("(", $routeClassMethodExecution)[0];
-
-				# Call controller method
+			} else {
 				call_user_func_array($routeClassMethodExecution, [$controllerParams]);
 			}
 
@@ -320,5 +334,16 @@ class Router
 
 		# Form possible execution expression
 		return $routeClass . '::' . $routeMethod;
+	}
+
+	/**
+	 * Check if passed signature (controller::method) belongs to current url
+	 *
+	 * @param  string $signature
+	 * @return bool
+	 */
+	public static function isCurrent($signature)
+	{
+		return Url::current() == Url::c($signature);
 	}
 }

@@ -13,7 +13,7 @@ class View
 
 	public static function titleChange($title)
 	{
-		echo "<script>document.title = \"$title\";</script>";
+		echo "<script>document.title = `$title`;</script>";
 	}
 
 	public static function getDir($path)
@@ -31,6 +31,7 @@ class View
 	public static function render($path, array $data = [])
 	{
 		extract($data);
+		global $t; // #hardcode
 		$full_path = BACKEND_DIR . "Views/" . $path . ".php";
 		require($full_path);
 	}

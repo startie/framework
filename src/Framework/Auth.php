@@ -28,6 +28,7 @@ class Auth
 		if (!Auth::is()) {
 			Session::set('urlBeforeLogin', Url::current());
 			Redirect::page($_ENV['AUTH_ASK_FIRST']);
+			die();
 		} else if (!Access::is('users')) {
 			Redirect::page($_ENV['AUTH_ASK_SECOND']);
 		}
