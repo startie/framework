@@ -1,4 +1,5 @@
 ### Install
+
 ```
 composer init
 ```
@@ -8,11 +9,13 @@ composer require startie/framework
 ```
 
 ### Folders & files
+
 ```
 mkdir backend && mkdir backend/Controllers && mkdir backend/Models
 ```
 
 ### /composer.json
+
 ```
 "autoload": {
     "classmap": [
@@ -23,16 +26,18 @@ mkdir backend && mkdir backend/Controllers && mkdir backend/Models
 ```
 
 ### Config
+
 ```
 mkdir backend/Config && mkdir backend/Config/Bootstrap && mkdir backend/Config/Env
 ```
 
 ### /index.php
+
 ```
 touch index.php
 ```
 
-```
+```php
 <?php
 
 require 'backend/Config/Bootstrap/Common.php';
@@ -87,6 +92,7 @@ Startie\Router::init();
 ```
 
 ### /backend/Config/Common.php
+
 ```
 <?php
 
@@ -112,6 +118,7 @@ class Index_Controller
 ```
 
 ### /backend/Routs/Index.php
+
 ```
 <?php
 
@@ -124,6 +131,7 @@ return $Index = [
 ```
 
 ### /backend/Config/Routs.php
+
 ```
 <?php
 
