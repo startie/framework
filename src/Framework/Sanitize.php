@@ -1,7 +1,11 @@
 <?php
 
+namespace Startie;
+
 class Sanitize
 {
+	// "" => "0"
+	// NULL => "0"
 	// Sanitize::int(NULL) // "0"
 
 	public static function int($var)
