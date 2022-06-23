@@ -8,15 +8,33 @@ class Asseter
 	public static $jsPrefix;
 	public static $cssPrefix;
 
-	#
-	#	Description:
-	#	- load prefixes for assets
-	#
+	public static function config()
+	{
+		$path = App::path("backend/Config/Asseter/Common.php");
+
+		if (!file_exists($path)) {
+			throw new Exception("Config for Asseter is missing");
+		} else {
+			$Config = require($path);
+			$ConfigPrefixes = $Config['prefixes'];
+
+			if (isset($ConfigPrefixes['js'])) {
+				self::$jsPrefix = $ConfigPrefixes['js'];
+			} else {
+				throw new Exception("JS prefix is not defined");
+			}
+
+			if (isset($ConfigPrefixes['css'])) {
+				self::$jsPrefix = $ConfigPrefixes['css'];
+			} else {
+				throw new Exception("CSS prefix is not defined");
+			}
+		}
+	}
 
 	public static function init()
 	{
-		if (isset($_ENV['JS_PREFIX'])) 		self::$jsPrefix 				= $_ENV['JS_PREFIX'];
-		if (isset($_ENV['CSS_PREFIX'])) 		self::$cssPrefix 				= $_ENV['CSS_PREFIX'];
+		self::config();
 	}
 
 	public static function getJsHash()
