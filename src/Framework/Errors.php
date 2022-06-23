@@ -2,123 +2,187 @@
 
 namespace Startie;
 
+use Startie\Config;
+use Startie\Auth;
+use Startie\Logs;
+use Startie\Access;
+
 class Errors
 {
-    public static function init()
-    {
-        if (Access::is('developers') || Access::is('admins')) {
-            # Report all PHP errors
-            error_reporting(E_ALL);
+    public static $logs;
 
-            # Works good sometimes, maybe uncomment?
-            // ini_set('display_errors', 1); 
-            // error_reporting(~0);
-        } else {
-            //error_reporting(0);
-            error_reporting(E_ERROR | E_PARSE);
+    public static function config()
+    {
+        $stage = strtolower(Config::$stage);
+        $machine = strtolower(Config::$machine);
+
+        $Config_Errors_path = App::path("backend/Config/Errors/{$stage}_{$machine}.php");
+
+        $Config_Errors = require $Config_Errors_path;
+
+        foreach ($Config_Errors['ini'] as $setting => $value) {
+            ini_set($setting, $value);
         }
 
-        # Do not log repeated messages
-        ini_set('ignore_repeated_errors', 1);
+        self::$logs = $Config_Errors['logs'];
 
-        // # Start remembering everything that would normally be outputted, but don't quite do anything with it yet.
-        ob_start();
-
-        set_error_handler("Startie\Errors::errorHandler");
-        register_shutdown_function("Startie\Errors::shutdownFunction");
+        error_reporting($Config_Errors['error_reporting']);
     }
 
-    #
-    #   @param int $errno уровень ошибки
-    #   @param string $errstr сообщение об ошибке
-    #   @param string $errfile имя файла, в котором произошла ошибка
-    #   @param int $errline номер строки, в которой произошла ошибка
-    #   @return boolean
-    #
-
-    public static function errorHandler($errno, $errstr, $errfile, $errline)
+    public static function init()
     {
-        if (error_reporting() & $errno) {
-            $errors = array(
-                E_ERROR => 'E_ERROR',
-                E_WARNING => 'E_WARNING',
-                E_PARSE => 'E_PARSE',
-                E_NOTICE => 'E_NOTICE',
-                E_CORE_ERROR => 'E_CORE_ERROR',
-                E_CORE_WARNING => 'E_CORE_WARNING',
-                E_COMPILE_ERROR => 'E_COMPILE_ERROR',
-                E_COMPILE_WARNING => 'E_COMPILE_WARNING',
-                E_USER_ERROR => 'E_USER_ERROR',
-                E_USER_WARNING => 'E_USER_WARNING',
-                E_USER_NOTICE => 'E_USER_NOTICE',
-                E_STRICT => 'E_STRICT',
-                E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',
-                E_DEPRECATED => 'E_DEPRECATED',
-                E_USER_DEPRECATED => 'E_USER_DEPRECATED',
-            );
+        // Run configuration
+        Errors::config();
 
-            # Make own error message
-            $errurl = $_SERVER['SCRIPT_NAME'] . "?" . $_SERVER['QUERY_STRING'];
+        // Start remembering everything that would normally be outputted, but don't quite do anything with it yet
+        ob_start();
 
-            if (!is_int($errline)) {
-                $errline = 0;
-            };
+        // Handlers
+        set_error_handler("Startie\Errors::errorHandler"); // errors
+        set_exception_handler("Startie\Errors::exceptionHandler"); // exceptions
+        register_shutdown_function("Startie\Errors::shutdownFunction"); // fatal errors
+    }
 
-            $CurrentUserId = Auth::getIdInService('app');
-            $CurrentUserId = ($CurrentUserId) ? $CurrentUserId : 0;
+    public static function errorHandler($level, $message, $file = '', $line = 0)
+    {
+        throw new \ErrorException($message, 0, $level, $file, $line);
+    }
 
-            $appLogId = AppLogs::create([
-                'insert' => [
-                    ['createdAt', '`UTC_TIMESTAMP()`'],
-                    ['UserId', $CurrentUserId, 'INT'],
-                    ['line', $errline, 'INT'],
-                    ['file', $errfile, 'STR'],
-                    ['url', $errurl, 'STR'],
-                    ['message', $errors[$errno] . ': ' . $errstr, 'STR'],
-                    ['type', 'errors', 'STR'],
-                    ['object', 'php', 'STR'],
-                ]
-            ]);
+    /**
+     * Method to call when an uncaught exception occurs
+     *
+     * @param  mixed $e
+     * @return void
+     */
+    public static function exceptionHandler($e)
+    {
+        /* Log in storage */
 
-            return $appLogId;
+        if (self::$logs) {
+            $LogId = self::log($e);
         }
 
-        # Do not run internal PHP errors handler
-        return true;
+        /* Display */
+
+        if (ini_get('display_errors')) {
+            if (isset($LogId)) {
+                self::render($e, "Log generated: #$LogId.");
+            } else {
+                self::render($e, "No log was generated.");
+            }
+        } else {
+            self::render("Unknown error has been occurred");
+        }
     }
 
     public static function shutdownFunction()
     {
-        # If there was an error and it was fatal
+        // If there was an error and it was fatal
         if ($error = error_get_last() and $error['type'] & (E_ERROR | E_PARSE | E_COMPILE_ERROR | E_CORE_ERROR)) {
+
             # Clean buffer & don't show default error message
             ob_end_clean();
 
-            # Forming error message
-            if (Config::$stage == 'PRODUCTION' && $_ENV['MODE_DEV'] == 0) {
-                $msg = "Send your administrator url of this page ";
-            } else {
-                $msg = "<br> " . $error['message'] . " " . $error['file'] . " [" . $error['line'] . "]";
+            // Show error message for production
+            if ($_ENV["MODE_DEV"] == 0) {
+                $msg = "Please send out support url of this page";
+                self::render($msg);
             }
 
-            # Show error message
-            if ($_ENV['MODE_DEV']) {
-                echo "
-                <div style='margin: 50px'>
-                    <h3 style='font-family: Arial;'>Error</h3>
-                    <div style='font-family: Courier New; white-space: pre-wrap; font-size: 15px;'>$msg<div>
-                </div>";
-            } else {
+            // Show error message in dev mode
+            elseif ($_ENV['MODE_DEV'] == 1) {
+                $msg = "<br>" . $error['message'] . " " . $error['file'] . " [" . $error['line'] . "]";
+                self::render($msg);
+            }
+
+            // Show only error ID
+            else {
                 $appLogId = error_handler($error['type'], $error['message'], $error['file'], $error['line']);
                 if ($appLogId) {
-                    echo "<div style='text-align: center; font-family: Arial; position: absolute;'><h3>Error</h3> #" . $appLogId . "</div>";
+                    self::render("#{$appLogId}");
                 } else {
-                    echo "<div style='text-align: center; font-family: Arial; position: absolute;'><h3>Error</h3> Undefined</div>";
+                    self::render("#unknown");
                 }
             }
         } else {
-            # Send & turn off the buffer
+            // Send & turn off the buffer
             ob_end_flush();
         }
+    }
+
+    public static function log($e)
+    {
+        // UserId
+        $UserIdCurrent = Auth::getIdInService('app') ? Auth::getIdInService('app') : 0;
+
+        // line
+        $line = $e->getLine();
+
+        // message
+        $message = $e->getMessage();
+        $message = substr($message, 0, 65535);
+        $message = ($message) ? $message : "";
+
+        // file
+        $file = $e->getFile();
+        $file = ($file) ? $file : "";
+
+        // url
+
+        $url = $_SERVER['PROTOCOL'] . $_SERVER['SERVER_NAME'] . ":" . $_SERVER['SERVER_PORT'] . $_SERVER['SCRIPT_NAME'];
+        if (isset($_SERVER['QUERY_STRING'])) {
+            $url .= "?" . $_SERVER['QUERY_STRING'];
+        }
+        $url = ($url) ? $url : "";
+
+        // trace
+        $trace = $e->getTrace();
+        unset($trace[0]['args'][0]->xdebug_message); // delete html from xdebug
+        $trace = json_encode($trace);
+        if (strlen($trace) > 65535) {
+            $trace = substr($trace, 0, 65535);
+        }
+        $trace = $trace ? $trace : "";
+
+        // type
+        if (method_exists($e, 'getType')) {
+            $type = $e->getType();
+        } else {
+            $type = "error";
+        }
+
+        // object
+        if (method_exists($e, 'getObject')) {
+            $object = $e->getObject();
+        } else {
+            $object = "php";
+        }
+
+        $LogId = Logs::generate(
+            compact(
+                'UserIdCurrent',
+                'line',
+                'message',
+                'file',
+                'url',
+                'trace',
+                'type',
+                'object'
+            )
+        );
+
+        return $LogId;
+    }
+
+    public static function render($message, $addition = "")
+    {
+        echo
+        "
+        <div style='margin: 50px; font-family: Menlo, Courier New;'>
+            <h1>Error</h1>
+            <div style='white-space: pre-wrap; font-size: 15px;'>{$message}<div>
+            <div class='margin-top:30px'>{$addition}</div>
+        </div>
+        ";
     }
 }
