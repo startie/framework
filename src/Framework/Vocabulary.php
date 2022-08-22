@@ -6,17 +6,14 @@ class Vocabulary
 {
 	public static function get($path, $params = [])
 	{
-		$CurrentUserId = Auth::getIdInService('app');
-		$CurrentUserId = ($CurrentUserId) ? $CurrentUserId : 0;
-
 		$v = "";
-		$fullPath = STORAGE_DIR . "vocabularies/{$path}.json";
+		$fullPath = App::path("backend/Vocabularies/{$path}.json");
 
 		if (file_exists($fullPath)) {
 			$v = json_decode(file_get_contents($fullPath), true);
 
 			if ($v === null && json_last_error() !== JSON_ERROR_NONE) {
-				throw new Exception("Json data on $fullPath incorrect");
+				throw new \Exception("JSON data on $fullPath incorrect");
 			}
 
 			# Arrifying
@@ -36,19 +33,7 @@ class Vocabulary
 			return $v;
 		} else {
 
-			throw new Exception("Vocabulary on $fullPath doesn't exists");
-
-			AppLogs::create([
-				'insert' => [
-					['createdAt', '`UTC_TIMESTAMP()`'],
-					['UserId', $CurrentUserId, 'INT'],
-					['line', 0, 'INT'],
-					['file', 'Vocabulary::get()'],
-					['message',  'File doesnt exsists: ' . $fullPath],
-					['type', 'errors'],
-					['object', 'php'],
-				]
-			]);
+			throw new \Exception("Vocabulary on $fullPath doesn't exists");
 		}
 	}
 

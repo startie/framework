@@ -72,4 +72,17 @@ class Dev
 
 		echo "sed -i '' 's/$search/$replace/g' $filePath";
 	}
+
+	public static function counter($start_time)
+	{
+		$result = "";
+
+		if (Dev::is()) {
+			$result .= "<div id='DevLoadCounter' class='container-fluid text-muted'>";
+			$result .= number_format(microtime(true) - $start_time, 2) . "s";
+			$result .= "</div>";
+		}
+
+		return $result;
+	}
 }

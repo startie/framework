@@ -11,9 +11,10 @@ class Css
 
 	public static function node($url)
 	{
-		if ($_ENV['MODE_DEV']) {
-			Css::url(NODE_MODULES_URL . $url);
-		}
+		die('deprecated');
+		// if ($_ENV['MODE_DEV']) {
+		// 	Css::url(NODE_MODULES_URL . $url);
+		// }
 	}
 
 	public static function page($name)
@@ -28,8 +29,15 @@ class Css
 
 	public static function p($name)
 	{
+		throw new \Startie\Exception('Css::p() is deprecated, use Css::public');
 		$path = PUBLIC_URL . $name . ".css";
 		echo "<link rel='stylesheet' href='$path'>";
+	}
+
+	public static function public($name)
+	{
+		$path = PUBLIC_URL . $name . ".css";
+		return "<link rel='stylesheet' href='$path'>";
 	}
 
 	public static function frontend($name)

@@ -7,6 +7,7 @@ class Asseter
 
 	public static $jsPrefix;
 	public static $cssPrefix;
+	//public static $publicUrl;
 
 	public static function config()
 	{
@@ -16,19 +17,24 @@ class Asseter
 			throw new Exception("Config for Asseter is missing");
 		} else {
 			$Config = require($path);
-			$ConfigPrefixes = $Config['prefixes'];
 
-			if (isset($ConfigPrefixes['js'])) {
-				self::$jsPrefix = $ConfigPrefixes['js'];
+			if (isset($Config['prefixes']['js'])) {
+				self::$jsPrefix = $Config['prefixes']['js'];
 			} else {
 				throw new Exception("JS prefix is not defined");
 			}
 
-			if (isset($ConfigPrefixes['css'])) {
-				self::$jsPrefix = $ConfigPrefixes['css'];
+			if (isset($Config['prefixes']['css'])) {
+				self::$cssPrefix = $Config['prefixes']['css'];
 			} else {
 				throw new Exception("CSS prefix is not defined");
 			}
+
+			// if (isset($ConfigPrefixes['publicUrl'])) {
+			// 	self::$publicUrl = $Config['publicUrl'];
+			// } else {
+			// 	throw new Exception("Public URL is not defined");
+			// }
 		}
 	}
 
@@ -39,17 +45,36 @@ class Asseter
 
 	public static function getJsHash()
 	{
+		$hash = "";
+
 		$listOfFiles = array_diff(scandir(PUBLIC_DIR . "/js"), array('..', '.'));
+
+		if (empty($listOfFiles)) {
+			return $hash;
+		}
+
+		$listOfFilesNew = [];
 		foreach ($listOfFiles as $file) {
 			if (strpos($file, '.js')) {
 				$listOfFilesNew[] = $file;
 			}
 		}
-		$listOfFiles = $listOfFilesNew;
-		$lastJSFile = $listOfFilesNew[count($listOfFilesNew) - 1];
+
+		if (empty($listOfFilesNew)) {
+			return $hash;
+		}
+
+		if (count($listOfFilesNew) > 1) {
+			$lastJSFile = $listOfFilesNew[count($listOfFilesNew) - 1];
+		} else if (count($listOfFilesNew) === 1) {
+			$lastJSFile = $listOfFilesNew[0];
+		} else {
+			return $hash;
+		}
+
 		preg_match('/([a-z0-9]*)\.(js)/', $lastJSFile, $m);
-		$JShash = $m[1];
-		return $JShash;
+		$hash = $m[1];
+		return $hash;
 	}
 
 	public static function loadJs($bundle)

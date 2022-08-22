@@ -11,9 +11,10 @@ class Js
 
 	public static function node($url)
 	{
-		if ($_ENV['MODE_DEV']) {
-			Js::url(NODE_MODULES_URL . $url);
-		}
+		die('deprecated');
+		// if ($_ENV['MODE_DEV']) {
+		// 	Js::url(NODE_MODULES_URL . $url);
+		// }
 	}
 
 	public static function page($name)

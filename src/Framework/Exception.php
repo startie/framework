@@ -6,7 +6,7 @@ use PDOException;
 
 class Exception extends \Exception
 {
-    public function __construct($message, $type = "error", $object = "php",  $code = 0, Throwable $previous = null)
+    public function __construct($message, $type = "error", $object = "php",  $code = 0, $previous = null)
     {
         parent::__construct($message, intval($code), $previous);
 
@@ -34,7 +34,7 @@ class Exception extends \Exception
      * ```
      *
      * @param  mixed $e
-     * @return void
+     * @return \Startie\Exception
      */
     public static function PDO(PDOException $e)
     {

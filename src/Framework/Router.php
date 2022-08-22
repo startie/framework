@@ -2,44 +2,102 @@
 
 namespace Startie;
 
+use Startie\View;
+use Startie\Validate;
+use Startie\Url;
+use Startie\Php;
+use Startie\Dump;
+use Startie\Dev;
+use Startie\Asseter;
+use Startie\Route;
+
 class Router
 {
-	public static function routs($Config)
-	{
-		global $root;
-		$backend = $root . "/backend";
 
+	/*
+	 * 	instance of Route
+	 */
+	public static $route;
+
+	public static function routs()
+	{
 		$Routs = [];
 
-		foreach ($Config as $RouteName) {
-			$path = "$backend/Routs/$RouteName.php";
-			$RouteContent = require $path;
-			$Routs = array_merge($RouteContent, $Routs);
+		$ConfigPath = App::path("backend/Config/Router/Routs.php");
+
+		/* If there is no config – try to guess */
+
+		if (!file_exists($ConfigPath)) {
+			//throw new \Startie\Exception("Could find the file: $ConfigPath");
+			$RoutsPath = App::path("backend/Routs/");
+
+			$RoutsFiles = scandir($RoutsPath);
+			foreach ($RoutsFiles as $RoutsFile) {
+				if ($RoutsFile != "." && $RoutsFile != "..") {
+					$RouteContent = require App::path("backend/Routs/{$RoutsFile}");
+					$Routs = array_merge($RouteContent, $Routs);
+				}
+			}
 		}
+
+		/* If there is a config – use it */
+
+		if (file_exists($ConfigPath)) {
+			$Config = require $ConfigPath;
+			if ($Config == 1) {
+				throw new \Startie\Exception("File $ConfigPath should return an array");
+			} else if (is_array($Config)) {
+				foreach ($Config as $RouteName) {
+					$path = App::path("backend/Routs/$RouteName.php");
+					$RouteContent = require $path;
+					$Routs = array_merge($RouteContent, $Routs);
+				}
+			}
+		}
+
 		return $Routs;
 	}
 
 	public static function init()
 	{
-		global $root;
-		global $Routs;
-		$RoutsPath = "$root/backend/Config/Routs.php";
-		require $RoutsPath;
+		/* On service */
 
 		if (!$_ENV['POWER']) {
 			die('On serivce');
 		}
 
+		/* Dev load count (start) */
+
 		$start_time = microtime(true);
 
+		/* Find current */
+
+		$result = self::find();
+		extract($result); // $isFinded, $findedRouteConfig, $controllerParams
+
+		/* Render */
+
+		if ($isFinded) {
+			self::render($findedRouteConfig, $controllerParams, $start_time);
+		} else {
+			Router::errorPage(404);
+			throw new \Startie\Exception("Route for this URL is not found");
+		}
+	}
+
+	public static function find()
+	{
 		#
 		# 	Vars
 		# 	
 
-		$backend = $root . "/backend";
 		$isFinded = 0;
 		$findedRouteConfig = [];
 		$controllerParams = [];
+
+		/* Export all routs */
+
+		$Routs = Router::routs();
 
 		#
 		# 	1. Parse url
@@ -59,10 +117,16 @@ class Router
 				} else {
 					$url = mb_substr($_SERVER['REQUEST_URI'], 1);
 				}
+
+				//$url = str_replace($url, $_ENV['DOMAIN'], ""); #wtf
+
+				if (!$url) {
+					$url = "/";
+				}
 			}
 
 			if (!$url) {
-				die('url param for router not found. apache is running?');
+				throw new \Startie\Exception("'url' param for router not found. apache is running?");
 			}
 		}
 
@@ -80,9 +144,6 @@ class Router
 		#	Set up routs
 		#
 
-		$Routs = Router::routs($Routs);
-		#Dump::made($Routs);
-
 		foreach ($Routs as $url => $config) {
 			$routsParsedUrlParts = Router::explodeUrl(['url' => $url]);
 			#Dump::make($routsParsedUrlParts);
@@ -91,15 +152,15 @@ class Router
 				$config['middles'] = "";
 			};
 
-			@$routsParsed[] = [
+			$routsParsed[] = [
 				'url' => $url,
 				'urlParts' => $routsParsedUrlParts,
 				'urlPartsCount' => count($routsParsedUrlParts),
-				'controller' => $config['controller'],
-				'type' => $config['type'],
-				'middles' => $config['middles'],
-				'title' => $config['title'],
-				'layout' => $config['layout'],
+				'controller' => $config['controller'] ?? NULL,
+				'type' => $config['type'] ?? NULL,
+				'middles' => $config['middles'] ?? NULL,
+				'title' => $config['title'] ?? NULL,
+				'layout' => $config['layout'] ?? NULL,
 			];
 		}
 
@@ -119,6 +180,7 @@ class Router
 
 					# 3.1.2. Check part by part in loop
 					for ($i = 0; $i < $urlPartsCount; $i++) {
+
 						### echo "Comparing '" . $urlParts[$i] . "' with '" . $routeParsed['urlParts'][$i] . "' ...";
 
 						# A. If part of url has variable or type hint
@@ -162,6 +224,7 @@ class Router
 								$successfulChecks++;
 							}
 						}
+
 						### echo " and it is " . $successfulChecks . "<br>";
 					}
 
@@ -177,119 +240,128 @@ class Router
 			}
 		}
 
-		#
-		#	4. Check result
-		#
+		return [
+			'isFinded' => $isFinded,
+			'findedRouteConfig' => $findedRouteConfig,
+			'controllerParams' => $controllerParams,
+		];
+	}
 
-		# 	4.1. If route is finded		
-		if ($isFinded) {
+	public static function render($RouteConfig, $controllerParams, $start_time)
+	{
+		/* Register utils */
 
-			# 4.1.1 Include bootstrap	
-			$RouteType = strtolower($findedRouteConfig['type']);
-			$RouteTypeUCFirst = ucfirst($RouteType);
+		View::utils();
 
-			$BootstrapPath = "$backend/Config/Bootstrap/$RouteTypeUCFirst.php";
+		/* Route */
+
+		$route = new Route($RouteConfig);
+		Router::$route = $route;
+
+		/* Boostrap */
+
+		self::bootstrap($route);
+
+		/* Middles */
+
+		self::middles($route);
+
+		/* Title */
+
+		if (isset($route->title)) {
+			$title = "<title>$route->title</title>";
+		}
+
+		/* Load layout */
+
+		if ($route->layout) {
+			$layout = Layout::return(
+				ucfirst($route->layout)
+			);
+		}
+
+		/* Content */
+
+		if (!file_exists($route->controllerFilePath)) {
+			throw new \Exception("File on '{$route->controllerFilePath}' doesn't exsists");
+		} else {
+			require $route->controllerFilePath;
+		}
+
+		if (!class_exists($route->controllerNamespacedClass)) {
+			throw new \Exception("Class '{$route->controllerNamespacedClass}' doesn't exsists");
+		}
+		if (!method_exists($route->controllerNamespacedClass, $route->method)) {
+			throw new \Exception("Controller method '{$route->classMethodExecution}' doesn't exsists");
+		}
+
+		// If we don't have params
+		if (empty($controllerParams)) {
+			$content = call_user_func("\Controllers\\" . $route->classMethodExecution);
+		}
+
+		// If we have params
+		else {
+			$content = call_user_func_array("\Controllers\\" . $route->classMethodExecution, [$controllerParams]);
+		}
+
+		/* Fill blocks */
+
+		if ($route->layout) {
+			$Config = require App::path("backend/Config/Layout/Common.php");
+			$ConfigBlocks = $Config['blocks'];
+
+			$ConfigBlocks['content'] = $content;
+			$ConfigBlocks['title'] = $title;
+
+			foreach ($ConfigBlocks as $Block => $BlockContent) {
+				$layout = str_replace(
+					"{{{$Block}}}",
+					$ConfigBlocks[$Block] ?? "",
+					$layout
+				);
+			}
+
+			/* Dev load count */
+
+			if (isset($ConfigBlocks['counter'])) {
+				$counter = Dev::counter($start_time);
+				$layout = str_replace("{{{counter}}}", $counter,  $layout);
+			}
+		}
+
+		if ($route->layout) {
+			echo $layout;
+		}
+	}
+
+	public static function bootstrap(Route $route)
+	{
+		if ($route->type) {
+			$RouteTypeUCFirst = ucfirst(strtolower($route->type));
+
+			$BootstrapPath = App::path("backend/Config/Bootstrap/$RouteTypeUCFirst.php");
 			if (file_exists($BootstrapPath)) {
 				require $BootstrapPath;
-			}
-
-			# 4.1.2 Include middles
-			if ($findedRouteConfig['middles']) {
-				$middlesStr = str_replace(" ", "", $findedRouteConfig['middles']);
-				$middlesArr = explode(',', $middlesStr);
-				foreach ($middlesArr as $middle) {;
-					require "$backend/Middles/$middle.php";
-				}
-			};
-
-
-			# 4.1.3 Title for PAGE
-			if ($RouteType == 'page') {
-				if (isset($findedRouteConfig['title'])) {
-					$routeTitle = $findedRouteConfig['title'];
-					View::title($routeTitle);
-				}
-			}
-
-			# 4.1.4 Layout 'before' part for PAGE
-			if ($RouteType == 'page') {
-				if (isset($findedRouteConfig['layout'])) {
-					$layoutName = ucfirst($findedRouteConfig['layout']);
-					$layoutPath = "$backend/Layouts/$layoutName/Before.php";
-					require($layoutPath);
-				}
-			}
-
-			// var_dump($findedRouteConfig);
-			// die();
-
-			# 4.1.5 CSS for PAGE
-			if ($RouteType == 'page') {
-				$controllerClass = explode("::", $findedRouteConfig['controller'])[0];
-				//Dump::make($controllerClass);
-				$controllerFunction = ucfirst(explode("::", $findedRouteConfig['controller'])[1]);
-				$hash = Asseter::getJsHash();
-				$filePath = "css/Pages"  . $controllerClass . $controllerFunction . Asseter::$cssPrefix . "." . $hash . ".css";
-				$fileDir = PUBLIC_DIR . $filePath;
-				if (file_exists($fileDir)) {
-					echo "<link href='" . PUBLIC_URL . $filePath . "' rel='stylesheet' type='text/css'>";
-				} else {
-					//Dump::make(PUBLIC_URL . $filePath);
-				}
-			}
-
-			# 4.1.6 Extracting execution expression
-
-			$routeClassMethodExecution = Router::extractMethodFromRoute(['routeExpression' => $findedRouteConfig['controller']]);
-			$routeClassMethodArr = explode("::", $routeClassMethodExecution);
-			$routeControllerClass = $routeClassMethodArr[0];
-			$routeControllerMethod = $routeClassMethodArr[1];
-
-			if (!method_exists($routeControllerClass, $routeControllerMethod)) {
-				throw new Exception("Controller method '$routeClassMethodExecution' doesn't exsists");
-			}
-
-			# If we don't have params
-			if (empty($controllerParams)) {
-				call_user_func($routeClassMethodExecution);
 			} else {
-				call_user_func_array($routeClassMethodExecution, [$controllerParams]);
+				throw new \Startie\Exception("Path '$BootstrapPath' is missing");
 			}
-
-			# 4.1.7 Layout 'after' part for PAGE
-			if ($RouteType == 'page') {
-				if (isset($findedRouteConfig['layout'])) {
-					$layoutName = ucfirst($findedRouteConfig['layout']);
-					$layoutDirAfter = BACKEND_DIR . 'Layouts/' . $layoutName . '/After.php';
-					require($layoutDirAfter);
-				}
-			}
-
-			# 4.1.8 JS for PAGE
-			if ($RouteType == 'page') {
-				$controllerClass = explode("::", $findedRouteConfig['controller'])[0];
-				$controllerFunction = ucfirst(explode("::", $findedRouteConfig['controller'])[1]);
-				$hash = Asseter::getJsHash();
-				$filePath = "js/Pages"  . $controllerClass . $controllerFunction . Asseter::$jsPrefix . "." . $hash . ".js";
-				$fileDir = PUBLIC_DIR . $filePath;
-				if (file_exists($fileDir)) {
-					echo "<script src='" . PUBLIC_URL . $filePath . "'></script>";
+		}
+	}
+	public static function middles(Route $route)
+	{
+		if ($route->middles) {
+			$middlesStr = str_replace(" ", "", $route->middles);
+			$middlesArr = explode(',', $middlesStr);
+			foreach ($middlesArr as $middle) {;
+				$MiddlePath = App::path("backend/Middles/$middle.php");
+				if (file_exists($MiddlePath)) {
+					require $MiddlePath;
 				} else {
-					//Dump::make(PUBLIC_URL . $filePath);
+					throw new \Startie\Exception("Path '$MiddlePath' is missing");
 				}
 			}
-		}
-
-		# 	4.2. If no route is finded
-		else {
-			Redirect::page('');
-		}
-
-		if (Dev::is() && $RouteType == 'page') {
-			echo "<div id='DevLoadCounter' class='container-fluid text-muted'>";
-			echo number_format(microtime(true) - $start_time, 2) . "s";
-			echo "</div>";
-		}
+		};
 	}
 
 	#
@@ -304,37 +376,10 @@ class Router
 		# Make as an array
 		$urlParts = explode('/', $url);
 
-		# Make strings as integers if possible
-		// foreach ($urlParts as $index => &$value) {
-		// 	# If route part can be numeric and doesn't contain type hinting for string
-		// 	if (is_numeric($value) && !preg_match('/\:str/', $value)){
-		// 		$value = intval($value);
-		// 	};
-		// };
-
 		return $urlParts;
 	}
 
-	public static function extractMethodFromRoute($params)
-	{
-		#Dump::made($params);
-		extract($params);
-		$routeClassMethodPieces = explode("::", $routeExpression);
 
-		# Get class name and make changes
-		$routeClass = $routeClassMethodPieces[0];
-		#$routeClass = strtolower($routeClass); #why?
-		$routeClass = $routeClass . "_Controller";
-		#$routeClass = ucfirst($routeClass);
-
-		# Get method name and delete parentheses
-		$routeMethod = $routeClassMethodPieces[1];
-		$routeMethod = str_replace("()", "", $routeMethod);
-		$routeMethod = strtolower($routeMethod);
-
-		# Form possible execution expression
-		return $routeClass . '::' . $routeMethod;
-	}
 
 	/**
 	 * Check if passed signature (controller::method) belongs to current url
@@ -345,5 +390,22 @@ class Router
 	public static function isCurrent($signature)
 	{
 		return Url::current() == Url::c($signature);
+	}
+
+	public static function errorPage($code)
+	{
+		$ConfigRouterPages = require App::path("backend/Config/Router/Pages.php");
+
+		if (isset($ConfigRouterPages[$code])) {
+			if (isset($ConfigRouterPages[$code]['view'])) {
+				$view = $ConfigRouterPages[$code]['view'];
+			} else {
+				throw new \Startie\Exception("View for '$code' error not found");
+			}
+		} else {
+			throw new \Startie\Exception("Configuration for '$code' not found");
+		}
+
+		echo View::r($view);
 	}
 }

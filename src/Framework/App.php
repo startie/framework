@@ -11,12 +11,15 @@ class App
         self::$root = $root;
 
         // Autoloading
+
         require "$root/vendor/autoload.php";
 
         // App constants
+
         require "$root/backend/Config/Common/App.php";
 
         // .env
+
         $dotenv = \Dotenv\Dotenv::createImmutable($root);
         $dotenv->load();
     }

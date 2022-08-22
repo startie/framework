@@ -8,8 +8,13 @@ class Language
     {
         $LanguageCode = Cookie::get('LanguageCode');
         if (!$LanguageCode) {
-            $LanguageCode = $_ENV['LANGUAGE_CODE'];
+            if (isset($_ENV['LANGUAGE_CODE'])) {
+                $LanguageCode = $_ENV['LANGUAGE_CODE'];
+            } else {
+                throw new \Startie\Exception("LANGUAGE_CODE is missing in .env");
+            }
         }
+
 
         return $LanguageCode;
     }

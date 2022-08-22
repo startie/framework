@@ -80,6 +80,18 @@ class Php
 		}
 	}
 
+	/*  
+		source: https://stackoverflow.com/questions/5225971/is-it-possible-to-get-list-of-defined-namespaces
+	*/
+
+	public static function namespaceExists($namespace)
+	{
+		$namespace .= "\\";
+		foreach (get_declared_classes() as $name)
+			if (strpos($name, $namespace) === 0) return true;
+		return false;
+	}
+
 	#
 	#
 	#	GLOBALS
@@ -101,56 +113,48 @@ class Php
 					return true;
 				}
 				return false;
-				break;
 
 			case 'ENV':
 				if (isset($_ENV[$name])) {
 					return true;
 				}
 				return false;
-				break;
 
 			case 'FILES':
 				if (isset($_FILES[$name])) {
 					return true;
 				}
 				return false;
-				break;
 
 			case 'GET':
 				if (isset($_GET[$name])) {
 					return true;
 				}
 				return false;
-				break;
 
 			case 'POST':
 				if (isset($_POST[$name])) {
 					return true;
 				}
 				return false;
-				break;
 
 			case 'REQUEST':
 				if (isset($_REQUEST[$name])) {
 					return true;
 				}
 				return false;
-				break;
 
 			case 'SERVER':
 				if (isset($_SERVER[$name])) {
 					return true;
 				}
 				return false;
-				break;
 
 			case 'SESSION':
 				if (isset($_SESSION[$name])) {
 					return true;
 				}
 				return false;
-				break;
 		}
 	}
 
@@ -168,56 +172,48 @@ class Php
 					return true;
 				}
 				return false;
-				break;
 
 			case 'ENV':
 				if (isset($_ENV[$var]) &&  $_ENV[$var] == $value) {
 					return true;
 				}
 				return false;
-				break;
 
 			case 'FILES':
 				if (isset($_FILES[$var]) &&  $_FILES[$var] == $value) {
 					return true;
 				}
 				return false;
-				break;
 
 			case 'GET':
 				if (isset($_GET[$var]) &&  $_GET[$var] == $value) {
 					return true;
 				}
 				return false;
-				break;
 
 			case 'POST':
 				if (isset($_POST[$var]) &&  $_POST[$var] == $value) {
 					return true;
 				}
 				return false;
-				break;
 
 			case 'REQUEST':
 				if (isset($_REQUEST[$var]) &&  $_REQUEST[$var] == $value) {
 					return true;
 				}
 				return false;
-				break;
 
 			case 'SERVER':
 				if (isset($_SERVER[$var]) &&  $_SERVER[$var] == $value) {
 					return true;
 				}
 				return false;
-				break;
 
 			case 'SESSION':
 				if (isset($_SESSION[$var]) &&  $_SESSION[$var] == $value) {
 					return true;
 				}
 				return false;
-				break;
 		}
 	}
 
@@ -539,7 +535,7 @@ class Php
 		$PlaceIdStr = "$num";
 		$PlaceIdStrLength = strlen($PlaceIdStr);
 
-		$step = $step;
+		//$step = $step;
 		$stepStr = "$step";
 		$stepLength = strlen($stepStr);
 

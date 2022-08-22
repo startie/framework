@@ -2,6 +2,8 @@
 
 namespace Startie;
 
+use InvalidArgumentException;
+
 class File
 {
 	public static function saveFromUrl($url, $path)

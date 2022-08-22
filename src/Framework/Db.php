@@ -2,23 +2,41 @@
 
 namespace Startie;
 
+use PDOException;
+use PDO;
+
 class Db
 {
 	public static $h;
 
-	public function __construct()
+	public static function config($name)
 	{
-		$dsn = 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8mb4;';
+		$ConfigDb = require App::path("backend/Config/Db/Common.php");
+		return $ConfigDb[$name];
+	}
 
-		try {
-			DB::$h = new \PDO($dsn, DB_USER, DB_PASSWORD);
-			DB::$h->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-		} catch (\PDOException $e) {
-			$message = "Error when connecting to database. Check credentionals and if your database is running.";
-			$message .= "<br/>";
-			$message .= $e->getMessage();
-			$message .= "<br/>";
-			die($message);
+	public function __construct($ConfigName)
+	{
+		$DbConfig = self::config($ConfigName);
+		extract($DbConfig);
+
+		if ($driver === "mysql") {
+			$dsn = "$driver:" . "host=$host;dbname=$name;charset=$charset";
+		} else {
+			throw new \Startie\Exception("Unsupported DB driver: $driver");
+		}
+
+		if ($driver === "mysql") {
+			try {
+				Db::$h = new \PDO($dsn, $user, $password);
+				Db::$h->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+			} catch (\PDOException $e) {
+				$message = "Error when connecting to database. Check credentionals and if your database is running.";
+				$message .= "<br/>";
+				$message .= $e->getMessage();
+				$message .= "<br/>";
+				die($message);
+			}
 		}
 	}
 

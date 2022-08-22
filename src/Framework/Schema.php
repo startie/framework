@@ -6,7 +6,7 @@ class Schema
 {
     public static function hasBt($val)
     {
-        if (strpos($val, '`') === 0) {
+        if (strpos($val ?? "", '`') === 0) {
             return true;
         } else {
             return false;

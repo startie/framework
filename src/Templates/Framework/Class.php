@@ -1,6 +1,5 @@
 <?php
 
-class Class
+class FrameworkClass
 {
-	
 }

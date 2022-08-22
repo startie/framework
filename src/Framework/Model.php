@@ -5,11 +5,10 @@ namespace Startie;
 use PDO;
 use PDOException;
 
-use Startie\Db;
-
-
 class Model
 {
+	public static $storage;
+
 	#
 	#
 	#		VARS
@@ -26,6 +25,21 @@ class Model
 		if (isset($_ENV[$envindex])) {
 			self::$excludeFunctions = explode(",", $_ENV[$envindex]);
 		}
+	}
+
+	public static function storage()
+	{
+		if (self::$storage) {
+			if (self::$storage[0] === "db") {
+				$storage = new \Startie\Db(self::$storage[1]);
+			} else {
+				throw new \Startie\Exception("Unknown storage");
+			}
+		} else {
+			$storage = new \Startie\Db("common");
+		}
+
+		return $storage;
 	}
 
 	#
@@ -49,15 +63,15 @@ class Model
 
 		extract($p);
 
-		// $insert = $fields ? $fields : $insert;
-		// $insert = $set ? $set : $insert;
+		$insert = $fields ?? $insert;
+		$insert = $set ?? $insert;
 
 		#
 		#	Form
 
 		$sql = "";
 		$sql .= " INSERT INTO ";
-		$sql .= get_called_class();
+		$sql .= str_replace("Models\\", "", get_called_class());
 		Model::__insert($sql, $insert);
 
 		#
@@ -70,10 +84,12 @@ class Model
 		#	State
 
 		try {
+
 			#
 			#	Prepare
 
-			$sth = DB::$h->prepare($sql);
+			$db = self::storage()::$h;
+			$sth = $db->prepare($sql);
 
 			#
 			#	Bind
@@ -95,11 +111,11 @@ class Model
 			if ($die) die();
 			if (!$test) {
 				$sth->execute();
-				$lastInsertedId = DB::$h->lastInsertId();
+				$lastInsertedId = $db->lastInsertId();
 				return $lastInsertedId;
 			}
 		} catch (PDOException $e) {
-			AppLogs::generateFromPdoException($e);
+			throw new \Startie\Exception($e);
 		}
 	}
 
@@ -113,7 +129,7 @@ class Model
 		#	Vars
 
 		$select = ['*'];
-		$from = get_called_class();
+		$from = str_replace("Models\\", "", get_called_class());
 		$debug = 0;
 		$die = 0;
 		$test = 0;
@@ -127,13 +143,13 @@ class Model
 		$sql = "\n";
 		Model::__select($sql, $select);
 		Model::__from($sql, $from);
-		Model::__join($sql, $join);
-		Model::__where($sql, $where);
-		Model::__group($sql, $group);
-		Model::__having($sql, $having);
-		Model::__order($sql, $order);
-		Model::__limit($sql, $limit);
-		Model::__offset($sql, $offset);
+		Model::__join($sql, $join ?? NULL);
+		Model::__where($sql, $where ?? NULL);
+		Model::__group($sql, $group ?? NULL);
+		Model::__having($sql, $having ?? NULL);
+		Model::__order($sql, $order ?? NULL);
+		Model::__limit($sql, $limit ?? NULL);
+		Model::__offset($sql, $offset ?? NULL);
 		$sql .= "";
 
 		#
@@ -161,13 +177,14 @@ class Model
 			#
 			#	Prepare
 
-			$sth = DB::$h->prepare($sql);
+			$db = self::storage()::$h;
+			$sth = $db->prepare($sql);
 
 			#
 			#	Bind
 
-			Model::bindClause($sth, $sql, $where);
-			Model::bindClause($sth, $sql, $having);
+			Model::bindClause($sth, $sql, $where ?? NULL);
+			Model::bindClause($sth, $sql, $having ?? NULL);
 
 			#
 			#	Debug
@@ -188,7 +205,7 @@ class Model
 				return $result;
 			}
 		} catch (PDOException $e) {
-			AppLogs::generateFromPdoException($e);
+			throw \Startie\Exception::PDO($e);
 		}
 	}
 
@@ -211,15 +228,18 @@ class Model
 		#	Checks
 
 		if (!isset($where)) {
-			Dump::made("Dangerous: no where for update");
-			die();
+			throw new \Startie\Exception("Dangerous: no where for update");
+			//die(); // after throw die is not reachable
 		}
 
 		#
 		#	Form
 
 		$sql = "";
-		$sql .= " UPDATE " . get_called_class();
+		$sql .= " UPDATE " . str_replace("Models\\", "", get_called_class());
+
+		$set = $insert ?? $fields ?? $set;
+
 		Model::_set($sql, $set);
 		Model::__where($sql, $where);
 
@@ -236,14 +256,15 @@ class Model
 			#
 			#	Prepare
 
-			$sth = DB::$h->prepare($sql);
+			$db = self::storage()::$h;
+			$sth = $db->prepare($sql);
 
 			#
 			#	Bind
 
 			Model::bindSet($sth, $sql, $set);
 			Model::bindClause($sth, $sql, $where);
-			Model::bindClause($sth, $sql, $having);
+			Model::bindClause($sth, $sql, $having ?? NULL);
 
 			#
 			#	Debug
@@ -264,7 +285,7 @@ class Model
 				return $affectedRowsCount;
 			}
 		} catch (PDOException $e) {
-			AppLogs::generateFromPdoException($e);
+			throw \Startie\Exception::PDO($e);
 		}
 	}
 
@@ -287,7 +308,7 @@ class Model
 		#	Form
 
 		$sql = "";
-		$sql .= "\nDELETE\nFROM " . get_called_class() . " \n";
+		$sql .= "\nDELETE\nFROM " . str_replace("Models\\", "", get_called_class()) . " \n";
 		Model::__where($sql, $where);
 
 		#
@@ -303,7 +324,8 @@ class Model
 			#
 			#	Prepare
 
-			$sth = DB::$h->prepare($sql);
+			$db = self::storage()::$h;
+			$sth = $db->prepare($sql);
 
 			#
 			#	Bind
@@ -329,7 +351,7 @@ class Model
 				return $affectedRowsCount;
 			}
 		} catch (PDOException $e) {
-			AppLogs::generateFromPdoException($e);
+			throw \Startie\Exception::PDO($e);
 		}
 	}
 
@@ -349,7 +371,7 @@ class Model
 		#	Vars
 
 		$select = ['*'];
-		$from = get_called_class();
+		$from = str_replace("Models\\", "", get_called_class());
 		$debug = 0;
 		$die = 0;
 		$test = 0;
@@ -391,7 +413,8 @@ class Model
 			#
 			#	Prepare
 
-			$sth = DB::$h->prepare($sql);
+			$db = self::storage()::$h;
+			$sth = $db->prepare($sql);
 
 			#
 			#	Bind
@@ -421,7 +444,7 @@ class Model
 				}
 			}
 		} catch (PDOException $e) {
-			AppLogs::generateFromPdoException($e);
+			throw \Startie\Exception::PDO($e);
 		}
 	}
 
@@ -435,7 +458,7 @@ class Model
 		#	Vars
 
 		$select = ['*'];
-		$from = get_called_class();
+		$from = str_replace("Models\\", "", get_called_class());
 		$debug = 0;
 		$die = 0;
 		$test = 0;
@@ -472,7 +495,8 @@ class Model
 			#
 			#	Prepare
 
-			$sth = DB::$h->prepare($sql);
+			$db = self::storage()::$h;
+			$sth = $db->prepare($sql);
 
 			#
 			#	Bind
@@ -503,7 +527,7 @@ class Model
 				}
 			}
 		} catch (PDOException $e) {
-			AppLogs::generateFromPdoException($e);
+			throw \Startie\Exception::PDO($e);
 		}
 	}
 
@@ -523,13 +547,47 @@ class Model
 		])[0];
 	}
 
-	#
-	#	$Entity = Entity::field(['field' => [[$val, 'TYPE']]]);
-	#	
-	#	$where = [
-	#		$field => [[$value, $type]]
-	#	], 
+	/**
+	 * Where
+	 *
+	 * Select with only where
+	 * 
+	 * ```
+	 * $Entity = Entity::field([
+	 * 		'column' => [[$val, 'TYPE']]
+	 * ]);
+	 * ```
+	 * @return void
+	 */
 
+	public static function where(
+		$where,
+		$options = ['debug' => 0, 'die' => 0, 'test' => 0]
+	) {
+		extract($options);
+
+		$result = self::read([
+			'where' => $where,
+			'debug' => $debug,
+			'die' => $die,
+			'test' => $test,
+		]);
+
+		return $result;
+	}
+
+	/**
+	 * Field
+	 * 
+	 * Select by certain field value
+	 *
+	 * ```php
+	 * $Entity = Entity::field([
+	 * 		'column' => [[$val, 'TYPE']]
+	 * ]);
+	 * ```
+	 * @return void
+	 */
 	public static function field(
 		$where,
 		$options = ['limit' => 1, 'debug' => 0, 'die' => 0, 'test' => 0]
@@ -729,7 +787,7 @@ class Model
 		$sql .= " ";
 		if (isset($join)) {
 			foreach ($join as $tableName => $joinParams) {
-				if ($joinParams[2]) {
+				if (isset($joinParams[2])) {
 					$joinType = strtoupper($joinParams[2]);
 				} else {
 					$joinType = "INNER";
@@ -897,7 +955,7 @@ class Model
 		foreach ($set as $i => $data) {
 			$col = $data[0];
 			$val = $data[1];
-			$type = $data[2];
+			$type = $data[2] ?? NULL;
 
 			# With backticks
 			if (Schema::hasBt($val)) {
@@ -943,7 +1001,7 @@ class Model
 		foreach ($insert as $data) {
 			$col = $data[0];
 			$val = $data[1];
-			$type = $data[2];
+			$type = $data[2] ?? NULL;
 
 			# With backticks
 			if (Schema::hasBt($val)) {
@@ -978,7 +1036,7 @@ class Model
 			foreach ($set as $i => &$data) {
 				$col = $data[0];
 				$val = $data[1];
-				$type = $data[2];
+				$type = $data[2] ?? NULL;
 				$bindExpr = ":{$col}{$i}";
 
 				#
@@ -1015,7 +1073,8 @@ class Model
 			foreach ($insert as $i => $data) {
 				$col = $data[0];
 				$val = $data[1];
-				$type = $data[2];
+				$type = $data[2] ?? NULL;
+
 				$bindExpr = ":{$col}";
 
 				#
@@ -1052,7 +1111,7 @@ class Model
 			foreach ($where as $columnName => $columnValuesArr) {
 				foreach ($columnValuesArr as $i => $data) {
 					$signAndValue = $data[0];
-					$type = $data[1];
+					$type = $data[1] ?? NULL;
 
 					# If we have type
 					if (isset($type)) {

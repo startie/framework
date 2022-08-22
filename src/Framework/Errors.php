@@ -97,12 +97,8 @@ class Errors
 
             // Show only error ID
             else {
-                $appLogId = error_handler($error['type'], $error['message'], $error['file'], $error['line']);
-                if ($appLogId) {
-                    self::render("#{$appLogId}");
-                } else {
-                    self::render("#unknown");
-                }
+                self::errorHandler($error['type'], $error['message'], $error['file'], $error['line']);
+                self::render("#unknown id error");
             }
         } else {
             // Send & turn off the buffer

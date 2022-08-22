@@ -31,56 +31,48 @@ class Input
 					return true;
 				}
 				return false;
-				break;
 
 			case 'ENV':
 				if (isset($_ENV[$name])) {
 					return true;
 				}
 				return false;
-				break;
 
 			case 'FILES':
 				if (isset($_FILES[$name])) {
 					return true;
 				}
 				return false;
-				break;
 
 			case 'GET':
 				if (isset($_GET[$name])) {
 					return true;
 				}
 				return false;
-				break;
 
 			case 'POST':
 				if (isset($_POST[$name])) {
 					return true;
 				}
 				return false;
-				break;
 
 			case 'REQUEST':
 				if (isset($_REQUEST[$name])) {
 					return true;
 				}
 				return false;
-				break;
 
 			case 'SERVER':
 				if (isset($_SERVER[$name])) {
 					return true;
 				}
 				return false;
-				break;
 
 			case 'SESSION':
 				if (isset($_SESSION[$name])) {
 					return true;
 				}
 				return false;
-				break;
 		}
 	}
 

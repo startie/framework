@@ -56,7 +56,11 @@ class Redirect
 			if (!empty($alt)) {
 				Redirect::page($alt);
 			} else {
-				Redirect::page($_ENV['REDIRECT_DEFAULT_URL']);
+				if (isset($_ENV['REDIRECT_DEFAULT_URL'])) {
+					Redirect::page($_ENV['REDIRECT_DEFAULT_URL']);
+				} else {
+					Redirect::page("");
+				}
 			}
 		}
 	}

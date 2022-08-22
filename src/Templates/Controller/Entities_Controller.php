@@ -1,68 +1,66 @@
-<?php
-
 class Entities_Controller
 {
-	#
-	#
-	#		PAGES
-	#
-	#
-	
-	public static function index()
-	{
-		Procedure::inc('Entities/pages/List');
-	}
+#
+#
+# PAGES
+#
+#
 
-	public static function show()
-	{
-		Procedure::inc('Entities/pages/Show');
-	}
+public static function index()
+{
+Procedure::inc('Entities/pages/List');
+}
 
-	public static function add()
-	{
-		Procedure::inc('Entities/pages/Add');
-	}
+public static function show()
+{
+Procedure::inc('Entities/pages/Show');
+}
 
-	public static function edit()
-	{
-		Procedure::inc('Entities/pages/Edit');
-	}
+public static function add()
+{
+Procedure::inc('Entities/pages/Add');
+}
 
-	#
-	#
-	#		ACTIONS
-	#
-	#
+public static function edit()
+{
+Procedure::inc('Entities/pages/Edit');
+}
 
-	public static function create()
-	{
-		Procedure::inc('Entities/pages/Create');
-	}
+#
+#
+# ACTIONS
+#
+#
 
-	public static function update()
-	{
-		Procedure::inc('Entities/pages/Update');
-	}
+public static function create()
+{
+Procedure::inc('Entities/pages/Create');
+}
 
-	public static function hide()
-	{
-		Procedure::inc('Entities/pages/Hide');
-	}
+public static function update()
+{
+Procedure::inc('Entities/pages/Update');
+}
 
-	public static function delete()
-	{
-		Procedure::inc('Entities/pages/Delete');
-	}
+public static function hide()
+{
+Procedure::inc('Entities/pages/Hide');
+}
 
-	#
-	#
-	#		TASKS
-	#
-	#
+public static function delete()
+{
+Procedure::inc('Entities/pages/Delete');
+}
 
-	#
-	#
-	#		API
-	#
-	#
+#
+#
+# TASKS
+#
+#
+
+#
+#
+# API
+#
+#
 }

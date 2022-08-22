@@ -2,16 +2,16 @@
 
 ```
 composer init
-```
-
-```
 composer require startie/framework
 ```
 
-### Folders & files
+### Set up folders
 
 ```
-mkdir backend && mkdir backend/Controllers && mkdir backend/Models
+mkdir public
+mkdir backend
+mkdir backend/Controllers
+mkdir backend/Models
 ```
 
 ### /composer.json
@@ -28,13 +28,14 @@ mkdir backend && mkdir backend/Controllers && mkdir backend/Models
 ### Config
 
 ```
-mkdir backend/Config && mkdir backend/Config/Bootstrap && mkdir backend/Config/Env
+mkdir backend/Config
+mkdir backend/Config/Bootstrap
 ```
 
-### /index.php
+### public/index.php
 
 ```
-touch index.php
+touch public/index.php
 ```
 
 ```php
@@ -43,7 +44,7 @@ touch index.php
 require 'backend/Config/Bootstrap/Common.php';
 ```
 
-### /backend/Config/Env/.env
+### .env
 
 ```
 POWER=1

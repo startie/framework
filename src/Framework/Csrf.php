@@ -2,16 +2,21 @@
 
 namespace Startie;
 
+use Startie\Url;
+use Startie\Logs;
+use Startie\Input;
+use Startie\Dump;
+use Startie\Auth;
+use Models\Users;
+use DateTime;
+use DateInterval;
+
 class Csrf
 {
 	public static function create()
 	{
 		# Generate token's hash
-		if (function_exists('mcrypt_create_iv')) {
-			$csrfToken = bin2hex(mcrypt_create_iv(32, MCRYPT_DEV_URANDOM));
-		} else {
-			$csrfToken = bin2hex(openssl_random_pseudo_bytes(32));
-		}
+		$csrfToken = bin2hex(openssl_random_pseudo_bytes(32));
 
 		if (Input::is('POST', 'csrfUrl')) {
 			$csrfUrl = Input::post('csrfUrl', 'STR');
@@ -72,18 +77,18 @@ class Csrf
 
 					# If not
 					else {
-						AppLogs::create([
-							'insert' => [
-								['createdAt', '`UTC_TIMESTAMP()`'],
-								['UserId', $CurrentUserId, 'INT'],
-								['line', __LINE__],
-								['file', __FILE__],
-								['url', $csrfUrl],
-								['message', 'Попытка CSRF c IP-адреса: ' . Users::getIpAddress()],
-								['type', 'error'],
-								['object', 'security']
-							]
-						]);
+						// Logs::create([
+						// 	'insert' => [
+						// 		['createdAt', '`UTC_TIMESTAMP()`'],
+						// 		['UserId', $CurrentUserId, 'INT'],
+						// 		['line', __LINE__],
+						// 		['file', __FILE__],
+						// 		['url', $csrfUrl],
+						// 		['message', 'Попытка CSRF c IP-адреса: ' . Users::getIpAddress(),],
+						// 		['type', 'error'],
+						// 		['object', 'security']
+						// 	]
+						// ]);
 					}
 				}
 			}

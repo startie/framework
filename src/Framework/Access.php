@@ -2,65 +2,105 @@
 
 namespace Startie;
 
+use Models\UserProfiles;
+
 class Access
 {
+	const PROVIDERS_NAMESPACE = '\\Providers\\';
 	public static $providers = [];
 
 	public static function init()
 	{
+		// Load providers
+
 		if (isset($_ENV['ACCESS_PROVIDER'])) {
 			self::$providers = explode(',', $_ENV['ACCESS_PROVIDER']);
 		};
+
+		if (count(self::$providers) === 0) {
+			if (isset($_ENV['ACCESS_PROVIDERS'])) {
+				self::$providers = explode(',', $_ENV['ACCESS_PROVIDERS']);
+			}
+		}
+
+		// Init providers
+		// calling this: VkAccess::init()
+
+		if (count(self::$providers) > 0) {
+			foreach (self::$providers as $provider) {
+				$AccessProviderClass = self::PROVIDERS_NAMESPACE . $provider . 'Access'; // 'Providers\VkAccess'
+				if (class_exists($AccessProviderClass)) {
+					call_user_func($AccessProviderClass . "::init");
+				} else {
+					throw new \Startie\Exception("Class `$AccessProviderClass` is missing. Create it in \Providers namespace");
+				}
+			}
+		}
+
+		// Check existance of providers
+
+		foreach (self::$providers as $provider) {
+			$AccessProviderClass = self::PROVIDERS_NAMESPACE . $provider . 'Access'; // 'Providers\VkAccess'
+			if (!class_exists($AccessProviderClass)) {
+				throw new \Startie\Exception("Class `$AccessProviderClass` is missing. Create it in \Providers namespace");
+			}
+		}
 	}
 
-	#
-	#	Example:
-	#	Access:is('admins')	
-
-	public static function is($group)
+	public static function is($group, $UserId = null)
 	{
-		#
-		# 	Unify group string
-		# 	e.g, 'Admins' => 'admins'
+		if ($UserId) {
+			$UserProfiles = UserProfiles::where([
+				'UserId' => [[$UserId, 'INT']]
+			]);
+
+			// echo "<pre>\n";
+			// var_dump(
+			// 	$UserProfiles
+			// );
+			// echo '</pre>';
+			// die();
+		}
+
+		//	Unify group string
+		// 	e.g, 'Admins' => 'admins'
 
 		$group = strtolower($group);
 
-		#
-		# 	Check if there are providers from .env
+		// 	Check if there are providers from .env
 
 		if (is_array(self::$providers)) {
 
-			#
-			# 	Loop through all of them
-
 			foreach (self::$providers as $provider) {
 
-				#
-				# 	Evaluate class and method (e.g VkAccess::is)
+				// 	Evaluate class and method
 
-				$classMethod = 'Providers\\' . $provider . 'Access::is';
+				$AccessProviderClass = 'Providers\\' . $provider . 'Access'; // 'Providers\VkAccess'
+				$СlassAndMethod = $AccessProviderClass . '::is'; // 'Providers\VkAccess::is'
 
-				#
-				# 	Call it with param '$group', if true return true
+				// 	Call it with param '$group'
 
-				if (call_user_func($classMethod, $group)) {
+				$hasAccess = call_user_func($СlassAndMethod, $group);
+
+				// If 'true' – return true
+
+				if ($hasAccess) {
 					return true;
 				}
 
-				# If not – continue the loop
+				// If 'false' – continue the loop
 			}
 
-			#
-			# 	If after all iterations we don't get true, return false
+			//
+			// 	If after all iterations we don't get true, return false
 
 			return false;
 		}
 
-		#
-		# 	If no providers found – return the error and stop an app
+		// 	If no providers found, then return the error and stop the app
 
 		else {
-			die('No access providers');
+			throw new \Startie\Exception("There are no defined Access providers");
 		}
 	}
 }

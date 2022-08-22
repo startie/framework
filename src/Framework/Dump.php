@@ -4,9 +4,20 @@ namespace Startie;
 
 class Dump
 {
-    public static function checkAccess()
+    protected static $hasAccess;
+
+    public static function init($callback = NULL)
     {
-        return Access::is('developers') || $_ENV['MODE_DEV'];
+        if ($callback) {
+            self::$hasAccess = $callback();
+        } else {
+            self::$hasAccess = true;
+        }
+    }
+
+    public static function hasAccess()
+    {
+        return self::$hasAccess;
     }
 
     public static function e($var)
@@ -17,12 +28,14 @@ class Dump
     }
 
     #
-    #   For JS network console
+    #   1. 
+    #   a) For JS network console
+    #   b) For PHP console
     #
 
     public static function __pre($var, $msg = "")
     {
-        if (Dump::checkAccess()) {
+        if (self::$hasAccess) {
             var_dump($var);
             echo $msg . "\n";
         }
@@ -30,7 +43,7 @@ class Dump
 
     public static function __make($result, $die = 0, $msg = "", $trace = 0)
     {
-        if (Dump::checkAccess()) {
+        if (self::hasAccess()) {
             Dump::__pre($result, $msg);
             if ($trace) {
                 Dump::pre(debug_backtrace());
@@ -51,7 +64,7 @@ class Dump
 
     public static function _pre($var, $msg = "")
     {
-        if (Dump::checkAccess()) {
+        if (self::hasAccess()) {
             echo "<pre>";
             echo $msg . "\n";
             var_dump($var);
@@ -68,7 +81,7 @@ class Dump
         $backTrace .= "</mark>";
         $backTrace .= "<br>";
 
-        if (Dump::checkAccess()) {
+        if (self::hasAccess()) {
             Dump::_pre($result, $msg . $backTrace);
             if ($trace) {
                 Dump::pre(debug_backtrace());
@@ -89,7 +102,7 @@ class Dump
 
     public static function pre($var, $msg = "")
     {
-        if (Dump::checkAccess()) {
+        if (self::hasAccess()) {
             echo "<pre>";
             echo $msg . "\n";
             self::var_dump($var);
@@ -106,10 +119,13 @@ class Dump
         $backTraceArr = array_reverse($backTraceArr);
         for ($i = 0; $i < count($backTraceArr); $i++) {
             if (
-                strpos($backTraceArr[$i]['file'], "Framework/Core/Dump") === false
+                strpos(
+                    $backTraceArr[$i]['file'] ?? "",
+                    "Framework/Core/Dump"
+                ) === false
             ) {
-                $line = $backTraceArr[$i]['line'];
-                $file = $backTraceArr[$i]['file'];
+                $line = $backTraceArr[$i]['line'] ?? 0;
+                $file = $backTraceArr[$i]['file'] ?? "";
                 $backTrace .= "[$line]";
                 $backTrace .= "\t{$file}\n";
             }
@@ -117,7 +133,7 @@ class Dump
 
         $backTrace .= "</mark>";
 
-        if (Dump::checkAccess()) {
+        if (self::hasAccess()) {
             Dump::pre($result, $msg . $backTrace);
             if ($trace) {
                 Dump::pre(debug_backtrace());
@@ -134,7 +150,7 @@ class Dump
 
     public static function start($var)
     {
-        if (Dump::checkAccess()) {
+        if (self::hasAccess()) {
             echo "<pre>";
             self::var_dump($var);
             echo "<br>";
@@ -143,7 +159,7 @@ class Dump
 
     public static function next($var)
     {
-        if (Dump::checkAccess()) {
+        if (self::hasAccess()) {
             self::var_dump($var);
             echo "<br>";
         }
@@ -151,7 +167,7 @@ class Dump
 
     public static function end($var)
     {
-        if (Dump::checkAccess()) {
+        if (self::hasAccess()) {
             self::var_dump($var);
             echo "</pre>";
         }

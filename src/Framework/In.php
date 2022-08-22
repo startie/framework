@@ -36,7 +36,7 @@ class In
 				if (!empty($if[2])) {
 					$data = $if[2];
 				} else {
-					$data = $data;
+					//$data = $data;
 				}
 			}
 		}
