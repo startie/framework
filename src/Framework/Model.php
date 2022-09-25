@@ -390,14 +390,40 @@ class Model
 			$sql .= "count(*) as count";
 		}
 		$sql .= "\n\n";
-		Model::__from($sql, $from);
-		Model::__join($sql, $join);
-		Model::__where($sql, $where);
-		Model::__group($sql, $group);
-		Model::__having($sql, $having);
-		Model::__order($sql, $order);
-		Model::__limit($sql, $limit);
-		Model::__offset($sql, $offset);
+
+		if (isset($from)) {
+			Model::__from($sql, $from);
+		}
+
+		if (isset($join)) {
+			Model::__join($sql, $join);
+		}
+
+		if (isset($where)) {
+			Model::__where($sql, $where);
+		}
+
+		if (isset($group)) {
+			Model::__group($sql, $group);
+		}
+
+		if (isset($having)) {
+			Model::__having($sql, $having);
+		}
+
+		if (isset($order)) {
+			Model::__order($sql, $order);
+		}
+
+		if (isset($limit)) {
+			Model::__limit($sql, $limit);
+		}
+
+		if (isset($offset)) {
+			Model::__offset($sql, $offset);
+		}
+
+
 		$sql .= "\n";
 
 		#
