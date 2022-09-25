@@ -295,13 +295,13 @@ class Router
 			throw new \Exception("Controller method '{$route->classMethodExecution}' doesn't exsists");
 		}
 
-		// If we don't have params
+		/* If we don't have params */
+
 		if (empty($controllerParams)) {
 			$content = call_user_func("\Controllers\\" . $route->classMethodExecution);
 		}
 
-		// If we have params
-		else {
+		/* If we have params */ else {
 			$content = call_user_func_array("\Controllers\\" . $route->classMethodExecution, [$controllerParams]);
 		}
 

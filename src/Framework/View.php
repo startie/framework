@@ -12,15 +12,16 @@ class View
 			ob_start();
 			global $t;
 
-
 			extract($data);
 			require($path);
 
-
 			$content = ob_get_contents();
 
+			/*
+				Fix spaces
+				Dangerous because of spoiling data displaying
+			*/
 
-			// Dangerous because of spoiling data displaying
 			// $content = str_replace("\n", "", $content);
 			// $content = str_replace("\t", "", $content);
 			// $content = preg_replace("/ {2,}/m", "", $content);

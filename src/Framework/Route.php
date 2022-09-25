@@ -6,6 +6,17 @@ use Startie\App;
 
 class Route
 {
+    public $type;
+    public $middles;
+    public $title;
+    public $layout;
+    public $class;
+    public $method;
+    public $classMethodExecution;
+    public $classFull;
+    public $controllerNamespacedClass;
+    public $controllerFilePath;
+
     public function __construct($config)
     {
         $this->type = $config['type'] ?? "";
@@ -25,25 +36,4 @@ class Route
 
         $this->controllerFilePath = App::path("backend/Controllers/{$this->classFull}.php");
     }
-
-    // public static function extractMethodFromRoute($params)
-    // {
-    //     #Dump::made($params);
-    //     extract($params);
-    //     $routeClassMethodPieces = explode("::", $routeExpression);
-
-    //     # Get class name and make changes
-    //     $routeClass = $routeClassMethodPieces[0];
-    //     #$routeClass = strtolower($routeClass); #why?
-    //     $routeClass = $routeClass . "_Controller";
-    //     #$routeClass = ucfirst($routeClass);
-
-    //     # Get method name and delete parentheses
-    //     $routeMethod = $routeClassMethodPieces[1];
-    //     $routeMethod = str_replace("()", "", $routeMethod);
-    //     $routeMethod = strtolower($routeMethod);
-
-    //     # Form possible execution expression
-    //     return $routeClass . '::' . $routeMethod;
-    // }
 }

@@ -30,7 +30,7 @@ class Texts
 			if ($str == "") {
 				return "";
 			} else {
-				return $t[$str] ?? $t[str_replace(" ", "_", $str)];
+				return $t[$str] ?? $t[str_replace(" ", "_", $str)] ?? "";
 			}
 		}
 

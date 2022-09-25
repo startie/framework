@@ -2,29 +2,63 @@
 
 namespace Startie;
 
+use Startie\Logs;
 use Startie\Config;
 use Startie\Auth;
-use Startie\Logs;
-use Startie\Access;
+use Startie\App;
 
 class Errors
 {
     public static $logs;
+    public static $handler;
 
     public static function config()
     {
+        /*
+            Find config
+        */
+
         $stage = strtolower(Config::$stage);
         $machine = strtolower(Config::$machine);
-
         $Config_Errors_path = App::path("backend/Config/Errors/{$stage}_{$machine}.php");
-
         $Config_Errors = require $Config_Errors_path;
+
+        /*
+            Set ini
+        */
 
         foreach ($Config_Errors['ini'] as $setting => $value) {
             ini_set($setting, $value);
         }
 
+        /*
+            Set logs settings
+        */
+
         self::$logs = $Config_Errors['logs'];
+
+        /*
+            Set handler
+        */
+
+        if (isset($Config_Errors['handler'])) {
+            if ($Config_Errors['handler'] == 'Whoops') {
+                $handler = new \Whoops\Handler\PrettyPageHandler;
+                $handler->setEditor(
+                    $Config_Errors['handlerEditor']
+                );
+                $whoops = new \Whoops\Run;
+                $whoops->pushHandler($handler);
+                $whoops->register();
+                self::$handler = 'Whoops';
+            } else {
+                self::$handler = 'Startie';
+            }
+        }
+
+        /*
+            Turn on reporting
+        */
 
         error_reporting($Config_Errors['error_reporting']);
     }
@@ -34,13 +68,14 @@ class Errors
         // Run configuration
         Errors::config();
 
-        // Start remembering everything that would normally be outputted, but don't quite do anything with it yet
-        ob_start();
+        //ob_start();
 
         // Handlers
-        set_error_handler("Startie\Errors::errorHandler"); // errors
-        set_exception_handler("Startie\Errors::exceptionHandler"); // exceptions
-        register_shutdown_function("Startie\Errors::shutdownFunction"); // fatal errors
+        if (self::$handler === 'Startie') {
+            set_error_handler("Startie\Errors::errorHandler"); // errors
+            set_exception_handler("Startie\Errors::exceptionHandler"); // exceptions
+            register_shutdown_function("Startie\Errors::shutdownFunction"); // fatal errors
+        }
     }
 
     public static function errorHandler($level, $message, $file = '', $line = 0)
@@ -62,16 +97,28 @@ class Errors
             $LogId = self::log($e);
         }
 
-        /* Display */
+        /* Collect errors */
 
-        if (ini_get('display_errors')) {
-            if (isset($LogId)) {
-                self::render($e, "Log generated: #$LogId.");
+        if (self::$handler === 'Startie') {
+            if (ini_get('display_errors')) {
+                if (isset($LogId)) {
+                    $errorHTML = self::render($e, "Log generated: #$LogId.");
+                } else {
+                    $errorHTML = self::render($e, "No log was generated.");
+                }
             } else {
-                self::render($e, "No log was generated.");
+                $errorHTML = self::render("Unknown error has been occurred");
             }
-        } else {
-            self::render("Unknown error has been occurred");
+        }
+
+        /*
+            Display
+        */
+
+        ob_get_clean();
+
+        if (self::$handler === 'Startie') {
+            echo $errorHTML;
         }
     }
 
@@ -172,13 +219,12 @@ class Errors
 
     public static function render($message, $addition = "")
     {
-        echo
-        "
-        <div style='margin: 50px; font-family: Menlo, Courier New;'>
-            <h1>Error</h1>
-            <div style='white-space: pre-wrap; font-size: 15px;'>{$message}<div>
-            <div class='margin-top:30px'>{$addition}</div>
-        </div>
+        return "        
+            <div style='margin: 50px; font-family: Menlo, Courier New;'>
+                <h1>Error</h1>
+                <div style='white-space: pre-wrap; font-size: 15px;'>{$message}<div>
+                <div class='margin-top:30px'>{$addition}</div>
+            </div>
         ";
     }
 }
