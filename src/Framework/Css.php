@@ -30,8 +30,8 @@ class Css
 	public static function p($name)
 	{
 		throw new \Startie\Exception('Css::p() is deprecated, use Css::public');
-		$path = PUBLIC_URL . $name . ".css";
-		echo "<link rel='stylesheet' href='$path'>";
+		//$path = PUBLIC_URL . $name . ".css";
+		//echo "<link rel='stylesheet' href='$path'>";
 	}
 
 	public static function public($name)

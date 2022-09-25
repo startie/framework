@@ -9,6 +9,7 @@ class Model
 {
 	public static $storage;
 
+	public static $types;
 	#
 	#
 	#		VARS

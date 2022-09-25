@@ -4,6 +4,23 @@ namespace Startie;
 
 class Pagination
 {
+	public $entriesPerPage;
+	public $maxPages;
+	public $align;
+	public $EntitiesCount;
+	public $controllerExpression;
+	public $page;
+	public $offset;
+	public $per;
+	public $totalEntities;
+	public $totalPages;
+	public $links;
+	public $getParams;
+	public $urlFirst;
+	public $urlLast;
+	public $urlNext;
+	public $urlPrev;
+
 	function __construct($entriesPerPage, $maxPages, $align, $EntitiesCount, $controllerExpression)
 	{
 		$this->entriesPerPage = $entriesPerPage;
