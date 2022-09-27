@@ -1,42 +1,30 @@
-### Install
+# Installation
 
 ```
 composer init
 composer require startie/framework
 ```
 
-### Set up folders
+# Set up
+
+## Project structure in Terminal
 
 ```
-mkdir public
-mkdir backend
-mkdir backend/Controllers
-mkdir backend/Models
+mkdir backend && mkdir backend/Controllers && mkdir backend/Config && mkdir backend/Config/Bootstrap && mkdir backend/Routs && touch index.php && touch backend/Config/Bootstrap/Common.php && touch .env && mkdir backend/Config/Common && backend/Config/Common/App.php && touch backend/Controllers/Index_Controller.php && touch backend/Routs/Index.php
 ```
 
-### /composer.json
+## `composer.json`
 
-```
+```json
 "autoload": {
     "classmap": [
         "backend/Controllers",
-        "backend/Models",
+        "backend/Models"
     ]
-},
+}
 ```
 
-### Config
-
-```
-mkdir backend/Config
-mkdir backend/Config/Bootstrap
-```
-
-### index.php
-
-```
-touch index.php
-```
+## `index.php`
 
 ```php
 <?php
@@ -44,9 +32,9 @@ touch index.php
 require 'backend/Config/Bootstrap/Common.php';
 ```
 
-### .env
+## `.env`
 
-```
+```php
 POWER=1
 MODE_DEV=1
 NO_CONNECTION=0
@@ -60,10 +48,10 @@ DATE_TIMEZONE="Europe/London"
 TIMEZONE_OFFSET="0"
 LOCALE="ru_RU.UTF-8"
 
-PROTOCOL=""
-SERVERNAME=""
-SERVERPORT=""
-DOMAIN=""
+PROTOCOL="http://"
+SERVERNAME="localhost"
+SERVERPORT=":8000"
+DOMAIN="/"
 
 DIR_APP=""
 DIR_APP_PHYSICAL=""
@@ -71,26 +59,23 @@ DIR_APP_PHYSICAL=""
 INPUT_TYPE_DEFAULT="STR"
 ```
 
-### /backend/Config/Bootstrap/Common.php
+## `backend/Config/Bootstrap/Common.php`
 
-```
+```php
 <?php
 
 $root = dirname(__DIR__, 3);
 
 require "$root/vendor/autoload.php";
 
-$root = dirname(__DIR__, 3);
 \Startie\App::init($root);
-
 \Startie\Config::init();
 \Startie\Router::init();
-
 ```
 
-### /backend/Config/Common.php
+## `backend/Config/Common/App.php`
 
-```
+```php
 <?php
 
 $APP_NAME = "";
@@ -100,29 +85,37 @@ $APP_V = "";
 $APP_V_DATE = "";
 ```
 
-### /backend/Controllers/Index_Controller.php
+## `backend/Controllers/Index_Controller.php`
 
-```
+```php
 <?php
+
+namespace Controllers;
 
 class Index_Controller
 {
     public static function index()
     {
-        echo "hello world";
+        echo "Index";
     }
 }
 ```
 
-### /backend/Routs/Index.php
+## `backend/Routs/Index.php`
 
-```
+```php
 <?php
 
-return $Index = [
+return [
     '/' => [
         'title' => 'Index page',
         'controller' => 'Index::index',
     ],
 ];
+```
+
+# Run in Terminal
+
+```
+php -S localhost:8000
 ```

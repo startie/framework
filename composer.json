@@ -17,8 +17,7 @@
     "require": {
         "mustache/mustache": "~2.5",
         "vlucas/phpdotenv": "^5.4",
-        "filp/whoops": "^2.14",
-        "spatie/ignition": "^1.4"
+        "filp/whoops": "^2.14"
     },
     "require-dev": {
         "phpunit/phpunit": "^9",
