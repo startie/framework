@@ -32,10 +32,10 @@ mkdir backend/Config
 mkdir backend/Config/Bootstrap
 ```
 
-### public/index.php
+### index.php
 
 ```
-touch public/index.php
+touch index.php
 ```
 
 ```php
@@ -79,17 +79,13 @@ INPUT_TYPE_DEFAULT="STR"
 $root = dirname(__DIR__, 3);
 
 require "$root/vendor/autoload.php";
-require "$root/backend/Config/Common.php";
 
-$dotenv = Dotenv\Dotenv::createImmutable("$root/backend/Config/Env");
-$dotenv->load();
+$root = dirname(__DIR__, 3);
+\Startie\App::init($root);
 
-Startie\Config::init();
-Startie\Session::init();
-Startie\Asseter::init();
-Startie\Input::init();
-Startie\Model::init();
-Startie\Router::init();
+\Startie\Config::init();
+\Startie\Router::init();
+
 ```
 
 ### /backend/Config/Common.php
@@ -128,15 +124,5 @@ return $Index = [
         'title' => 'Index page',
         'controller' => 'Index::index',
     ],
-];
-```
-
-### /backend/Config/Routs.php
-
-```
-<?php
-
-$Routs = [
-    'Index',
 ];
 ```
