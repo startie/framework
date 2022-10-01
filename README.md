@@ -10,7 +10,7 @@ composer require startie/framework
 ## Project structure in Terminal
 
 ```
-mkdir backend && mkdir backend/Controllers && mkdir backend/Config && mkdir backend/Config/Bootstrap && mkdir backend/Routs && touch index.php && touch backend/Config/Bootstrap/Common.php && touch .env && mkdir backend/Config/Common && backend/Config/Common/App.php && touch backend/Controllers/Index_Controller.php && touch backend/Routs/Index.php
+mkdir backend && mkdir backend/Controllers && mkdir backend/Config && mkdir backend/Config/Bootstrap && mkdir backend/Routs && touch index.php && touch backend/Config/Bootstrap/Common.php && touch .env && mkdir backend/Config/Common && touch backend/Config/Common/App.php && touch backend/Controllers/Index_Controller.php && touch backend/Routs/Index.php
 ```
 
 ## `composer.json`
@@ -19,7 +19,6 @@ mkdir backend && mkdir backend/Controllers && mkdir backend/Config && mkdir back
 "autoload": {
     "classmap": [
         "backend/Controllers",
-        "backend/Models"
     ]
 }
 ```
