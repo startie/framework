@@ -11,18 +11,51 @@ class Texts
 {
 	public static function init()
 	{
+		/*
+			Get current language
+		*/
+
 		$LanguageCode = Language::code();
 
-		$ConfigTexts = require App::path('backend/Config/Texts/Common.php');
+		/*
+			Load texts
+		*/
 
-		$ConfigTextsPaths = array_map(
-			function ($name) use ($LanguageCode) {
-				return $name . "/$LanguageCode";
-			},
-			$ConfigTexts
-		);
+		$TextsPaths = []; // ['Common/ru', 'Users/ru', ... ]
 
-		/* Register utils */
+		/*
+			a) if there is no config: by scanning backend/Texts directory
+		*/
+
+		$ConfigPath = App::path('backend/Config/Texts/Common.php');
+		if (!file_exists($ConfigPath)) {
+			$TextsPath = App::path("backend/Texts/");
+
+			$TextsFiles = scandir($TextsPath);
+			foreach ($TextsFiles as $TextsFile) {
+				if ($TextsFile != "." && $TextsFile != "..") {
+					$TextsPaths[] = "{$TextsFile}/$LanguageCode";
+				}
+			}
+		}
+
+		/*
+			b) if there is config: by loading config
+		*/
+
+		if (file_exists($ConfigPath)) {
+			$ConfigTexts = require $ConfigPath;
+
+			$TextsPaths = array_map(
+				function ($name) use ($LanguageCode) {
+					return $name . "/$LanguageCode";
+				},
+				$ConfigTexts
+			);
+		}
+		/* 
+			Register utils 
+		*/
 
 		function t($str = "")
 		{
@@ -34,7 +67,11 @@ class Texts
 			}
 		}
 
-		$t = self::collect($ConfigTextsPaths);
+		/*
+			Collect texts
+		*/
+
+		$t = self::collect($TextsPaths);
 
 		$GLOBALS['t'] = $t;
 	}
