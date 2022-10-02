@@ -3,21 +3,14 @@
 namespace Startie;
 
 use Startie\View;
-use Startie\Validate;
 use Startie\Url;
 use Startie\Php;
-use Startie\Dump;
-use Startie\Dev;
-use Startie\Asseter;
 use Startie\Route;
 
 class Router
 {
-
-	/*
-	 * 	instance of Route
-	 */
-	public static $route;
+	public static Route $route;
+	public static float $startedAt;
 
 	public static function routs()
 	{
@@ -68,7 +61,7 @@ class Router
 
 		/* Dev load count (start) */
 
-		$start_time = microtime(true);
+		Router::$startedAt = microtime(true);
 
 		/* Find current */
 
@@ -78,7 +71,7 @@ class Router
 		/* Render */
 
 		if ($isFinded) {
-			self::render($findedRouteConfig, $controllerParams, $start_time);
+			Router::render($findedRouteConfig, $controllerParams);
 		} else {
 			Router::errorPage(404);
 			throw new \Startie\Exception("Route for this URL is not found");
@@ -240,14 +233,16 @@ class Router
 			}
 		}
 
-		return [
+		$result = [
 			'isFinded' => $isFinded,
 			'findedRouteConfig' => $findedRouteConfig,
 			'controllerParams' => $controllerParams,
 		];
+
+		return $result;
 	}
 
-	public static function render($RouteConfig, $controllerParams, $start_time)
+	public static function render($RouteConfig, $controllerParams)
 	{
 		/* Register utils */
 
@@ -314,19 +309,12 @@ class Router
 			$ConfigBlocks['content'] = $content;
 			$ConfigBlocks['title'] = $title;
 
-			foreach ($ConfigBlocks as $Block => $BlockContent) {
+			foreach ($ConfigBlocks as $BlockLabel => $BlockContent) {
 				$layout = str_replace(
-					"{{{$Block}}}",
-					$ConfigBlocks[$Block] ?? "",
+					"{{{$BlockLabel}}}",
+					$BlockContent ?? "",
 					$layout
 				);
-			}
-
-			/* Dev load count */
-
-			if (isset($ConfigBlocks['counter'])) {
-				$counter = Dev::counter($start_time);
-				$layout = str_replace("{{{counter}}}", $counter,  $layout);
 			}
 		}
 
@@ -379,8 +367,6 @@ class Router
 		return $urlParts;
 	}
 
-
-
 	/**
 	 * Check if passed signature (controller::method) belongs to current url
 	 *
@@ -392,20 +378,32 @@ class Router
 		return Url::current() == Url::c($signature);
 	}
 
+	/**
+	 * Pass error code to display a certain view
+	 *
+	 * @param  int $code
+	 * @return void
+	 */
 	public static function errorPage($code)
 	{
-		$ConfigRouterPages = require App::path("backend/Config/Router/Pages.php");
+		$ConfigRouterPagesPath = App::path("backend/Config/Router/Pages.php");
 
-		if (isset($ConfigRouterPages[$code])) {
-			if (isset($ConfigRouterPages[$code]['view'])) {
-				$view = $ConfigRouterPages[$code]['view'];
+		if (file_exists($ConfigRouterPagesPath)) {
+			$ConfigRouterPages = require App::path("backend/Config/Router/Pages.php");
+
+			if (isset($ConfigRouterPages[$code])) {
+				if (isset($ConfigRouterPages[$code]['view'])) {
+					$view = $ConfigRouterPages[$code]['view'];
+				} else {
+					throw new \Startie\Exception("View for '$code' error not found");
+				}
 			} else {
-				throw new \Startie\Exception("View for '$code' error not found");
+				throw new \Startie\Exception("Configuration for '$code' not found");
 			}
-		} else {
-			throw new \Startie\Exception("Configuration for '$code' not found");
-		}
 
-		echo View::r($view);
+			echo View::r($view);
+		} else {
+			throw new \Startie\Exception("Error page for code '$code' is not cofigured in 'backend/Config/Router/Pages.php'");
+		}
 	}
 }
