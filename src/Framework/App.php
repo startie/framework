@@ -5,10 +5,12 @@ namespace Startie;
 class App
 {
     public static $root;
+    public static float $initializedAt;
 
     public static function init($root)
     {
         self::$root = $root;
+        self::$initializedAt = microtime(true);
 
         // Autoloading
 

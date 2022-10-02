@@ -10,7 +10,7 @@ use Startie\Route;
 class Router
 {
 	public static Route $route;
-	public static float $startedAt;
+	public static float $initializedAt;
 
 	public static function routs()
 	{
@@ -61,7 +61,7 @@ class Router
 
 		/* Dev load count (start) */
 
-		Router::$startedAt = microtime(true);
+		Router::$initializedAt = microtime(true);
 
 		/* Find current */
 
