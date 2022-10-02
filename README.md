@@ -54,8 +54,6 @@ DOMAIN="/"
 
 DIR_APP=""
 DIR_APP_PHYSICAL=""
-
-INPUT_TYPE_DEFAULT="STR"
 ```
 
 ## `backend/Config/Bootstrap/Common.php`
