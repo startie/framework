@@ -4,24 +4,43 @@ namespace Startie;
 
 class Input
 {
-	public static $inputTypeDefault;
+	use \Startie\Bootable;
 
-	public static function init()
+	public static $SanitizeTypeDefault;
+
+	public static function boot()
 	{
-		if (isset($_ENV['INPUT_TYPE_DEFAULT'])) {
-			self::$inputTypeDefault = $_ENV['INPUT_TYPE_DEFAULT'];
+		self::$isBooted = true;
+		self::config();
+	}
+
+	public static function config()
+	{
+		$path = App::path("backend/Config/Input/*.php");
+
+		if (!file_exists($path)) {
+			throw new Exception("Config for 'Startie\Input' is missing");
+		} else {
+			$Config = require($path);
+			if (isset($Config['SanitizeTypeDefault'])) {
+				Input::$SanitizeTypeDefault = strtoupper($Config['SanitizeTypeDefault']);
+			} else {
+				throw new Exception("'SanitizeTypeDefault' is not defined in config for 'Startie\Input'");
+			}
 		}
 	}
 
-	#
-	#
-	#	Description:
-	# 	- checks if (super) global array has variable
-	#
-	#
-
+	/**
+	 * Checks if the superglobal array certain key.
+	 *
+	 * @param  string $glob
+	 * @param  string $name
+	 * @return boolean
+	 */
 	public static function is($glob, $name)
 	{
+		self::requireBoot();
+
 		$glob = strtoupper($glob);
 
 		switch ($glob) {
@@ -74,10 +93,14 @@ class Input
 				}
 				return false;
 		}
+
+		return false;
 	}
 
 	public static function isEmpty($glob, $exclude)
 	{
+		self::requireBoot();
+
 		# $exclude = [
 		# 	'name1', 'name2'
 		# ]; 
@@ -96,91 +119,65 @@ class Input
 		return $isGetEmpty;
 	}
 
-	public static function cookie($var, $type)
+	private static function g($var, $SanitizeType, $glob)
 	{
-		if (!$type) {
-			$type = self::$inputTypeDefault;
+		if (!$SanitizeType) {
+			$SanitizeType = Input::$SanitizeTypeDefault;
 		};
-		return call_user_func(
-			'Startie\Sanitize::' . $type,
-			$_COOKIE[$var]
+
+		$result = call_user_func(
+			'Startie\Sanitize::' . $SanitizeType,
+			$glob[$var] ?? NULL
 		);
+
+		return $result;
 	}
 
-	public static function env($var, $type)
+	public static function cookie($var, $SanitizeType)
 	{
-		if (!$type) {
-			$type = self::$inputTypeDefault;
-		};
-		return call_user_func(
-			'Startie\Sanitize::' . $type,
-			$_ENV[$var]
-		);
+		self::requireBoot();
+		return self::g($var, $SanitizeType, $_COOKIE);
 	}
 
-	public static function files($var, $type)
+	public static function env($var, $SanitizeType)
 	{
-		if (!$type) {
-			$type = self::$inputTypeDefault;
-		};
-		return call_user_func(
-			'Startie\Sanitize::' . $type,
-			$_FILES[$var]
-		);
+		self::requireBoot();
+		return self::g($var, $SanitizeType, $_ENV);
 	}
 
-	public static function get($var, $type)
+	public static function files($var, $SanitizeType)
 	{
-		if (!$type) {
-			$type = self::$inputTypeDefault;
-		};
-		return call_user_func(
-			'Startie\Sanitize::' . $type,
-			$_GET[$var]
-		);
+		self::requireBoot();
+		return self::g($var, $SanitizeType, $_FILES);
 	}
 
-	public static function post($var, $type)
+	public static function get($var, $SanitizeType)
 	{
-		if (!$type) {
-			$type = self::$inputTypeDefault;
-		};
-		return call_user_func(
-			'Startie\Sanitize::' . $type,
-			$_POST[$var]
-		);
+		self::requireBoot();
+		return self::g($var, $SanitizeType, $_GET);
 	}
 
-	public static function request($var, $type)
+	public static function post($var, $SanitizeType)
 	{
-		if (!$type) {
-			$type = self::$inputTypeDefault;
-		};
-		return call_user_func(
-			'Startie\Sanitize::' . $type,
-			$_REQUEST[$var]
-		);
+		self::requireBoot();
+		return self::g($var, $SanitizeType, $_POST);
 	}
 
-	public static function server($var, $type)
+	public static function request($var, $SanitizeType)
 	{
-		if (!$type) {
-			$type = self::$inputTypeDefault;
-		};
-		return call_user_func(
-			'Startie\Sanitize::' . $type,
-			$_SERVER[$var]
-		);
+		self::requireBoot();
+		return self::g($var, $SanitizeType, $_REQUEST);
 	}
 
-	public static function session($var, $type)
+	public static function server($var, $SanitizeType)
 	{
-		if (!$type) {
-			$type = self::$inputTypeDefault;
-		};
-		return call_user_func(
-			'Startie\Sanitize::' . $type,
-			$_SESSION[$var]
-		);
+		self::requireBoot();
+		return self::g($var, $SanitizeType, $_SERVER);
+	}
+
+	public static function session($var, $SanitizeType)
+	{
+		self::requireBoot();
+		return self::g($var, $SanitizeType, $_SESSION);
 	}
 }

@@ -12,9 +12,9 @@ class In
 	 * In::e('get', 'query', 'STR', ['', NULL], ['trim']);
 	 * ```
 	 * 
-	 * @param  string $global 			A name of global array: $_GET, $_POST
+	 * @param  string $global 			A name of global array: 'get' for $_GET, 'post' for $_POST, etc.
 	 * @param  string $name 			A variable name.
-	 * @param  string $type 			Type for sanitizing.
+	 * @param  string $SanitizeType 	Type string for sanitizing.
 	 * @param  array $if 				Array of 3 values: 0 – value for equality check; 1 – true case substitute; 2 – false case substitute
 	 * @param  array $processing		Array of functions to call on value.
 	 * @param  array $replacements		Array of replacements.
@@ -23,9 +23,21 @@ class In
 	 * 
 	 */
 
-	public static function e($global, $name, $type, $if = [], $processing = [], $replacements = [])
+	public static function e($global, $name, $SanitizeType, $if = [], $processing = [], $replacements = [])
 	{
-		$data = Input::$global($name, $type);
+		/*
+			fix name
+		*/
+
+		/*
+			evaluate type
+		*/
+
+		if ($SanitizeType === '') {
+			$SanitizeType = Input::$SanitizeTypeDefault;
+		}
+
+		$data = Input::$global($name, $SanitizeType);
 
 		/* if */
 
@@ -59,16 +71,43 @@ class In
 
 		return $data;
 	}
-
-	public static function get($name, $type, $if = [], $processing = [], $replacements = [])
+	public static function cookie($name, $SanitizeType = '', $if = [], $processing = [], $replacements = [])
 	{
-		$data = In::e("get", $name, $type, $if, $processing, $replacements);
-		return $data;
+		return In::e("cookie", $name, $SanitizeType, $if, $processing, $replacements);
 	}
 
-	public static function post($name, $type, $if = [], $processing = [], $replacements = [])
+	public static function env($name, $SanitizeType = '', $if = [], $processing = [], $replacements = [])
 	{
-		$data = In::e("post", $name, $type, $if, $processing, $replacements);
-		return $data;
+		return In::e("env", $name, $SanitizeType, $if, $processing, $replacements);
+	}
+
+	public static function files($name, $SanitizeType = '', $if = [], $processing = [], $replacements = [])
+	{
+		return In::e("files", $name, $SanitizeType, $if, $processing, $replacements);
+	}
+
+	public static function get($name, $SanitizeType = '', $if = [], $processing = [], $replacements = [])
+	{
+		return In::e("get", $name, $SanitizeType, $if, $processing, $replacements);
+	}
+
+	public static function post($name, $SanitizeType = '', $if = [], $processing = [], $replacements = [])
+	{
+		return In::e("post", $name, $SanitizeType, $if, $processing, $replacements);
+	}
+
+	public static function request($name, $SanitizeType = '', $if = [], $processing = [], $replacements = [])
+	{
+		return In::e("request", $name, $SanitizeType, $if, $processing, $replacements);
+	}
+
+	public static function server($name, $SanitizeType = '', $if = [], $processing = [], $replacements = [])
+	{
+		return In::e("server", $name, $SanitizeType, $if, $processing, $replacements);
+	}
+
+	public static function session($name, $SanitizeType = '', $if = [], $processing = [], $replacements = [])
+	{
+		return In::e("session", $name, $SanitizeType, $if, $processing, $replacements);
 	}
 }
