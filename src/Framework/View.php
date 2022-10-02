@@ -49,4 +49,9 @@ class View
 			return View::r($a, $b);
 		}
 	}
+
+	public static function titleChange($title)
+	{
+		echo "<script>document.title = \"$title\";</script>";
+	}
 }
