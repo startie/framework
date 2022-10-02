@@ -571,7 +571,7 @@ class Model
 				'id' => [[$id, 'INT']]
 			],
 			'debug' => $debug
-		])[0];
+		])[0] ?? [];
 	}
 
 	/**
@@ -829,7 +829,14 @@ class Model
 		}
 	}
 
-	#	на этом методе работают __where() и __having()
+	/**
+	 * This method is required by ::__where() and ::__having()
+	 *
+	 * @param  mixed $sql
+	 * @param  mixed $params
+	 * @param  mixed $type
+	 * @return void
+	 */
 	public static function __clause(&$sql, $params, $type)
 	{
 		$sql .= " ";
@@ -915,16 +922,17 @@ class Model
 				$sql .= "\n";
 			}
 		}
+
 		$sql .= " ";
 	}
 
 	public static function __where(&$sql, $params)
 	{
-		return self::__clause($sql, $params, "WHERE");
+		self::__clause($sql, $params, "WHERE");
 	}
 	public static function __having(&$sql, $params)
 	{
-		return self::__clause($sql, $params, "HAVING");
+		self::__clause($sql, $params, "HAVING");
 	}
 
 	public static function __group(&$sql, $group)
