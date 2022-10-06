@@ -500,13 +500,13 @@ class Model
 		$sql .= "count(*)";
 		$sql .= "\n\n";
 		Model::__from($sql, $from);
-		Model::__join($sql, $join);
-		Model::__where($sql, $where);
-		Model::__group($sql, $group);
-		Model::__having($sql, $having);
-		Model::__order($sql, $order);
-		Model::__limit($sql, $limit);
-		Model::__offset($sql, $offset);
+		Model::__join($sql, $join ?? NULL);
+		Model::__where($sql, $where ?? NULL);
+		Model::__group($sql, $group ?? NULL);
+		Model::__having($sql, $having ?? NULL);
+		Model::__order($sql, $order ?? NULL);
+		Model::__limit($sql, $limit ?? NULL);
+		Model::__offset($sql, $offset ?? NULL);
 		$sql .= "";
 
 		#
