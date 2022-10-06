@@ -7,7 +7,8 @@ class Procedure
 	public static function inc($name, array $data = [])
 	{
 		extract($data);
-		require(BACKEND_DIR . "/Procedures/" . $name . ".php");
+		$path = App::path("backend/Procedures/{$name}.php");
+		require($path);
 	}
 
 	public static function return($name, array $data = [])

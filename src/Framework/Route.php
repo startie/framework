@@ -26,11 +26,14 @@ class Route
 
         $signature = $config['controller'];
         $this->class = explode("::", $signature)[0];
-        $this->method = ucfirst(
-            explode("::", $signature)[1]
-        );
 
-        $this->classMethodExecution = "{$this->class}_Controller::" . strtolower($this->method);
+        // $this->method = ucfirst(
+        //     explode("::", $signature)[1]
+        // );
+        $this->method = explode("::", $signature)[1];
+
+        //$this->classMethodExecution = "{$this->class}_Controller::" . strtolower($this->method);
+        $this->classMethodExecution = "{$this->class}_Controller::{$this->method}";
         $this->classFull = "{$this->class}_Controller";
         $this->controllerNamespacedClass = "\Controllers\\{$this->classFull}";
 

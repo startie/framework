@@ -296,7 +296,8 @@ class Router
 			$content = call_user_func("\Controllers\\" . $route->classMethodExecution);
 		}
 
-		/* If we have params */ else {
+		/* If we have params */
+		if (!empty($controllerParams)) {
 			$content = call_user_func_array("\Controllers\\" . $route->classMethodExecution, [$controllerParams]);
 		}
 
@@ -320,6 +321,8 @@ class Router
 
 		if ($route->layout) {
 			echo $layout;
+		} else {
+			echo $content;
 		}
 	}
 
