@@ -38,6 +38,11 @@ class View
 	{
 		$path = App::path("backend/Views/{$name}.php");
 		global $t;
+		if (!isset($data['t'])) {
+			$data['t'] = $t;
+		} else {
+			//$data['t'] = array_merge($data['t'], $t);
+		}
 		extract($data);
 		require($path);
 	}

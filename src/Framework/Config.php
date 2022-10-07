@@ -34,7 +34,7 @@ class Config
 	 * 	- ...
 	 */
 
-	public static function dirs()
+	private static function dirs()
 	{
 		// Load
 

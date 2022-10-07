@@ -50,6 +50,8 @@ class Url
 		Url::$ROOT = URL_APP;
 
 		define("PUBLIC_URL", URL_APP . "public/");
+
+		define("STORAGE_URL", URL_APP . "storage/");
 	}
 
 	/**
