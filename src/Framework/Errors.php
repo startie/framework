@@ -127,8 +127,10 @@ class Errors
         // If there was an error and it was fatal
         if ($error = error_get_last() and $error['type'] & (E_ERROR | E_PARSE | E_COMPILE_ERROR | E_CORE_ERROR)) {
 
-            # Clean buffer & don't show default error message
-            ob_end_clean();
+            // Clean buffer & don't show default error message
+            if (ob_get_length() > 0) {
+                ob_end_clean();
+            }
 
             // Show error message for production
             if ($_ENV["MODE_DEV"] == 0) {
@@ -149,7 +151,9 @@ class Errors
             }
         } else {
             // Send & turn off the buffer
-            ob_end_flush();
+            if (ob_get_length() > 0) {
+                ob_end_flush();
+            }
         }
     }
 
