@@ -22,7 +22,7 @@ class Storage
                 break;
 
             case 'mysql':
-                $dsn = "mysql:host={$host};dbname={$dbname};charset={$charset}";
+                $dsn = "mysql:host={$host};dbname={$name};charset={$charset}";
                 break;
 
             default:
