@@ -34,12 +34,18 @@ require 'backend/Config/Bootstrap/Common.php';
 ## `.env`
 
 ```php
+# MAIN
+
+STAGE="DEVELOPMENT"
+MACHINE="LOCAL"
+
+# MODE
+
 POWER=1
 MODE_DEV=1
 NO_CONNECTION=0
 
-STAGE="DEVELOPMENT"
-MACHINE="LOCAL"
+# REGION
 
 TIMEZONE="UTC"
 DATE_DEFAULT_TIMEZONE="Europe/London"
@@ -47,10 +53,14 @@ DATE_TIMEZONE="Europe/London"
 TIMEZONE_OFFSET="0"
 LOCALE="ru_RU.UTF-8"
 
+# NETWORK
+
 PROTOCOL="http://"
 SERVERNAME="localhost"
 SERVERPORT=":8000"
 DOMAIN="/"
+
+# DIR
 
 DIR_APP=""
 DIR_APP_PHYSICAL=""
@@ -61,12 +71,15 @@ DIR_APP_PHYSICAL=""
 ```php
 <?php
 
+# BASIC
+
 $root = dirname(__DIR__, 3);
-
 require "$root/vendor/autoload.php";
-
 \Startie\App::init($root);
 \Startie\Config::init();
+
+# ROUTING
+
 \Startie\Router::init();
 ```
 
@@ -75,11 +88,11 @@ require "$root/vendor/autoload.php";
 ```php
 <?php
 
-$APP_NAME = "";
-$APP_DESCRIPTION = "";
-$APP_FOUNDED = 2022;
-$APP_V = "";
-$APP_V_DATE = "";
+const APP_NAME = "Startie";
+const APP_DESCRIPTION = "Educational PHP framework";
+const APP_FOUNDED = 2023;
+const APP_V = "1.0.0";
+const APP_V_DATE = "2023-12-01";
 ```
 
 ## `backend/Controllers/Index_Controller.php`
@@ -93,7 +106,7 @@ class Index_Controller
 {
     public static function index()
     {
-        echo "Index";
+        echo "hi";
     }
 }
 ```

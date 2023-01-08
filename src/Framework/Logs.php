@@ -38,7 +38,11 @@ class Logs
         }
 
         $dsn = Storage::dsn($Config_Db['logs']);
-        $texts = $Config_Db['logs']['texts'];
+        if (isset($Config_Db['logs']['texts'])) {
+            $texts = $Config_Db['logs']['texts'];
+        } else {
+            $texts = '';
+        };
 
         return [
             'storage' =>
