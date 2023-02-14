@@ -29,12 +29,6 @@ class Asseter
 			} else {
 				throw new Exception("CSS prefix is not defined");
 			}
-
-			// if (isset($ConfigPrefixes['publicUrl'])) {
-			// 	self::$publicUrl = $Config['publicUrl'];
-			// } else {
-			// 	throw new Exception("Public URL is not defined");
-			// }
 		}
 	}
 
@@ -47,34 +41,39 @@ class Asseter
 	{
 		$hash = "";
 
-		$listOfFiles = array_diff(scandir(PUBLIC_DIR . "/js"), array('..', '.'));
+		$dirJS = scandir(PUBLIC_DIR . "/js");
+		if (is_array($dirJS)) {
+			$listOfFiles = array_diff($dirJS, ['..', '.']);
 
-		if (empty($listOfFiles)) {
-			return $hash;
-		}
-
-		$listOfFilesNew = [];
-		foreach ($listOfFiles as $file) {
-			if (strpos($file, '.js')) {
-				$listOfFilesNew[] = $file;
+			if (empty($listOfFiles)) {
+				return $hash;
 			}
-		}
 
-		if (empty($listOfFilesNew)) {
+			$listOfFilesNew = [];
+			foreach ($listOfFiles as $file) {
+				if (strpos($file, '.js')) {
+					$listOfFilesNew[] = $file;
+				}
+			}
+
+			if (empty($listOfFilesNew)) {
+				return $hash;
+			}
+
+			if (count($listOfFilesNew) > 1) {
+				$lastJSFile = $listOfFilesNew[count($listOfFilesNew) - 1];
+			} else if (count($listOfFilesNew) === 1) {
+				$lastJSFile = $listOfFilesNew[0];
+			} else {
+				return $hash;
+			}
+
+			preg_match('/([a-z0-9]*)\.(js)/', $lastJSFile, $m);
+			$hash = $m[1];
 			return $hash;
-		}
-
-		if (count($listOfFilesNew) > 1) {
-			$lastJSFile = $listOfFilesNew[count($listOfFilesNew) - 1];
-		} else if (count($listOfFilesNew) === 1) {
-			$lastJSFile = $listOfFilesNew[0];
 		} else {
 			return $hash;
 		}
-
-		preg_match('/([a-z0-9]*)\.(js)/', $lastJSFile, $m);
-		$hash = $m[1];
-		return $hash;
 	}
 
 	public static function loadJs($bundle)

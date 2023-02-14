@@ -25,6 +25,8 @@ mkdir backend && mkdir backend/Controllers && mkdir backend/Config && mkdir back
 
 ## `index.php`
 
+This is the file, that get recieves all requests and associate them with classes from 'Controllers' namespace.
+
 ```php
 <?php
 

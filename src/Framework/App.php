@@ -12,13 +12,14 @@ class App
         self::$root = $root;
         self::$initializedAt = microtime(true);
 
-        // Autoloading
-
-        require "$root/vendor/autoload.php";
-
         // App constants
 
-        require "$root/backend/Config/Common/App.php";
+        $constantsPath = "$root/backend/Config/Common/App.php";
+        if (file_exists($constantsPath)) {
+            require $constantsPath;
+        } else {
+            throw new Exception("No 'backend/Config/Common/App.php'");
+        }
 
         // .env
 

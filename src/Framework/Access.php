@@ -53,13 +53,6 @@ class Access
 			$UserProfiles = UserProfiles::where([
 				'UserId' => [[$UserId, 'INT']]
 			]);
-
-			// echo "<pre>\n";
-			// var_dump(
-			// 	$UserProfiles
-			// );
-			// echo '</pre>';
-			// die();
 		}
 
 		//	Unify group string
