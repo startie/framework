@@ -21,7 +21,7 @@ class Db
 		extract($DbConfig);
 
 		if ($driver === "mysql") {
-			$dsn = "$driver:" . "host=$host;post=$port;dbname=$name;charset=$charset";
+			$dsn = "$driver:" . "host=$host;port=$port;dbname=$name;charset=$charset";
 		} else {
 			throw new \Startie\Exception("Unsupported DB driver: $driver");
 		}
