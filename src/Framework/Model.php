@@ -734,7 +734,7 @@ class Model
 		if (Input::is($global, $gindex)) {
 			$global = strtolower($global);
 			$where[$windex] = [
-				[call_user_func('Input::' . $global, $gindex, $type), $type]
+				[call_user_func('\Startie\Input::' . $global, $gindex, $type), $type]
 			];
 		}
 		return $where;
