@@ -39,14 +39,17 @@ class Asseter
 
 	public static function getJsHash()
 	{
-		$hash = "";
+		$PUBLIC_JS_DIR = PUBLIC_DIR . "js/";
+		$jsFiles = scandir($PUBLIC_JS_DIR);
 
-		$dirJS = scandir(PUBLIC_DIR . "/js");
-		if (is_array($dirJS)) {
-			$listOfFiles = array_diff($dirJS, ['..', '.']);
+		if ($jsFiles === false) {
+			throw new Exception("No js files for finding hash on $PUBLIC_JS_DIR");
+		} else {
+			$hash = "";
+			$listOfFiles = array_diff($jsFiles, ['..', '.']);
 
 			if (empty($listOfFiles)) {
-				return $hash;
+				throw new Exception("No js files for finding hash on $PUBLIC_JS_DIR");
 			}
 
 			$listOfFilesNew = [];
@@ -57,7 +60,7 @@ class Asseter
 			}
 
 			if (empty($listOfFilesNew)) {
-				return $hash;
+				throw new Exception("No js files for finding hash on $PUBLIC_JS_DIR");
 			}
 
 			if (count($listOfFilesNew) > 1) {
@@ -65,13 +68,12 @@ class Asseter
 			} else if (count($listOfFilesNew) === 1) {
 				$lastJSFile = $listOfFilesNew[0];
 			} else {
-				return $hash;
+				throw new Exception("No js files for finding hash on $PUBLIC_JS_DIR");
 			}
 
 			preg_match('/([a-z0-9]*)\.(js)/', $lastJSFile, $m);
 			$hash = $m[1];
-			return $hash;
-		} else {
+
 			return $hash;
 		}
 	}
