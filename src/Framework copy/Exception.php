@@ -39,15 +39,9 @@ class Exception extends \Exception
      * @param  mixed $e
      * @return \Startie\Exception
      */
-    public static function PDO(PDOException $e, $sql)
+    public static function PDO(PDOException $e)
     {
-        $own = new Exception(
-            $e->getMessage() . PHP_EOL . PHP_EOL . $sql . PHP_EOL . PHP_EOL,
-            "error",
-            "db",
-            $e->getCode(),
-            $e->getPrevious()
-        );
+        $own = new Exception($e->getMessage(), "error", "db", $e->getCode(), $e->getPrevious());
         return $own;
     }
 }

@@ -7,18 +7,16 @@ use PDOException;
 
 class Model
 {
+	public static $storage;
+
+	public static $types;
 	#
 	#
 	#		VARS
 	#
 	#
 
-	public static $storage;
-
-	public static $types;
-
 	public static $testModeMessage = "Test mode: no write to db";
-
 	public static $excludeFunctions;
 
 	public static function init()
@@ -51,10 +49,11 @@ class Model
 	#
 	#
 
-	/**
-	 * Creates a row in the table and returns it's id
-	 */
-	public static function create(array $params): int|string
+	#
+	#	Description:
+	# 	returns INT – id of created row
+
+	public static function create($p)
 	{
 		#
 		#	Vars
@@ -63,13 +62,13 @@ class Model
 		$die = 0;
 		$test = 0;
 
-		extract($params);
+		extract($p);
 
 		$insert = $fields ?? $insert;
 		$insert = $set ?? $insert;
 
 		#
-		#	SQL generate
+		#	Form
 
 		$sql = "";
 		$sql .= " INSERT INTO ";
@@ -80,38 +79,37 @@ class Model
 		#	Debug
 
 		Db::debug($debug, "Debugging '" . get_called_class() . "' model");
-		Db::debugStart($debug, $params);
+		Db::debugStart($debug, $p);
 
 		#
-		#	Prepare
+		#	State
 
-		$db = self::storage()::$h;
 		try {
+
+			#
+			#	Prepare
+
+			$db = self::storage()::$h;
 			$sth = $db->prepare($sql);
-		} catch (PDOException $e) {
-			throw \Startie\Exception::PDO($e, $sql);
-		}
 
-		#
-		#	Bind
+			#
+			#	Bind
 
-		Model::bindInsert($sth, $sql, $insert);
+			Model::bindInsert($sth, $sql, $insert);
 
-		#
-		#	Debug
+			#
+			#	Debug
 
-		Db::debugContinue($debug, $sth);
-		Db::debugEnd($debug, $sql);
-		if ($test) {
-			Dump::e("Test mode (create): no write to db");
-		}
+			Db::debugContinue($debug, $sth);
+			Db::debugEnd($debug, $sql);
+			if ($test) {
+				Dump::e("Test mode (create): no write to db");
+			}
 
-		#
-		#	Execute
+			#
+			#	Execute
 
-		if ($die) die();
-
-		try {
+			if ($die) die();
 			if (!$test) {
 				$sth->execute();
 				$lastInsertedId = $db->lastInsertId();
@@ -122,10 +120,11 @@ class Model
 		}
 	}
 
-	/**
-	 * Returns an array of rows (arrays) for corresponding entities
-	 */
-	public static function read(array $params = []): array
+	#
+	#	Description:
+	# 	returns ARRAY – array of arrays (entities)
+
+	public static function read($p = [])
 	{
 		#
 		#	Vars
@@ -137,21 +136,21 @@ class Model
 		$test = 0;
 		$excludeFunctions = 0;
 
-		extract($params);
+		extract($p);
 
 		#
-		#	SQL generate
+		#	Form
 
 		$sql = "\n";
-		Model::SELECT_($sql, $select);
-		Model::FROM_($sql, $from);
-		Model::JOIN_($sql, $join ?? []);
-		Model::WHERE_($sql, $where ?? []);
-		Model::GROUP_($sql, $group ?? []);
-		Model::HAVING_($sql, $having ?? []);
-		Model::ORDER_($sql, $order ?? NULL);
-		Model::LIMIT_($sql, $limit ?? NULL);
-		Model::OFFSET_($sql, $offset ?? NULL);
+		Model::__select($sql, $select);
+		Model::__from($sql, $from);
+		Model::__join($sql, $join ?? NULL);
+		Model::__where($sql, $where ?? NULL);
+		Model::__group($sql, $group ?? NULL);
+		Model::__having($sql, $having ?? NULL);
+		Model::__order($sql, $order ?? NULL);
+		Model::__limit($sql, $limit ?? NULL);
+		Model::__offset($sql, $offset ?? NULL);
 		$sql .= "";
 
 		#
@@ -173,52 +172,49 @@ class Model
 		#	Debug
 
 		Db::debug($debug, "Debugging '" . get_called_class() . "' model");
-		Db::debugStart($debug, $params);
+		Db::debugStart($debug, $p);
 
-		#
-		#	Prepare
-
-		$db = self::storage()::$h;
 		try {
+			#
+			#	Prepare
+
+			$db = self::storage()::$h;
 			$sth = $db->prepare($sql);
-		} catch (PDOException $e) {
-			throw \Startie\Exception::PDO($e, $sql);
-		}
 
-		#
-		#	Bind
+			#
+			#	Bind
 
-		Model::bindClause($sth, $sql, $where ?? NULL);
-		Model::bindClause($sth, $sql, $having ?? NULL);
+			Model::bindClause($sth, $sql, $where ?? NULL);
+			Model::bindClause($sth, $sql, $having ?? NULL);
 
-		#
-		#	Debug
+			#
+			#	Debug
 
-		Db::debugContinue($debug, $sth);
-		Db::debugEnd($debug, $sql);
-		if ($test) {
-			Dump::e("Test mode (read): no write to db");
-		}
+			Db::debugContinue($debug, $sth);
+			Db::debugEnd($debug, $sql);
+			if ($test) {
+				Dump::e("Test mode (read): no write to db");
+			}
 
-		#
-		#	Execute
+			#
+			#	Execute
 
-		if ($die) die();
-		try {
+			if ($die) die();
 			if (!$test) {
 				$sth->execute();
-				$rows = $sth->fetchAll(PDO::FETCH_ASSOC);
-				return $rows;
+				$result = $sth->fetchAll(PDO::FETCH_ASSOC);
+				return $result;
 			}
 		} catch (PDOException $e) {
-			throw \Startie\Exception::PDO($e, $sql);
+			throw \Startie\Exception::PDO($e);
 		}
 	}
 
-	/**
-	 * Updates rows and returns count of affected rows
-	 */
-	public static function update($params): int
+	#
+	#	Description:
+	#	returns INT – count of affected rows
+
+	public static function update($p)
 	{
 		#
 		#	Vars
@@ -227,7 +223,7 @@ class Model
 		$die = 0;
 		$test = 0;
 
-		extract($params);
+		extract($p);
 
 		#
 		#	Checks
@@ -238,68 +234,67 @@ class Model
 		}
 
 		#
-		#	SQL generate
+		#	Form
 
 		$sql = "";
 		$sql .= " UPDATE " . str_replace("Models\\", "", get_called_class());
 
 		$set = $insert ?? $fields ?? $set;
 
-		Model::SET_($sql, $set);
-		Model::WHERE_($sql, $where);
+		Model::_set($sql, $set);
+		Model::__where($sql, $where);
 
 		#
 		#	Debug
 
 		Db::debug($debug, "Debugging '" . get_called_class() . "' model");
-		Db::debugStart($debug, $params);
+		Db::debugStart($debug, $p);
 
 		#
-		#	Prepare
+		#	State
 
-		$db = self::storage()::$h;
 		try {
+			#
+			#	Prepare
+
+			$db = self::storage()::$h;
 			$sth = $db->prepare($sql);
-		} catch (PDOException $e) {
-			throw \Startie\Exception::PDO($e, $sql);
-		}
 
-		#
-		#	Bind
+			#
+			#	Bind
 
-		Model::bindSet($sth, $sql, $set);
-		Model::bindClause($sth, $sql, $where ?? NULL);
-		Model::bindClause($sth, $sql, $having ?? NULL);
+			Model::bindSet($sth, $sql, $set);
+			Model::bindClause($sth, $sql, $where);
+			Model::bindClause($sth, $sql, $having ?? NULL);
 
-		#
-		#	Debug
+			#
+			#	Debug
 
-		Db::debugContinue($debug, $sth);
-		Db::debugEnd($debug, $sql);
-		if ($test) {
-			Dump::e("Test mode (update): no write to db");
-		}
+			Db::debugContinue($debug, $sth);
+			Db::debugEnd($debug, $sql);
+			if ($test) {
+				Dump::e("Test mode (update): no write to db");
+			}
 
-		#
-		#	Execute
+			#
+			#	Execute
 
-		if ($die) die();
-
-		try {
+			if ($die) die();
 			if (!$test) {
 				$sth->execute();
 				$affectedRowsCount = $sth->rowCount();
 				return $affectedRowsCount;
 			}
 		} catch (PDOException $e) {
-			throw \Startie\Exception::PDO($e, $sql);
+			throw \Startie\Exception::PDO($e);
 		}
 	}
 
-	/**
-	 * Deletes rows and returns count of affected rows
-	 */
-	public static function delete($params): int
+	#
+	#	Description:
+	#	returns INT – count of affected rows
+
+	public static function delete($p)
 	{
 		#
 		#	Vars
@@ -308,54 +303,258 @@ class Model
 		$die = 0;
 		$test = 0;
 
-		extract($params);
+		extract($p);
 
 		#
-		#	SQL generate
+		#	Form
 
 		$sql = "";
 		$sql .= "\nDELETE\nFROM " . str_replace("Models\\", "", get_called_class()) . " \n";
-		Model::WHERE_($sql, $where);
+		Model::__where($sql, $where);
 
 		#
 		#	Debug
 
 		Db::debug($debug, "Debugging '" . get_called_class() . "' model");
-		Db::debugStart($debug, $params);
+		Db::debugStart($debug, $p);
 
 		#
-		#	Prepare
-
-		$db = self::storage()::$h;
-		$sth = $db->prepare($sql);
-
-		#
-		#	Bind
-
-		Model::bindClause($sth, $sql, $where);
-
-		#
-		#	Debug
-
-		Db::debugContinue($debug, $sth);
-		Db::debugEnd($debug, $sql);
-		if ($test) {
-			Dump::e("Test mode (delete): no write to db");
-		}
-
-		#
-		#	Execute
-
-		if ($die) die();
+		#	State
 
 		try {
+			#
+			#	Prepare
+
+			$db = self::storage()::$h;
+			$sth = $db->prepare($sql);
+
+			#
+			#	Bind
+
+			Model::bindClause($sth, $sql, $where);
+
+			#
+			#	Debug
+
+			Db::debugContinue($debug, $sth);
+			Db::debugEnd($debug, $sql);
+			if ($test) {
+				Dump::e("Test mode (delete): no write to db");
+			}
+
+			#
+			#	Execute
+
+			if ($die) die();
 			if (!$test) {
 				$sth->execute();
 				$affectedRowsCount = $sth->rowCount();
 				return $affectedRowsCount;
 			}
 		} catch (PDOException $e) {
-			throw \Startie\Exception::PDO($e, $sql);
+			throw \Startie\Exception::PDO($e);
+		}
+	}
+
+	#
+	#
+	#		ADDITIONAL
+	#
+	#
+
+	#
+	#	Description:
+	# 	returns INT – sum count
+
+	public static function count($p, $customSelect = NULL)
+	{
+		#
+		#	Vars
+
+		$select = ['*'];
+		$from = str_replace("Models\\", "", get_called_class());
+		$debug = 0;
+		$die = 0;
+		$test = 0;
+
+		extract($p);
+
+		#
+		#	Form
+
+		$sql = "\n\n";
+		$sql .= " SELECT ";
+		if ($customSelect) {
+			#Dump::made($customSelect);
+			$sql .= "count($customSelect) as count";
+		} else {
+			$sql .= "count(*) as count";
+		}
+		$sql .= "\n\n";
+
+		if (isset($from)) {
+			Model::__from($sql, $from);
+		}
+
+		if (isset($join)) {
+			Model::__join($sql, $join);
+		}
+
+		if (isset($where)) {
+			Model::__where($sql, $where);
+		}
+
+		if (isset($group)) {
+			Model::__group($sql, $group);
+		}
+
+		if (isset($having)) {
+			Model::__having($sql, $having);
+		}
+
+		if (isset($order)) {
+			Model::__order($sql, $order);
+		}
+
+		if (isset($limit)) {
+			Model::__limit($sql, $limit);
+		}
+
+		if (isset($offset)) {
+			Model::__offset($sql, $offset);
+		}
+
+
+		$sql .= "\n";
+
+		#
+		#	Debug
+
+		Db::debug($debug, "Debugging '" . get_called_class() . "' model");
+		Db::debugStart($debug, $p);
+
+		#
+		#	State
+
+		try {
+			#
+			#	Prepare
+
+			$db = self::storage()::$h;
+			$sth = $db->prepare($sql);
+
+			#
+			#	Bind
+
+			Model::bindClause($sth, $sql, $where);
+
+			#
+			#	Debug
+
+			Db::debugContinue($debug, $sth);
+			Db::debugEnd($debug, $sql);
+			if ($test) {
+				Dump::e("Test mode (count): no write to db");
+			}
+
+			#
+			#	Execute
+
+			if ($die) die();
+			if (!$test) {
+				$sth->execute();
+				$result = $sth->fetchAll(PDO::FETCH_ASSOC);
+				if (!$result) {
+					return 0;
+				} else {
+					return $result[0]["count"];
+				}
+			}
+		} catch (PDOException $e) {
+			throw \Startie\Exception::PDO($e);
+		}
+	}
+
+	#
+	#	Description:
+	# 	returns BOOLEAN – exists entity with param or not
+
+	public static function is($p)
+	{
+		#
+		#	Vars
+
+		$select = ['*'];
+		$from = str_replace("Models\\", "", get_called_class());
+		$debug = 0;
+		$die = 0;
+		$test = 0;
+
+		extract($p);
+
+		#
+		#	Form
+
+		$sql = "\n\n";
+		$sql .= " SELECT ";
+		$sql .= "count(*)";
+		$sql .= "\n\n";
+		Model::__from($sql, $from);
+		Model::__join($sql, $join ?? NULL);
+		Model::__where($sql, $where ?? NULL);
+		Model::__group($sql, $group ?? NULL);
+		Model::__having($sql, $having ?? NULL);
+		Model::__order($sql, $order ?? NULL);
+		Model::__limit($sql, $limit ?? NULL);
+		Model::__offset($sql, $offset ?? NULL);
+		$sql .= "";
+
+		#
+		#	Debug
+
+		Db::debug($debug, "Debugging '" . get_called_class() . "' model");
+		Db::debugStart($debug, $p);
+
+		#
+		#	State
+
+		try {
+			#
+			#	Prepare
+
+			$db = self::storage()::$h;
+			$sth = $db->prepare($sql);
+
+			#
+			#	Bind
+
+			Model::bindClause($sth, $sql, $where);
+
+			#
+			#	Debug
+			# 
+
+			Db::debugContinue($debug, $sth);
+			Db::debugEnd($debug, $sql);
+			if ($test) {
+				Dump::e("Test mode (is): no write to db");
+			}
+
+			#
+			#	Execute
+
+			if ($die) die();
+			if (!$test) {
+				$sth->execute();
+				$result = $sth->fetchAll(PDO::FETCH_ASSOC);
+				if ($result[0]["count(*)"]) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+		} catch (PDOException $e) {
+			throw \Startie\Exception::PDO($e);
 		}
 	}
 
@@ -365,70 +564,33 @@ class Model
 	#
 	#
 
-	/**
-	 * Get count of records filtered by params
-	 */
-	public static function count(array $params, string|null $customSelect = NULL): int
+	public static function id($id, $debug = 0)
 	{
-		$select = $params['select'] ?? '';
-		if ($customSelect) {
-			$select = ["count($customSelect) as count"];
-		} else {
-			$select = ["count(*) as count"];
-		}
-		$params['select'] = $select;
-
-		$result = self::read($params);
-		if (!$result) {
-			return 0;
-		} else {
-			return $result[0]["count"];
-		}
-	}
-
-	/**
-	 * 
-	 * Tells if exists entity with params or not
-	 */
-	public static function is(array $params, string|null $customSelect = NULL): bool
-	{
-		$count = self::count($params, $customSelect);
-		if ($count <= 0) {
-			return false;
-		} else {
-			return true;
-		}
-	}
-
-	/**
-	 * Returns a first row for specified id in the table
-	 */
-	public static function id($id, $debug = 0, $die = 0): array
-	{
-		$rows = self::read([
+		return self::read([
 			'where' => [
 				'id' => [[$id, 'INT']]
 			],
 			'debug' => $debug
-		]);
-
-		$row = $rows[0] ?? [];
-		return $row;
+		])[0] ?? [];
 	}
 
 	/**
-	 * Returns rows with specified 'where' only
+	 * Where
+	 *
+	 * Select with only where
 	 * 
 	 * ```
-	 * $Entity = Entity::where([
-	 * 		'column' => [['value', 'TYPE']]
+	 * $Entity = Entity::field([
+	 * 		'column' => [[$val, 'TYPE']]
 	 * ]);
 	 * ```
+	 * @return void
 	 */
+
 	public static function where(
 		$where,
 		$options = ['debug' => 0, 'die' => 0, 'test' => 0]
-	): array {
+	) {
 		extract($options);
 
 		$result = self::read([
@@ -442,15 +604,16 @@ class Model
 	}
 
 	/**
-	 * Select only one row with certain field value
+	 * Field
+	 * 
+	 * Select by certain field value
 	 *
 	 * ```php
 	 * $Entity = Entity::field([
 	 * 		'column' => [[$val, 'TYPE']]
 	 * ]);
 	 * ```
-	 * 
-	 * @deprecated
+	 * @return void
 	 */
 	public static function field(
 		$where,
@@ -473,10 +636,6 @@ class Model
 		}
 	}
 
-	/**
-	 * 
-	 * @deprecated
-	 */
 	public static function cnt($column)
 	{
 		return self::read([
@@ -624,11 +783,11 @@ class Model
 
 	#
 	#
-	#		SQL CODE GENERATORS
+	#		FORM HELPERS
 	#
 	#
 
-	public static function SELECT_(&$sql, array $select)
+	public static function __select(&$sql, $select)
 	{
 		$sql .= " ";
 		$sql .= "SELECT";
@@ -642,7 +801,7 @@ class Model
 		$sql .= "\n\n ";
 	}
 
-	public static function FROM_(&$sql, string $from)
+	public static function __from(&$sql, $from)
 	{
 		$sql .= " ";
 		$sql .= "FROM ";
@@ -650,7 +809,7 @@ class Model
 		$sql .= "\n\n ";
 	}
 
-	public static function JOIN_(&$sql, array $join)
+	public static function __join(&$sql, $join)
 	{
 		$sql .= " ";
 		if (isset($join)) {
@@ -671,9 +830,14 @@ class Model
 	}
 
 	/**
-	 * This method is required by ::WHERE_() and ::HAVING_()
+	 * This method is required by ::__where() and ::__having()
+	 *
+	 * @param  mixed $sql
+	 * @param  mixed $params
+	 * @param  mixed $type
+	 * @return void
 	 */
-	public static function CLAUSE_(&$sql, array $params, string $type): void
+	public static function __clause(&$sql, $params, $type)
 	{
 		$sql .= " ";
 		$sql .= "{$type} \t 1 = 1 ";
@@ -687,7 +851,7 @@ class Model
 					# $columnValueData[1] == type (t)
 
 					# Get sign
-					$signHolder = $columnValueData[0] ?? '';
+					$signHolder = $columnValueData[0];
 					if (strpos($signHolder, '<=') !== false) {
 						$sign = '<=';
 					} else if (strpos($signHolder, '>=') !== false) {
@@ -705,10 +869,10 @@ class Model
 					};
 
 					# A. With backticks – do not make binding
-					if (strpos($signHolder, '`') !== false) {
+					if (strpos($columnValueData[0], '`') !== false) {
 						#Dump::make($sign);
 						# Delete backticks
-						$v = preg_replace('/`/', '', $signHolder);
+						$v = preg_replace('/`/', '', $columnValueData[0]);
 						# A. When has LIKE, REGEXP, IN, IS NULL, IS NOT NULL
 						if (
 							strrpos($v, 'LIKE') !== false ||
@@ -762,16 +926,16 @@ class Model
 		$sql .= " ";
 	}
 
-	public static function WHERE_(&$sql, array $params)
+	public static function __where(&$sql, $params)
 	{
-		self::CLAUSE_($sql, $params, "WHERE");
+		self::__clause($sql, $params, "WHERE");
 	}
-	public static function HAVING_(&$sql, array $params)
+	public static function __having(&$sql, $params)
 	{
-		self::CLAUSE_($sql, $params, "HAVING");
+		self::__clause($sql, $params, "HAVING");
 	}
 
-	public static function GROUP_(&$sql, $group)
+	public static function __group(&$sql, $group)
 	{
 		if (isset($group) && !empty($group)) {
 
@@ -786,7 +950,7 @@ class Model
 		}
 	}
 
-	public static function ORDER_(&$sql, $order)
+	public static function __order(&$sql, $order)
 	{
 		if (isset($order)) {
 
@@ -801,7 +965,7 @@ class Model
 		}
 	}
 
-	public static function LIMIT_(&$sql, $limit)
+	public static function __limit(&$sql, $limit)
 	{
 		if (isset($limit)) {
 			$sql .= "\n";
@@ -810,7 +974,7 @@ class Model
 		}
 	}
 
-	public static function OFFSET_(&$sql, $offset)
+	public static function __offset(&$sql, $offset)
 	{
 		if (isset($offset)) {
 			$sql .= "\n";
@@ -819,7 +983,7 @@ class Model
 		}
 	}
 
-	public static function SET_(&$sql, $set)
+	public static function _set(&$sql, $set)
 	{
 		$sql .= " ";
 		$sql .= "SET ";
@@ -975,15 +1139,13 @@ class Model
 		}
 	}
 
-	/**
-	 * For 'WHERE' and 'HAVING' clauses
-	 */
-	public static function bindClause(&$sth, &$sql, $clause)
+	# for 'where' and 'having'
+	public static function bindClause(&$sth, &$sql, $where)
 	{
-		if (isset($clause)) {
-			foreach ($clause as $columnName => $columnValuesArr) {
+		if (isset($where)) {
+			foreach ($where as $columnName => $columnValuesArr) {
 				foreach ($columnValuesArr as $i => $data) {
-					$signAndValue = $data[0] ?? '';
+					$signAndValue = $data[0];
 					$type = $data[1] ?? NULL;
 
 					# If we have type

@@ -243,8 +243,8 @@ class Url
 
 		// 1. Query string
 		// a) Use current query string 
-		if ($queryString === NULL) {
-			$queryString = $_SERVER['QUERY_STRING'] ?? '';
+		if (!$queryString) {
+			$queryString = $_SERVER['QUERY_STRING'];
 		}
 
 		// b) Use passed

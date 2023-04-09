@@ -64,14 +64,8 @@ class In
 		/* replacements */
 
 		if (!empty($replacements)) {
-			foreach ($replacements as $replacement) {
-				if (isset($replacement[0]) && isset($replacement[1])) {
-					preg_replace(
-						"/" . preg_quote($replacement[0]) . "/",
-						$replacement[1],
-						$data ?? []
-					);
-				}
+			foreach ($replacements as $r) {
+				preg_replace($r[0], $r[1], $data);
 			}
 		}
 

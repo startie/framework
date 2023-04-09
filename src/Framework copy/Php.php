@@ -271,58 +271,10 @@ class Php
 		return mb_strtoupper($firstChar, $encoding) . $then;
 	}
 
-	/**
-	 * @source https://gist.github.com/MakStashkevich/31f5cb7b229bc735aeaa89a6796327ce
-	 */
-	public static function mb_str_pad(string $input, int $pad_length, string $pad_string = "\x20", int $pad_type = STR_PAD_RIGHT, string $encoding = 'UTF-8')
-	{
-		$input_length = mb_strlen($input, $encoding);
-		$pad_string_length = mb_strlen($pad_string, $encoding);
-
-		if ($pad_length <= 0 || ($pad_length - $input_length) <= 0) {
-			return $input;
-		}
-
-		$num_pad_chars = $pad_length - $input_length;
-
-		switch ($pad_type) {
-			case STR_PAD_RIGHT:
-				$left_pad = 0;
-				$right_pad = $num_pad_chars;
-				break;
-
-			case STR_PAD_LEFT:
-				$left_pad = $num_pad_chars;
-				$right_pad = 0;
-				break;
-
-			case STR_PAD_BOTH:
-				$left_pad = floor($num_pad_chars / 2);
-				$right_pad = $num_pad_chars - $left_pad;
-				break;
-		}
-
-		$result = '';
-		for ($i = 0; $i < $left_pad; ++$i) {
-			$result .= mb_substr($pad_string, $i % $pad_string_length, 1, $encoding);
-		}
-		$result .= $input;
-		for ($i = 0; $i < $right_pad; ++$i) {
-			$result .= mb_substr($pad_string, $i % $pad_string_length, 1, $encoding);
-		}
-
-		return $result;
-	}
-
 	public static function isJson($string)
 	{
-		if (isset($string)) {
-			json_decode($string);
-
-			return (json_last_error() == JSON_ERROR_NONE);
-		} else {
-			return false;
-		}
+		json_decode($string);
+		return (json_last_error() == JSON_ERROR_NONE);
 	}
 
 	public static function transliterate($textcyr = NULL, $textlat = NULL)
@@ -491,12 +443,11 @@ class Php
 
 	public static function oma(&$arr, $col, $dir = SORT_ASC)
 	{
-		$sort_col = [];
+		$sort_col = array();
 		foreach ($arr as $key => $row) {
-			if (isset($row[$col])) {
-				$sort_col[$key] = $row[$col];
-			}
+			$sort_col[$key] = $row[$col];
 		}
+
 		array_multisort($sort_col, $dir, $arr);
 	}
 

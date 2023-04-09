@@ -22,8 +22,8 @@ class Dev
 	{
 		static::$stop = 0;
 		static::$stop = microtime(true);
-		$time = microtime(true) - static::$start;
-		echo $time;
+		$t = microtime(true) - static::$start;
+		echo $t;
 		echo "<br>";
 	}
 
