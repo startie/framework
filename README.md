@@ -18,7 +18,7 @@ mkdir backend && mkdir backend/Controllers && mkdir backend/Config && mkdir back
 ```json
 "autoload": {
     "classmap": [
-        "backend/Controllers",
+        "backend/Controllers"
     ]
 }
 ```
@@ -64,8 +64,7 @@ DOMAIN="/"
 
 # DIR
 
-DIR_APP=""
-DIR_APP_PHYSICAL=""
+DIR_APP="" # full path to the root directory with trailing slash
 ```
 
 ## `backend/Config/Bootstrap/Common.php`
@@ -93,8 +92,8 @@ require "$root/vendor/autoload.php";
 const APP_NAME = "Startie";
 const APP_DESCRIPTION = "Educational PHP framework";
 const APP_FOUNDED = 2023;
-const APP_V = "1.0.0";
-const APP_V_DATE = "2023-12-01";
+const APP_V = "";
+const APP_V_DATE = "";
 ```
 
 ## `backend/Controllers/Index_Controller.php`
