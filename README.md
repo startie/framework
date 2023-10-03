@@ -35,7 +35,7 @@ require 'backend/Config/Bootstrap/Common.php';
 
 ## `.env`
 
-```php
+```env
 # MAIN
 
 STAGE="DEVELOPMENT"
