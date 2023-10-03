@@ -194,28 +194,4 @@ class Dump
             echo "</pre>";
         }
     }
-
-    // public static function isVar($strVar) { 
-    //  $vars = get_defined_vars();
-    //  if($vars[$strVar]){
-    //      return 1;
-    //  }
-    //  return;
-    // } 
-
-    // public static function err($strVar)
-    // {
-    //  if(!Dump::isVar($strVar)){
-    //      Dump::made("Variable '\${$strVar}' is not found");
-    //  }
-    // }
 }
-
-// function d($var)
-// {
-//     Dump::make($var);
-// }
-// function dd($var)
-// {
-//     Dump::made($var);
-// }

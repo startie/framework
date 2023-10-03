@@ -5,16 +5,43 @@ namespace Startie;
 class Config
 {
 	/**
-	 * Can be: "DEVELOPMENT", "TEST", "PRODUCTION"
+	 * @var string $stage. Possible values: "DEVELOPMENT", "TEST", "PRODUCTION"
 	 */
 	public static $stage;
 
 	/**
-	 * Can be: "LOCAL", "REMOTE"
+	 * @var string $machine. Possible values: "LOCAL", "REMOTE"
 	 */
 	public static $machine;
 
 	public static function init(): void
+	{
+		Config::loadEnv();
+		Config::defineFilesystemConstants();
+		Config::defineRegionConstants();
+	}
+
+	public static function get($name)
+	{
+		$stage = strtolower(Config::$stage);
+		$machine = strtolower(Config::$machine);
+
+		$name = ucfirst(strtolower($name));
+
+		$pathStart = "backend/Config/$name";
+
+		$path = App::path("$pathStart/{$stage}_{$machine}.php");
+		$path = is_file($path) ? $path : App::path("$pathStart/*.php");
+		$path = is_file($path) ? $path : App::path("$pathStart/Common.php");
+
+		if (is_file(!$path)) {
+			throw new Exception("Config path for `$name` was not found" . $path);
+		} else {
+			return require $path;
+		}
+	}
+
+	public static function loadEnv()
 	{
 		if (isset($_ENV['MACHINE'])) {
 			self::$machine = $_ENV['MACHINE'];
@@ -27,16 +54,13 @@ class Config
 		} else {
 			throw new \Startie\Exception("No 'STAGE' in .env");
 		}
-
-		Config::dirs();
-		Config::region();
 	}
 
 	/**
-	 * Creates some useful global constants as: DIR_APP, BACKEND_DIR, PUBLIC_DIR, etc.
+	 * Defines some useful global constants such as: 
+	 * DIR_APP, BACKEND_DIR, PUBLIC_DIR, etc.
 	 */
-
-	private static function dirs(): void
+	private static function defineFilesystemConstants(): void
 	{
 		// Load .env
 		if (isset($_ENV['DIR_APP'])) {
@@ -44,13 +68,17 @@ class Config
 
 			// Checking DIR_APP
 			if (!file_exists($dirRoot)) {
-				throw new \Startie\Exception("Path 'DIR_APP' from .env doesn't exist");
+				throw new \Startie\Exception(
+					"Path 'DIR_APP' from .env doesn't exist"
+				);
 			}
 		} else {
-			throw new \Startie\Exception("No 'DIR_APP' in .env");
+			throw new \Startie\Exception(
+				"No 'DIR_APP' in .env"
+			);
 		}
 
-		// Create constants
+		// Define constants
 		define("DIR_APP", $dirRoot);
 		define("FRONTEND_DIR", DIR_APP . "frontend/");
 		define("BACKEND_DIR", DIR_APP . "backend/");
@@ -62,7 +90,7 @@ class Config
 	/**
 	 * Creates some usefule global constants and applying regional settings
 	 */
-	public static function region(): void
+	public static function defineRegionConstants(): void
 	{
 		define('DATE_TIMEZONE', $_ENV['DATE_TIMEZONE']);
 		define('TIMEZONE', $_ENV['TIMEZONE']);
@@ -70,13 +98,5 @@ class Config
 
 		date_default_timezone_set($_ENV['DATE_DEFAULT_TIMEZONE']);
 		setlocale(LC_ALL, $_ENV['LOCALE']);
-	}
-
-	/**
-	 * Helper for getting a main variable from any config file
-	 */
-	public static function get($path)
-	{
-		return require App::path("backend/Config/{$path}.php");
 	}
 }

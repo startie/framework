@@ -12,16 +12,20 @@ class App
         self::$root = $root;
         self::$initializedAt = microtime(true);
 
-        // App constants
+        /*
+            App constants
+        */
 
-        $constantsPath = "$root/backend/Config/Common/App.php";
+        $constantsPath = App::path("backend/Config/Common/App.php");
         if (file_exists($constantsPath)) {
             require $constantsPath;
         } else {
-            throw new Exception("No 'backend/Config/Common/App.php'");
+            throw new Exception("Path was not found: " . $constantsPath);
         }
 
-        // .env
+        /*
+            Load .env
+        */
 
         $dotenv = \Dotenv\Dotenv::createImmutable($root);
         $dotenv->load();

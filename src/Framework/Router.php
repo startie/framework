@@ -65,8 +65,12 @@ class Router
 
 		/* Find current */
 
-		$result = self::find();
-		extract($result); // $isFinded, $findedRouteConfig, $controllerParams
+		$find = self::find();
+		[
+			'isFinded' => $isFinded,
+			'findedRouteConfig' => $findedRouteConfig,
+			'controllerParams' => $controllerParams
+		] = $find;
 
 		/* Render */
 
@@ -283,6 +287,7 @@ class Router
 			require $route->controllerFilePath;
 		}
 
+
 		if (!class_exists($route->controllerNamespacedClass)) {
 			throw new \Exception("Class '{$route->controllerNamespacedClass}' doesn't exsists");
 		}
@@ -293,7 +298,8 @@ class Router
 		/* If we don't have params */
 
 		if (empty($controllerParams)) {
-			$content = call_user_func("\Controllers\\" . $route->classMethodExecution);
+			$controllerClassMethod = "\Controllers\\" . $route->classMethodExecution;
+			$content = call_user_func($controllerClassMethod);
 		}
 
 		/* If we have params */
@@ -339,6 +345,7 @@ class Router
 			}
 		}
 	}
+
 	public static function middles(Route $route)
 	{
 		if ($route->middles) {
@@ -355,13 +362,12 @@ class Router
 		};
 	}
 
-	#
-	# 	$params = ['url']
-	#
-
-	public static function explodeUrl($params)
+	/**
+	 * @param $params = ['url']
+	 */
+	public static function explodeUrl(array $params)
 	{
-		extract($params);
+		extract($params); # => $url
 		# Delete all spaces
 		$url = rtrim($url, '/');
 		# Make as an array
@@ -372,11 +378,8 @@ class Router
 
 	/**
 	 * Check if passed signature (controller::method) belongs to current url
-	 *
-	 * @param  string $signature
-	 * @return bool
 	 */
-	public static function isCurrent($signature)
+	public static function isCurrent(string $signature): bool
 	{
 		return Url::current() == Url::c($signature);
 	}

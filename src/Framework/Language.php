@@ -4,7 +4,7 @@ namespace Startie;
 
 class Language
 {
-    public static function code()
+    public static function code(): string
     {
         $LanguageCode = Cookie::get('LanguageCode');
         if (!$LanguageCode) {
@@ -14,7 +14,6 @@ class Language
                 throw new \Startie\Exception("LANGUAGE_CODE is missing in .env");
             }
         }
-
 
         return $LanguageCode;
     }

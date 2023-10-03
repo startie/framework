@@ -2,26 +2,25 @@
 
 namespace Startie;
 
-use \Startie\Access;
 use \Startie\Session;
 use \Models\Users;
+use Startie\Config;
 
 class Auth
 {
 	use \Startie\Bootable;
 
+	public static $conig;
+
 	public static function boot()
 	{
 		self::$isBooted = true;
+		self::loadConfig();
+	}
 
-		// Loads config file
-
-		$ConfigCommonPath = App::path('backend/Config/Auth/Common.php');
-		if (file_exists($ConfigCommonPath)) {
-			$ConfigCommon = require $ConfigCommonPath;
-		} else {
-			throw new \Startie\Exception("Couldn't boot the 'Auth' class: path '$ConfigCommonPath' doesn't exist");
-		}
+	public static function loadConfig()
+	{
+		Auth::$conig = Config::get('Auth');
 	}
 
 	#
@@ -39,7 +38,7 @@ class Auth
 		$_SESSION['auth'][] = $authEntity;
 	}
 
-	public static function is()
+	public static function is(): bool
 	{
 		# When setup about no connection
 		// if($_ENV['NO_CONNECTION']){
@@ -55,7 +54,7 @@ class Auth
 		// }
 	}
 
-	public static function isWithService($serviceName)
+	public static function isWithService($serviceName): bool
 	{
 		if (Session::is('auth')) {
 			foreach (Session::get('auth') as $authEntity) {
@@ -69,6 +68,9 @@ class Auth
 		return false;
 	}
 
+	/**
+	 * @return integer|bool
+	 */
 	public static function getIdInService($serviceName)
 	{
 		if (Session::is('auth')) {

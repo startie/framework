@@ -4,8 +4,7 @@ namespace Startie;
 
 class Stats
 {
-
-	public static function init()
+	public static function init(): void
 	{
 
 		// Visits couner

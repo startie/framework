@@ -55,6 +55,27 @@ class Dev
 		}
 	}
 
+	/**
+	 * В файле .env можно разместить специальный ключ DEV_SECRET_MODE_KEY
+	 * Если значение этого ключа передавать при запросе 
+	 * (например, в query string), можно зайти в секретный режим.
+	 */
+	public static function isSecretMode()
+	{
+		if ($_ENV['MODE_DEV']) {
+			if (isset($_ENV['DEV_SECRET_MODE_KEY'])) {
+				if (isset($_REQUEST['DEV_SECRET_MODE_KEY'])) {
+					return
+						$_ENV['DEV_SECRET_MODE_KEY']
+						===
+						$_REQUEST['DEV_SECRET_MODE_KEY'];
+				}
+			}
+		}
+
+		return false;
+	}
+
 	public static function is()
 	{
 		if (Access::is('developers') || $_ENV['MODE_DEV']) {

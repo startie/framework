@@ -3,17 +3,15 @@
 namespace Startie;
 
 use Startie\Url;
-use Startie\Logs;
 use Startie\Input;
 use Startie\Dump;
 use Startie\Auth;
-use Models\Users;
 use DateTime;
 use DateInterval;
 
 class Csrf
 {
-	public static function create()
+	public static function create(): void
 	{
 		# Generate token's hash
 		$csrfToken = bin2hex(openssl_random_pseudo_bytes(32));

@@ -6,6 +6,16 @@ use InvalidArgumentException;
 
 class File
 {
+	public static function downloadFromUrl(string $url)
+	{
+		$ch = curl_init($url);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		$data = curl_exec($ch);
+		curl_close($ch);
+
+		return $data;
+	}
+
 	public static function saveFromUrl($url, $path)
 	{
 		# 	Create path if it doesn't exist
@@ -16,13 +26,28 @@ class File
 		foreach ($parts as $part)
 			if (!is_dir($dir .= "/$part")) mkdir($dir);
 
-		# 	Load
+		$data = self::downloadFromUrl($url);
 
-		$ch = curl_init($url);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		$data = curl_exec($ch);
-		curl_close($ch);
 		$result = file_put_contents($path, $data);
+	}
+
+	function initDirPath($desiredPath)
+	{
+		if (is_dir($desiredPath)) {
+			throw new Exception("Path already exists.");
+			return false;
+		}
+
+		$parts = explode('/', $desiredPath);
+
+		$currentPath = '';
+
+		foreach ($parts as $part) {
+			$currentPath .= "/$part";
+			if (!is_dir($currentPath)) {
+				mkdir($currentPath);
+			}
+		}
 	}
 
 	public static function saveFromPath($path1, $path2)
@@ -152,5 +177,25 @@ class File
 			}
 		}
 		rmdir($path);
+	}
+
+	/**
+	 * Creates temporary file from response body
+	 * 
+	 * @return string abosolute file path to that file
+	 */
+	public static function createTempFromString(string $data): string
+	{
+		# 	Создать временный файл
+
+		$temporaryFile = tmpfile();
+		$meta = stream_get_meta_data($temporaryFile);
+		$temporaryFilePath = $meta['uri'];
+
+		#   Сохранить скачанный как временный файл
+
+		file_put_contents($temporaryFilePath, $data);
+
+		return $temporaryFilePath;
 	}
 }

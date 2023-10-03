@@ -9,7 +9,7 @@ class Asseter
 	public static $cssPrefix;
 	//public static $publicUrl;
 
-	public static function config()
+	public static function loadConfig()
 	{
 		$path = App::path("backend/Config/Asseter/Common.php");
 
@@ -34,7 +34,7 @@ class Asseter
 
 	public static function init()
 	{
-		self::config();
+		self::loadConfig();
 	}
 
 	public static function getJsHash()

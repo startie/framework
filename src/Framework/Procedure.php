@@ -8,6 +8,7 @@ class Procedure
 	{
 		extract($data);
 		$path = App::path("backend/Procedures/{$name}.php");
+		global $t;
 		require($path);
 	}
 

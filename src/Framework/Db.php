@@ -2,68 +2,132 @@
 
 namespace Startie;
 
-use PDOException;
-use PDO;
-
 class Db
 {
-	public static $h;
+	use \Startie\Bootable;
 
-	public static function config($name)
+	public static $connections = [];
+	public static $excludeFunctions;
+
+	public static function boot()
 	{
-		$ConfigDb = require App::path("backend/Config/Db/Common.php");
-		return $ConfigDb[$name];
+		self::$isBooted = true;
+		self::loadConfig();
 	}
 
-	public function __construct($ConfigName)
+	public static function loadConfig()
 	{
-		$DbConfig = self::config($ConfigName);
-		extract($DbConfig);
+		Db::$config = Config::get("Db");
+	}
 
-		if ($driver === "mysql") {
-			$dsn = "$driver:" . "host=$host;port=$port;dbname=$name;charset=$charset";
-		} else {
-			throw new \Startie\Exception("Unsupported DB driver: $driver");
-		}
+	/**
+	 * Load config, make connections and store them
+	 */
+	public static function init()
+	{
+		self::requireBoot();
 
-		if ($driver === "mysql") {
-			try {
-				Db::$h = new \PDO($dsn, $user, $password);
-				Db::$h->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-			} catch (\PDOException $e) {
-				$message = "Error when connecting to database. Check credentionals and if your database is running.";
-				$message .= "<br/>";
-				$message .= $e->getMessage();
-				$message .= "<br/>";
-				die($message);
+		/*
+			Check and store connections
+			`$type` examples: "logs", "common"
+		*/
+
+		foreach (Db::$config as $type => $params) {
+			$dsn = Db::dsn($params);
+			$connection = Db::connect($dsn, $params["driver"]);
+			if ($connection) {
+				Db::$connections[$type] = $connection;
 			}
 		}
-	}
 
-	public function truncateTable($table)
-	{
-		global $dbh;
+		/*
+			DB_EXCLUDE_FUNCTIONS
+		*/
 
-		// Forcing truncate
-		$sql = "SET FOREIGN_KEY_CHECKS = 0;";
-		$sql .= "TRUNCATE TABLE $table";
+		$envindex = 'DB_EXCLUDE_FUNCTIONS';
 
-		// $sql = "TRUNCATE TABLE $table";
-
-		try {
-
-			$dbh->exec($sql);
-			//echo "Table '$table' trucated successfully!";
-
-		} catch (PDOException $e) {
-
-			echo $e->getMessage();
+		if (isset($_ENV[$envindex])) {
+			Db::$excludeFunctions = explode(",", $_ENV[$envindex]);
 		}
 	}
 
-	public static function n($query)
+	public static function config($name = NULL)
 	{
-		return $query . "\n";
+		if (isset($name)) {
+			return Db::$config[$name];
+		}
+	}
+
+	public static function connect($dsn, $driver)
+	{
+		if ($driver === "mysql") {
+			try {
+				$connection = new \PDO($dsn);
+				$connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+				return $connection;
+			} catch (\PDOException $e) {
+				$errorText = "Failed to connect to database." . PHP_EOL;
+				Logs::toFile($e . PHP_EOL . PHP_EOL);
+
+				if (Dev::isSecretMode()) {
+					$errorText .= "Hi developer!"
+						. "Check your connection credentionals and if the database is running."
+						. PHP_EOL . PHP_EOL
+						. $e->getMessage()
+						. PHP_EOL
+						. $e->getTraceAsString();
+				}
+				echo Errors::make($errorText);
+				die();
+			}
+		} else {
+			throw new Exception('Unsupported driver');
+			return false;
+		}
+	}
+
+	/**
+	 * Returns DSN string
+	 *
+	 * PHP >=7.4
+	 *
+	 * @return string
+	 */
+	public static function dsn(array $params)
+	{
+		$dsn = "";
+
+		[
+			'driver' => $driver,
+			'host' => $host,
+			'port' => $port,
+			'name' => $name,
+			'user' => $user,
+			'password' => $password,
+			'charset' => $charset,
+		] = $params;
+
+		if (isset($params['path'])) {
+			['path' => $path] = $params;
+		};
+
+		switch ($driver) {
+			case 'sqlite':
+				$dsn = "sqlite:$path";
+				break;
+
+			case 'mysql':
+				$dsn = "mysql:host=$host;port=$port;dbname=$name;charset=$charset;user=$user;password=$password";
+				break;
+
+			case 'pgsql':
+				$dsn = "pgsql:host=$host;port=$port;dbname=$name;charset=$charset;user=$user;password=$password";
+
+			default:
+				throw new \Startie\Exception("Unsupported DB driver: $driver");
+		}
+
+		return $dsn;
 	}
 
 	public static function debugStart($debug = 0, $object = NULL)
@@ -85,54 +149,4 @@ class Db
 	{
 		if ($debug) Dump::make($object, $die = 0, $msg);
 	}
-
-	public static function showTable($table)
-	{
-		global $dbh;
-
-		$sql = "SELECT * FROM $table";
-
-		try {
-			echo "<br>";
-			echo "Showing content of table '$table'";
-			echo "<br><br>";
-
-			$results = $dbh->query($sql);
-			echo "<pre>";
-			var_dump($results->fetchAll(PDO::FETCH_ASSOC));
-			echo "</pre>";
-		} catch (Exception $e) {
-			echo $e->getMessage();
-		}
-	}
-
-	public static function e($sql, $type = 'fetch')
-	{
-		global $dbh;
-
-		try {
-			$results = $dbh->query($sql);
-			if ($type == 'fetch') {
-				return $results->fetchAll(PDO::FETCH_ASSOC);
-			}
-			if ($type == 'count') {
-				return $results->rowCount();
-			}
-		} catch (Exception $e) {
-			echo $e->getMessage();
-		}
-	}
-
-	// public static function query($query)
-	// {
-	// 	global $dbh;
-
-	// 	$sth = $dbh->prepare($query);
-	// 	$sth->execute();
-
-	// 	$result = $sth->fetchAll(PDO::FETCH_ASSOC);
-
-	// 	return $result;
-	// }
-
 }

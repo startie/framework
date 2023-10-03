@@ -7,11 +7,9 @@ use PDOException;
 
 class Model
 {
-	#
-	#
-	#		VARS
-	#
-	#
+	use \Startie\Bootable;
+
+	public static $config;
 
 	public static $storage;
 
@@ -21,28 +19,23 @@ class Model
 
 	public static $excludeFunctions;
 
-	public static function init()
+	public static function boot()
 	{
-		$envindex = 'DB_EXCLUDE_FUNCTIONS';
+		self::$isBooted = true;
+		self::loadConfig();
+	}
 
-		if (isset($_ENV[$envindex])) {
-			self::$excludeFunctions = explode(",", $_ENV[$envindex]);
-		}
+	public static function loadConfig()
+	{
+		Model::$config = Config::get('Model');
 	}
 
 	public static function storage()
 	{
-		if (self::$storage) {
-			if (self::$storage[0] === "db") {
-				$storage = new \Startie\Db(self::$storage[1]);
-			} else {
-				throw new \Startie\Exception("Unknown storage");
-			}
-		} else {
-			$storage = new \Startie\Db("common");
-		}
+		$name = Model::$config['storage']['name']; // e.g 'logs', 'common', etc.
+		$connection = Db::$connections[$name];
 
-		return $storage;
+		return $connection;
 	}
 
 	#
@@ -85,11 +78,11 @@ class Model
 		#
 		#	Prepare
 
-		$db = self::storage()::$h;
+		$db = Model::storage();
 		try {
 			$sth = $db->prepare($sql);
 		} catch (PDOException $e) {
-			throw \Startie\Exception::PDO($e, $sql);
+			throw Exception::PDO($e, $sql);
 		}
 
 		#
@@ -115,10 +108,11 @@ class Model
 			if (!$test) {
 				$sth->execute();
 				$lastInsertedId = $db->lastInsertId();
+				$lastInsertedId = intval($lastInsertedId);
 				return $lastInsertedId;
 			}
 		} catch (PDOException $e) {
-			throw new \Startie\Exception($e);
+			throw new Exception($e);
 		}
 	}
 
@@ -158,11 +152,11 @@ class Model
 		#	Exclude functions
 
 		# Env settings
-		if (self::$excludeFunctions) {
+		if (Db::$excludeFunctions) {
 			# Param
 			if ($excludeFunctions) {
 				#Dump::make($sql);
-				foreach (self::$excludeFunctions as $excludeFunction) {
+				foreach (Db::$excludeFunctions as $excludeFunction) {
 					$sql = str_replace($excludeFunction, "", $sql);
 				}
 				#Dump::made($sql);
@@ -178,11 +172,11 @@ class Model
 		#
 		#	Prepare
 
-		$db = self::storage()::$h;
+		$db = Model::storage();
 		try {
 			$sth = $db->prepare($sql);
 		} catch (PDOException $e) {
-			throw \Startie\Exception::PDO($e, $sql);
+			throw Exception::PDO($e, $sql);
 		}
 
 		#
@@ -211,7 +205,7 @@ class Model
 				return $rows;
 			}
 		} catch (PDOException $e) {
-			throw \Startie\Exception::PDO($e, $sql);
+			throw Exception::PDO($e, $sql);
 		}
 	}
 
@@ -233,7 +227,7 @@ class Model
 		#	Checks
 
 		if (!isset($where)) {
-			throw new \Startie\Exception("Dangerous: no where for update");
+			throw new Exception("Dangerous: no where for update");
 			//die(); // after throw die is not reachable
 		}
 
@@ -257,11 +251,11 @@ class Model
 		#
 		#	Prepare
 
-		$db = self::storage()::$h;
+		$db = Model::storage();
 		try {
 			$sth = $db->prepare($sql);
 		} catch (PDOException $e) {
-			throw \Startie\Exception::PDO($e, $sql);
+			throw Exception::PDO($e, $sql);
 		}
 
 		#
@@ -292,7 +286,7 @@ class Model
 				return $affectedRowsCount;
 			}
 		} catch (PDOException $e) {
-			throw \Startie\Exception::PDO($e, $sql);
+			throw Exception::PDO($e, $sql);
 		}
 	}
 
@@ -326,7 +320,7 @@ class Model
 		#
 		#	Prepare
 
-		$db = self::storage()::$h;
+		$db = Model::storage();
 		$sth = $db->prepare($sql);
 
 		#
@@ -355,7 +349,7 @@ class Model
 				return $affectedRowsCount;
 			}
 		} catch (PDOException $e) {
-			throw \Startie\Exception::PDO($e, $sql);
+			throw Exception::PDO($e, $sql);
 		}
 	}
 
@@ -479,7 +473,7 @@ class Model
 	 */
 	public static function cnt($column)
 	{
-		return self::read([
+		return Model::read([
 			'select' => [$column],
 			'order' => [$column . ' DESC'],
 			'limit' => 1,
@@ -565,20 +559,40 @@ class Model
 		return $final;
 	}
 
-	#
-	#	Description:
-	#	check if there is value in $global with $g(index)
-	#	then add this value to $where with $w(index)
-
-	public static function isWhereInput($where, $global, $type, $gindex, $windex)
+	/**
+	 * Check if there is a value in some global array with specified key
+	 * If it is presented, add this value to $where
+	 * 
+	 * @deprecated 0.19.20 use whereFromInput instead
+	 */
+	public static function isWhereInput($where, $global, $type, $keyInGlobal, $keyInWhere)
 	{
-		if (Input::is($global, $gindex)) {
+		if (Input::is($global, $keyInGlobal)) {
 			$global = strtolower($global);
-			$where[$windex] = [
-				[call_user_func('\Startie\Input::' . $global, $gindex, $type), $type]
+			$where[$keyInWhere] = [
+				[
+					call_user_func('\Startie\Input::' . $global, $keyInGlobal, $type),
+					$type
+				]
 			];
 		}
 		return $where;
+	}
+
+	public static function whereFromInput(
+		$where,
+		$global,
+		$type,
+		$keyInGlobal,
+		$keyInWhere
+	) {
+		return self::whereFromInput(
+			$where,
+			$global,
+			$type,
+			$keyInGlobal,
+			$keyInWhere
+		);
 	}
 
 	public static function detach($selectFields, $table, $e, $eIndex)
@@ -614,12 +628,13 @@ class Model
 		return $e;
 	}
 
-	public static function c($Entities, $params = [])
+	public static function c($entities, $params = [])
 	{
-		foreach ($Entities as &$e) {
-			$e = static::complete($e, $params);
+		foreach ($entities as &$entity) {
+			$entity = static::complete($entity, $params);
 		}
-		return $Entities;
+
+		return $entities;
 	}
 
 	#
@@ -764,11 +779,11 @@ class Model
 
 	public static function WHERE_(&$sql, array $params)
 	{
-		self::CLAUSE_($sql, $params, "WHERE");
+		Model::CLAUSE_($sql, $params, "WHERE");
 	}
 	public static function HAVING_(&$sql, array $params)
 	{
-		self::CLAUSE_($sql, $params, "HAVING");
+		Model::CLAUSE_($sql, $params, "HAVING");
 	}
 
 	public static function GROUP_(&$sql, $group)
@@ -829,7 +844,7 @@ class Model
 			$type = $data[2] ?? NULL;
 
 			# With backticks
-			if (Schema::hasBt($val)) {
+			if (Schema::hasBackticks($val)) {
 				# delete backticks
 				$valClean = preg_replace('/`/', '', $val);
 
@@ -875,7 +890,7 @@ class Model
 			$type = $data[2] ?? NULL;
 
 			# With backticks
-			if (Schema::hasBt($val)) {
+			if (Schema::hasBackticks($val)) {
 				# delete backticks
 				$valClean = preg_replace('/`/', '', $val);
 
@@ -913,7 +928,7 @@ class Model
 				#
 				# 	With backticks
 
-				if (Schema::hasBt($val)) {
+				if (Schema::hasBackticks($val)) {
 					# do nothing
 				}
 
@@ -951,7 +966,7 @@ class Model
 				#
 				# 	With backticks
 
-				if (Schema::hasBt($val)) {
+				if (Schema::hasBackticks($val)) {
 					# do nothing
 				}
 
@@ -1010,7 +1025,7 @@ class Model
 					else {
 						# Если есть бэктиксы
 						# - to support `< UNIX_TIMESTAMP()`
-						if (Schema::hasBt($signAndValue)) {
+						if (Schema::hasBackticks($signAndValue)) {
 							break (1);
 						}
 

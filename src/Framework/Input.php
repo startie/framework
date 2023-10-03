@@ -6,27 +6,30 @@ class Input
 {
 	use \Startie\Bootable;
 
-	public static $SanitizeTypeDefault;
-
 	public static function boot()
 	{
 		self::$isBooted = true;
-		self::config();
+		self::loadConfig();
 	}
 
-	public static function config()
-	{
-		$path = App::path("backend/Config/Input/*.php");
+	public static $SanitizeTypeDefault;
 
-		if (!file_exists($path)) {
-			throw new Exception("Config for 'Startie\Input' is missing");
-		} else {
-			$Config = require($path);
-			if (isset($Config['SanitizeTypeDefault'])) {
-				Input::$SanitizeTypeDefault = strtoupper($Config['SanitizeTypeDefault']);
-			} else {
-				throw new Exception("'SanitizeTypeDefault' is not defined in config for 'Startie\Input'");
+	public static function loadConfig()
+	{
+		$configPath = App::path("backend/Config/Input/*.php");
+
+		if (file_exists($configPath)) {
+			self::$config = require($configPath);
+			if (!isset(self::$config['SanitizeTypeDefault'])) {
+				throw new Exception(
+					"'SanitizeTypeDefault' is not defined in config for 'Startie\Input'"
+				);
 			}
+		} else {
+			throw new Exception(
+				"Config path for `Input` was not found: "
+					. $configPath
+			);
 		}
 	}
 
@@ -122,7 +125,7 @@ class Input
 	private static function g($var, $SanitizeType, $glob)
 	{
 		if (!$SanitizeType) {
-			$SanitizeType = Input::$SanitizeTypeDefault;
+			$SanitizeType = self::$config['SanitizeTypeDefault'];
 		};
 
 		$result = call_user_func(
@@ -133,48 +136,80 @@ class Input
 		return $result;
 	}
 
+	/**
+	 * Gets a value from $_COOKIE variable specified by key
+	 * is required by Model::isWhereInput
+	 */
 	public static function cookie($var, $SanitizeType)
 	{
 		self::requireBoot();
 		return self::g($var, $SanitizeType, $_COOKIE);
 	}
 
+	/**
+	 * Gets a value from $_ENV variable specified by key
+	 * is required by Model::isWhereInput
+	 */
 	public static function env($var, $SanitizeType)
 	{
 		self::requireBoot();
 		return self::g($var, $SanitizeType, $_ENV);
 	}
 
+	/**
+	 * Gets a value from $_FILES variable specified by key
+	 * is required by Model::isWhereInput
+	 */
 	public static function files($var, $SanitizeType)
 	{
 		self::requireBoot();
 		return self::g($var, $SanitizeType, $_FILES);
 	}
 
+	/**
+	 * Gets a value from $_GET variable specified by key
+	 * is required by Model::isWhereInput
+	 */
 	public static function get($var, $SanitizeType)
 	{
 		self::requireBoot();
 		return self::g($var, $SanitizeType, $_GET);
 	}
 
+	/**
+	 * Gets a value from $_POST variable specified by key
+	 * is required by Model::isWhereInput
+	 */
 	public static function post($var, $SanitizeType)
 	{
 		self::requireBoot();
 		return self::g($var, $SanitizeType, $_POST);
 	}
 
+	/**
+	 * Gets a value from $_REQUEST variable specified by key
+	 * is required by Model::isWhereInput
+	 */
 	public static function request($var, $SanitizeType)
 	{
 		self::requireBoot();
 		return self::g($var, $SanitizeType, $_REQUEST);
 	}
 
+	/**
+	 * Gets a value from $_SERVER variable by key
+	 * is required by Model::isWhereInput
+	 */
 	public static function server($var, $SanitizeType)
 	{
 		self::requireBoot();
 		return self::g($var, $SanitizeType, $_SERVER);
 	}
 
+	/**
+	 * Gets a value from $_SESSION variable by key
+	 * is required by Model::isWhereInput
+	 */
 	public static function session($var, $SanitizeType)
 	{
 		self::requireBoot();
