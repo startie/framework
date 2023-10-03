@@ -1,31 +1,18 @@
-# Installation
+# Getting Started
+
+## 1. Install package
 
 ```
-composer init
 composer require startie/framework
 ```
 
-# Set up
+## 2. Create index file for web-server
 
-## Project structure in Terminal
+It will be the file that will recieve all client requests and associate them with controllers.
 
 ```
-mkdir backend && mkdir backend/Controllers && mkdir backend/Config && mkdir backend/Config/Bootstrap && mkdir backend/Routs && touch index.php && touch backend/Config/Bootstrap/Common.php && touch .env && mkdir backend/Config/Common && touch backend/Config/Common/App.php && touch backend/Controllers/Index_Controller.php && touch backend/Routs/Index.php
+touch index.php
 ```
-
-## `composer.json`
-
-```json
-"autoload": {
-    "classmap": [
-        "backend/Controllers"
-    ]
-}
-```
-
-## `index.php`
-
-This is the file, that get recieves all requests and associate them with classes from 'Controllers' namespace.
 
 ```php
 <?php
@@ -33,7 +20,62 @@ This is the file, that get recieves all requests and associate them with classes
 require 'backend/Config/Bootstrap/Common.php';
 ```
 
-## `.env`
+## 3. Create main bootstrap file
+
+This file initializes all important components.
+
+```
+mkdir backend/Config/Bootstrap
+touch backend/Config/Bootstrap/Common.php
+```
+
+```php
+<?php
+
+# BASIC
+
+$root = dirname(__DIR__, 3);
+require "$root/vendor/autoload.php";
+\Startie\App::init($root);
+\Startie\Config::init();
+
+# ROUTING
+
+\Startie\Router::init();
+```
+
+## 4. Create main development directory
+
+```
+mkdir backend
+```
+
+## 5. Create config directory
+
+```
+mkdir backend/Config
+mkdir backend/Config/Common
+```
+
+```
+touch backend/Config/Common/App.php
+```
+
+```php
+<?php
+
+const APP_NAME = "Startie";
+const APP_DESCRIPTION = "Educational PHP framework";
+const APP_FOUNDED = 2023;
+const APP_V = "";
+const APP_V_DATE = "";
+```
+
+## 6. Create enviroment config file
+
+```
+touch .env
+```
 
 ```env
 # MAIN
@@ -67,36 +109,12 @@ DOMAIN="/"
 DIR_APP="" # full path to the root directory with trailing slash
 ```
 
-## `backend/Config/Bootstrap/Common.php`
+## 7. Create main controller
 
-```php
-<?php
-
-# BASIC
-
-$root = dirname(__DIR__, 3);
-require "$root/vendor/autoload.php";
-\Startie\App::init($root);
-\Startie\Config::init();
-
-# ROUTING
-
-\Startie\Router::init();
 ```
-
-## `backend/Config/Common/App.php`
-
-```php
-<?php
-
-const APP_NAME = "Startie";
-const APP_DESCRIPTION = "Educational PHP framework";
-const APP_FOUNDED = 2023;
-const APP_V = "";
-const APP_V_DATE = "";
+mkdir backend/Controllers
+touch backend/Controllers/Index_Controller.php
 ```
-
-## `backend/Controllers/Index_Controller.php`
 
 ```php
 <?php
@@ -112,7 +130,24 @@ class Index_Controller
 }
 ```
 
-## `backend/Routs/Index.php`
+## 8. Modify `composer.json`
+
+To autoload all controllers's classes.
+
+```json
+"autoload": {
+    "classmap": [
+        "backend/Controllers"
+    ]
+}
+```
+
+## 9. Create routs
+
+```
+mkdir backend/Routs
+touch backend/Routs/Index.php
+```
 
 ```php
 <?php
@@ -125,7 +160,7 @@ return [
 ];
 ```
 
-# Run in Terminal
+## 10. Run server
 
 ```
 php -S localhost:8000
