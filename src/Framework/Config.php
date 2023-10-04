@@ -68,9 +68,7 @@ class Config
 
 			// Checking DIR_APP
 			if (!file_exists($dirRoot)) {
-				throw new \Startie\Exception(
-					"Path 'DIR_APP' from .env doesn't exist"
-				);
+				$dirRoot = \Startie\App::$root;
 			}
 		} else {
 			throw new \Startie\Exception(
