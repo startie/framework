@@ -20,12 +20,43 @@ touch index.php
 require 'backend/Config/Bootstrap/Common.php';
 ```
 
-## 3. Create main bootstrap file
+## 3. Create main development directory
+
+```
+mkdir backend
+```
+
+## 4. Create config directory
+
+```
+mkdir backend/Config
+```
+```
+mkdir backend/Config/Common
+```
+
+```
+touch backend/Config/Common/App.php
+```
+
+```php
+<?php
+
+const APP_NAME = "Startie";
+const APP_DESCRIPTION = "Educational PHP framework";
+const APP_FOUNDED = 2023;
+const APP_V = "";
+const APP_V_DATE = "";
+```
+
+## 5. Create main bootstrap file
 
 This file initializes all important components.
 
 ```
 mkdir backend/Config/Bootstrap
+```
+```
 touch backend/Config/Bootstrap/Common.php
 ```
 
@@ -42,33 +73,6 @@ require "$root/vendor/autoload.php";
 # ROUTING
 
 \Startie\Router::init();
-```
-
-## 4. Create main development directory
-
-```
-mkdir backend
-```
-
-## 5. Create config directory
-
-```
-mkdir backend/Config
-mkdir backend/Config/Common
-```
-
-```
-touch backend/Config/Common/App.php
-```
-
-```php
-<?php
-
-const APP_NAME = "Startie";
-const APP_DESCRIPTION = "Educational PHP framework";
-const APP_FOUNDED = 2023;
-const APP_V = "";
-const APP_V_DATE = "";
 ```
 
 ## 6. Create enviroment config file
@@ -103,16 +107,15 @@ PROTOCOL="http://"
 SERVERNAME="localhost"
 SERVERPORT=":8000"
 DOMAIN="/"
-
-# DIR
-
-DIR_APP="" # full path to the root directory with trailing slash
 ```
 
 ## 7. Create main controller
 
 ```
 mkdir backend/Controllers
+```
+
+```
 touch backend/Controllers/Index_Controller.php
 ```
 
