@@ -529,14 +529,16 @@ class Model
 			unset($fieldType);
 		}
 
-		# Возвращаем массив колонок:
-		# [
-		#	['columnName', 'columnValue', 'valueType'],
-		# 	['columnName', 'columnValue', 'valueType'],
-		# 	['columnName', 'columnValue', 'valueType'],
-		# ]
-		# 
-		# Подойдёт для вставки в методы create и update
+		/*
+			Return an array of columns
+			[
+				['columnName', 'columnValue', 'valueType'],
+				['columnName', 'columnValue', 'valueType'],
+				['columnName', 'columnValue', 'valueType'],
+			]
+			
+			Подойдёт для вставки в методы create и update
+		*/
 
 		return $rows;
 	}
@@ -567,6 +569,22 @@ class Model
 	 */
 	public static function isWhereInput($where, $global, $type, $keyInGlobal, $keyInWhere)
 	{
+		return self::whereFromInput(
+			$where,
+			$global,
+			$type,
+			$keyInGlobal,
+			$keyInWhere
+		);
+	}
+
+	public static function whereFromInput(
+		$where,
+		$global,
+		$type,
+		$keyInGlobal,
+		$keyInWhere
+	) {
 		if (Input::is($global, $keyInGlobal)) {
 			$global = strtolower($global);
 			$where[$keyInWhere] = [
@@ -577,22 +595,6 @@ class Model
 			];
 		}
 		return $where;
-	}
-
-	public static function whereFromInput(
-		$where,
-		$global,
-		$type,
-		$keyInGlobal,
-		$keyInWhere
-	) {
-		return self::whereFromInput(
-			$where,
-			$global,
-			$type,
-			$keyInGlobal,
-			$keyInWhere
-		);
 	}
 
 	public static function detach($selectFields, $table, $e, $eIndex)
