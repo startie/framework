@@ -2,6 +2,8 @@
 
 namespace Startie;
 
+use Startie\Asseter;
+
 class Js
 {
 	public static function url($url)
@@ -9,12 +11,15 @@ class Js
 		echo '<script src="' . $url . '"></script>';
 	}
 
-	public static function node($url)
+	public static function public($name)
 	{
-		die('deprecated');
-		// if ($_ENV['MODE_DEV']) {
-		// 	Js::url(NODE_MODULES_URL . $url);
-		// }
+		$path = PUBLIC_URL . $name . ".js";
+		echo "<script src='$path'></script>";
+	}
+
+	public static function p($name)
+	{
+		self::public($name);
 	}
 
 	public static function page($name)
@@ -26,13 +31,7 @@ class Js
 		}
 		Asseter::loadPageJs($nameNew);
 	}
-
-	public static function p($name)
-	{
-		$path = PUBLIC_URL . $name . ".js";
-		echo "<script src='$path'></script>";
-	}
-
+	
 	public static function frontend($name)
 	{
 		if ($_ENV['MODE_DEV']) {
@@ -40,6 +39,16 @@ class Js
 			echo "<script>";
 			echo file_get_contents($path);
 			echo "</script>";
+		}
+	}
+
+	/**
+	 * @deprecated
+	 */
+	public static function node($url)
+	{
+		if ($_ENV['MODE_DEV']) {
+			Js::url(NODE_MODULES_URL . $url);
 		}
 	}
 }

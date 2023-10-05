@@ -116,7 +116,7 @@ mkdir backend/Controllers
 ```
 
 ```
-touch backend/Controllers/Index_Controller.php
+touch backend/Controllers/Main_Controller.php
 ```
 
 ```php
@@ -124,11 +124,11 @@ touch backend/Controllers/Index_Controller.php
 
 namespace Controllers;
 
-class Index_Controller
+class Main_Controller
 {
     public static function index()
     {
-        echo "hi";
+        echo APP_NAME;
     }
 }
 ```
@@ -149,7 +149,7 @@ To autoload all controllers's classes.
 
 ```
 mkdir backend/Routs
-touch backend/Routs/Index.php
+touch backend/Routs/Main.php
 ```
 
 ```php
@@ -158,7 +158,7 @@ touch backend/Routs/Index.php
 return [
     '/' => [
         'title' => 'Index page',
-        'controller' => 'Index::index',
+        'controller' => 'Main::index',
     ],
 ];
 ```
