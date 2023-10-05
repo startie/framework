@@ -6,46 +6,53 @@ use Startie\Asseter;
 
 class Js
 {
-	public static function url($url)
+	public static function url(string $url): void
 	{
 		echo '<script src="' . $url . '"></script>';
 	}
 
-	public static function public($name)
+	public static function public(string $name): string
 	{
 		$path = PUBLIC_URL . $name . ".js";
-		echo "<script src='$path'></script>";
+		return "<script src='$path'></script>";
 	}
 
-	public static function p($name)
+	public static function page(string $name): void
 	{
-		self::public($name);
-	}
-
-	public static function page($name)
-	{
-		$nameNew = "";
 		$nameArr = explode('/', $name);
+		$nameNew = "";
 		foreach ($nameArr as $nameEntity) {
 			$nameNew .= $nameEntity;
 		}
+
 		Asseter::loadPageJs($nameNew);
 	}
 	
-	public static function frontend($name)
+	public static function frontend(string $name): void
 	{
+		$html = "";
 		if ($_ENV['MODE_DEV']) {
 			$path = FRONTEND_DIR . $name . ".js";
-			echo "<script>";
-			echo file_get_contents($path);
-			echo "</script>";
+			$html .= "<script>";
+			$html .= file_get_contents($path);
+			$html .= "</script>";
 		}
+
+		echo $html;
 	}
 
 	/**
 	 * @deprecated
 	 */
-	public static function node($url)
+	public static function p(string $name): string
+	{
+		return self::public($name);
+	}
+
+	/**
+	 * @deprecated
+	 */
+	public static function node(string $url): void
 	{
 		if ($_ENV['MODE_DEV']) {
 			Js::url(NODE_MODULES_URL . $url);

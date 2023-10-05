@@ -2,51 +2,60 @@
 
 namespace Startie;
 
+use Startie\Asseter;
+
 class Css
 {
-	public static function url($url)
+	public static function url(string $url): void
 	{
 		echo '<link href="' . $url . '" rel="stylesheet" type="text/css">';
 	}
 
-	public static function node($url)
-	{
-		die('deprecated');
-		// if ($_ENV['MODE_DEV']) {
-		// 	Css::url(NODE_MODULES_URL . $url);
-		// }
-	}
-
-	public static function page($name)
-	{
-		$nameNew = "";
-		$nameArr = explode('/', $name);
-		foreach ($nameArr as $nameEntity) {
-			$nameNew .= $nameEntity;
-		}
-		Asseter::loadPageCss($nameNew);
-	}
-
-	public static function p($name)
-	{
-		throw new \Startie\Exception('Css::p() is deprecated, use Css::public');
-		//$path = PUBLIC_URL . $name . ".css";
-		//echo "<link rel='stylesheet' href='$path'>";
-	}
-
-	public static function public($name)
+	public static function public(string $name): string
 	{
 		$path = PUBLIC_URL . $name . ".css";
 		return "<link rel='stylesheet' href='$path'>";
 	}
 
-	public static function frontend($name)
+	public static function page(string $name): void
 	{
+		$nameArr = explode('/', $name);
+		$nameNew = "";
+		foreach ($nameArr as $nameEntity) {
+			$nameNew .= $nameEntity;
+		}
+		
+		Asseter::loadPageCss($nameNew);
+	}
+
+	public static function frontend(string $name): void
+	{
+		$html = "";
 		if ($_ENV['MODE_DEV']) {
 			$path = FRONTEND_DIR . $name . ".css";
-			echo "<style>";
-			echo file_get_contents($path);
-			echo "</style>";
+			$html .= "<style>";
+			$html .= file_get_contents($path);
+			$html .= "</style>";
+		}
+
+		echo $html;
+	}
+
+	/**
+	 * @deprecated
+	 */
+	public static function p(string $name): string
+	{
+		return self::public($name);
+	}
+
+	/**
+	 * @deprecated
+	 */
+	public static function node(string $url): void
+	{
+		if ($_ENV['MODE_DEV']) {
+			Css::url(NODE_MODULES_URL . $url);
 		}
 	}
 }
