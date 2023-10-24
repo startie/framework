@@ -67,7 +67,7 @@ class Db
 				return $connection;
 			} catch (\PDOException $e) {
 				$errorText = "Failed to connect to database." . PHP_EOL;
-				Logs::toFile($e . PHP_EOL . PHP_EOL);
+				Logger::toFile($e . PHP_EOL . PHP_EOL);
 
 				if (Dev::isSecretMode()) {
 					$errorText .= "Hi developer!"
