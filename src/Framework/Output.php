@@ -4,7 +4,7 @@ namespace Startie;
 
 class Output
 {
-    public static function json(any $data): string
+    public static function json($data): string
     {
         return json_encode($data);
     }
