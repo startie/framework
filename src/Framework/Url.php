@@ -182,8 +182,12 @@ class Url
 				$findedVar = str_replace("$", "", $findedVar);
 
 				# Form url by replacing matches
-				if ($ControllerParams[$findedVar]) {
-					$foundedUrl = str_replace($findedVar, $ControllerParams[$findedVar], $foundedUrl);
+				if ($ControllerParams[$findedVar] ?? false) {
+					$foundedUrl = str_replace(
+						$findedVar, 
+						$ControllerParams[$findedVar], 
+						$foundedUrl
+					);
 				}
 			}
 
