@@ -102,11 +102,13 @@ class Router
 
 		# Get 'url' param from apache
 		$url = Php::input('GET', 'url', 'str');
-
+		
 		# Get 'url' param from server request uri
 		if (!$url) {
 			if ($_SERVER['REQUEST_URI'] === "/") {
 				$url = "/";
+			} elseif (str_starts_with($_SERVER['REQUEST_URI'], "/index.php")){
+				header("Location: /");
 			} else {
 				if (strpos($_SERVER['REQUEST_URI'], '?') != false) {
 					$questionMarkPos = strpos($_SERVER['REQUEST_URI'], '?');
