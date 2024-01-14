@@ -6,15 +6,22 @@ use Startie\Asseter;
 
 class Js
 {
-	public static function url(string $url): void
+	public static function tag(string $uri): string
 	{
-		echo '<script src="' . $url . '"></script>';
+		return "<script type='text/javascript' src='$uri'></script>";
+	}
+	
+	public static function uri(string $uri): string
+	{
+		$tag = self::tag($uri);
+		return $tag;
 	}
 
 	public static function public(string $name): string
 	{
-		$path = PUBLIC_URL . $name . ".js";
-		return "<script src='$path'></script>";
+		$uri = Asseter::getRootUrl() . "{$name}.js";
+		$tag = self::tag($uri);
+		return $tag;
 	}
 
 	public static function page(string $name): void
@@ -32,7 +39,7 @@ class Js
 	{
 		$html = "";
 		if ($_ENV['MODE_DEV']) {
-			$path = FRONTEND_DIR . $name . ".js";
+			$path = FRONTEND_DIR . "{$name}.js";
 			$html .= "<script>";
 			$html .= file_get_contents($path);
 			$html .= "</script>";
@@ -41,8 +48,15 @@ class Js
 		echo $html;
 	}
 
+	public static function node(string $url): void
+	{
+		if ($_ENV['MODE_DEV']) {
+			Js::url(NODE_MODULES_URL . $url);
+		}
+	}
+
 	/**
-	 * @deprecated
+	 * @deprecated 1.0.0 Bad naming, replaced by `public`
 	 */
 	public static function p(string $name): string
 	{
@@ -50,12 +64,10 @@ class Js
 	}
 
 	/**
-	 * @deprecated
+	 * @deprecated 1.0.0 Hardcoded echo, replaced by `uri`
 	 */
-	public static function node(string $url): void
+	public static function url(string $url): void
 	{
-		if ($_ENV['MODE_DEV']) {
-			Js::url(NODE_MODULES_URL . $url);
-		}
+		echo self::tag($url);
 	}
 }

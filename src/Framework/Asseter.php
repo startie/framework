@@ -2,136 +2,172 @@
 
 namespace Startie;
 
+use Startie\Config;
+
 class Asseter
 {
-
 	public static $jsPrefix;
 	public static $cssPrefix;
-	//public static $publicUrl;
-
-	public static function loadConfig()
-	{
-		$path = App::path("backend/Config/Asseter/Common.php");
-
-		if (!file_exists($path)) {
-			throw new Exception("Config for Asseter is missing");
-		} else {
-			$Config = require($path);
-
-			if (isset($Config['prefixes']['js'])) {
-				self::$jsPrefix = $Config['prefixes']['js'];
-			} else {
-				throw new Exception("JS prefix is not defined");
-			}
-
-			if (isset($Config['prefixes']['css'])) {
-				self::$cssPrefix = $Config['prefixes']['css'];
-			} else {
-				throw new Exception("CSS prefix is not defined");
-			}
-		}
-	}
+	public static string $root;
+	public static string $hash = "";
 
 	public static function init()
 	{
 		self::loadConfig();
 	}
 
-	public static function getJsHash()
+	public static function loadConfig()
 	{
-		$PUBLIC_JS_DIR = PUBLIC_DIR . "js/";
-		$jsFiles = scandir($PUBLIC_JS_DIR);
+		$config = Config::get("Asseter");
 
-		if ($jsFiles === false) {
-			throw new Exception("No js files for finding hash on $PUBLIC_JS_DIR");
-		} else {
-			$hash = "";
-			$listOfFiles = array_diff($jsFiles, ['..', '.']);
-
-			if (empty($listOfFiles)) {
-				throw new Exception("No js files for finding hash on $PUBLIC_JS_DIR");
-			}
-
-			$listOfFilesNew = [];
-			foreach ($listOfFiles as $file) {
-				if (strpos($file, '.js')) {
-					$listOfFilesNew[] = $file;
-				}
-			}
-
-			if (empty($listOfFilesNew)) {
-				throw new Exception("No js files for finding hash on $PUBLIC_JS_DIR");
-			}
-
-			if (count($listOfFilesNew) > 1) {
-				$lastJSFile = $listOfFilesNew[count($listOfFilesNew) - 1];
-			} else if (count($listOfFilesNew) === 1) {
-				$lastJSFile = $listOfFilesNew[0];
+		if (isset($config['prefixes'])) {
+			if (isset($config['prefixes']['js'])) {
+				self::$jsPrefix = $config['prefixes']['js'];
 			} else {
-				throw new Exception("No js files for finding hash on $PUBLIC_JS_DIR");
+				throw new Exception("`js` prefix for Asseter is not configured");
 			}
 
-			preg_match('/([a-z0-9]*)\.(js)/', $lastJSFile, $m);
-			$hash = $m[1];
+			if (isset($config['prefixes']['css'])) {
+				self::$cssPrefix = $config['prefixes']['css'];
+			} else {
+				throw new Exception("`css` prefix for Asseter is not configured");
+			}
+		} else {
+			throw new Exception("`prefixes` for Asseter is not configured");
+		}
 
-			return $hash;
+		if (isset($config['root'])) {
+			self::$root = $config['root'];
+		} else {
+			throw new Exception("`root` for Asseter is not configured");
 		}
 	}
 
-	public static function loadJs($bundle)
+	public static function resolveHash(string $fromAssetType = "js"): string
+	{
+		if (self::$hash !== "") {
+			return self::$hash;
+		}
+
+		$PUBLIC_JS_DIR = PUBLIC_DIR . "$fromAssetType/";
+		$typeFiles = scandir($PUBLIC_JS_DIR);
+
+		if ($typeFiles === false) {
+			throw new Exception(
+				"No $fromAssetType files for finding hash on $PUBLIC_JS_DIR"
+			);
+		}
+
+		$hash = "";
+		$listOfFiles = array_diff($typeFiles, ['..', '.']);
+
+		if (empty($listOfFiles)) {
+			throw new Exception(
+				"No {$fromAssetType} files for finding hash on $PUBLIC_JS_DIR"
+			);
+		}
+
+		$listOfFilesNew = [];
+		foreach ($listOfFiles as $file) {
+			if (strpos($file, ".{$fromAssetType}")) {
+				$listOfFilesNew[] = $file;
+			}
+		}
+
+		if (empty($listOfFilesNew)) {
+			throw new Exception(
+				"No {$fromAssetType} files for finding hash on {$PUBLIC_JS_DIR}"
+			);
+		}
+
+		if (count($listOfFilesNew) > 1) {
+			$lastFileOfType = $listOfFilesNew[count($listOfFilesNew) - 1];
+		} else if (count($listOfFilesNew) === 1) {
+			$lastFileOfType = $listOfFilesNew[0];
+		} else {
+			throw new Exception(
+				"No {$fromAssetType} files for finding hash on {$PUBLIC_JS_DIR}"
+			);
+		}
+
+		preg_match("/([a-z0-9]*)\.({$fromAssetType})/", $lastFileOfType, $matches);
+		$hash = $matches[1];
+
+		self::$hash = $hash;
+		return $hash;
+	}
+
+	public static function getRootUrl()
+	{
+		return URL_APP . self::$root;
+	}
+
+	public static function loadJs(string $entry): void
 	{
 		$prefix = self::$jsPrefix;
-		$hash = Asseter::getJsHash();
-		$filename = PUBLIC_URL . "js/" . $bundle . $prefix . "." . $hash . ".js";
+		$hash = self::resolveHash();
+		$filename = URL_APP . self::root . "js/{$entry}{$prefix}.{$hash}.js";
 		echo "<script src='$filename'></script>";
 	}
 
-	public static function loadPageJs($bundle = NULL)
+	public static function loadPageJs(string|null $entry = NULL)
 	{
 		$prefix = self::$jsPrefix;
-		$hash = Asseter::getJsHash();
+		$hash = self::resolveHash();
 
-		#todo Find right index
+		// TODO: Find right index
 
-		if (!$bundle) {
+		if (!$entry) {
 			$controllerClass = debug_backtrace()[2]['class'];
 			$controllerClass = str_replace("_Controller", "", $controllerClass);
 
 			$controllerFunction = debug_backtrace()[2]['function'];
 			$controllerFunction = ucfirst($controllerFunction);
 
-			$filePath = "js/Pages"  . $controllerClass . $controllerFunction . $prefix . "." . $hash . ".js";
+			$filePath = "js/Pages{$controllerClass}{$controllerFunction}{$prefix}.{$hash}.js";
 		} else {
-			$filePath = "js/Pages"  . $bundle . $prefix . "." . $hash . ".js";
+			$filePath = "js/Pages{$entry}{$prefix}.{$hash}.js";
 		}
 
 		$fileDir = PUBLIC_DIR . $filePath;
 
 		if (file_exists($fileDir)) {
-			echo "<script                 src='" . PUBLIC_URL . $filePath . "'></script>";
+			$assetUrl = self::getRootUrl() . $filePath;
+			echo "<script src='{$assetUrl}'></script>";
 		} else {
-			echo $fileDir;
+			throw new Exception("No file in `$fileDir`");
 		}
 	}
 
-	public static function loadCss($bundle)
+	public static function loadCss(string $entry): void
 	{
 		$prefix = self::$cssPrefix;
-		$hash = Asseter::getJsHash();
-		echo "<link rel='stylesheet' href='" . PUBLIC_URL . "css/"      . $bundle . $prefix . "." . $hash . ".css'>";
+		$hash = self::resolveHash();
+		$assetUrl = self::getRootUrl() . "css/{$entry}{$prefix}.{$hash}.css";
+		echo "<link rel='stylesheet' href='{$assetUrl}'>";
 	}
 
-	public static function loadPageCss($bundle)
+	public static function loadPageCss(string $entry): void
 	{
 		$prefix = self::$cssPrefix;
-		$hash = Asseter::getJsHash();
-		echo "<link rel='stylesheet' href='" . PUBLIC_URL . "css/Pages" . $bundle . $prefix . "." . $hash . ".css'>";
+		$hash = self::resolveHash();
+		$assetUrl = self::getRootUrl() . "css/Pages{$entry}{$prefix}.{$hash}.css";
+		echo "<link rel='stylesheet' href='{$assetUrl}'>";
 	}
 
-	public static function loadRewriteCss($bundle)
+	public static function loadRewriteCss(string $entry): void
 	{
 		$prefix = self::$cssPrefix;
-		$hash = Asseter::getJsHash();
-		echo "<link rel='stylesheet' href='" . PUBLIC_URL . "css/Rewrite" . $bundle . $prefix . "." . $hash . ".css'>";
+		$hash = self::resolveHash();
+		$assetUrl = self::getRootUrl() . "css/Rewrite{$entry}{$prefix}.{$hash}.css";
+		echo "<link rel='stylesheet' href='{$assetUrl}'>";
+	}
+
+	/**
+	 * @deprecated
+	 */
+	public static function getJsHash()
+	{
+		return self::resolveHash();
 	}
 }

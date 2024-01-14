@@ -6,15 +6,22 @@ use Startie\Asseter;
 
 class Css
 {
-	public static function url(string $url): void
+	public static function tag(string $uri): string
 	{
-		echo '<link href="' . $url . '" rel="stylesheet" type="text/css">';
+		return "<link rel='stylesheet' type='text/css' href='$uri'>";
+	}
+
+	public static function uri(string $uri): string
+	{
+		$tag = self::tag($uri);
+		return $tag;
 	}
 
 	public static function public(string $name): string
 	{
-		$path = PUBLIC_URL . $name . ".css";
-		return "<link rel='stylesheet' href='$path'>";
+		$uri = Asseter::getRootUrl() . "{$name}.css";
+		$tag = self::tag($uri);
+		return $tag;
 	}
 
 	public static function page(string $name): void
@@ -32,7 +39,7 @@ class Css
 	{
 		$html = "";
 		if ($_ENV['MODE_DEV']) {
-			$path = FRONTEND_DIR . $name . ".css";
+			$path = FRONTEND_DIR . "$name.css";
 			$html .= "<style>";
 			$html .= file_get_contents($path);
 			$html .= "</style>";
@@ -41,8 +48,15 @@ class Css
 		echo $html;
 	}
 
+	public static function node(string $uri): void
+	{
+		if ($_ENV['MODE_DEV']) {
+			echo self::uri(NODE_MODULES_URL . $uri);
+		}
+	}
+
 	/**
-	 * @deprecated
+	 * @deprecated 1.0.0 Bad naming, replaced by `public`
 	 */
 	public static function p(string $name): string
 	{
@@ -50,12 +64,10 @@ class Css
 	}
 
 	/**
-	 * @deprecated
+	 * @deprecated 1.0.0 Hardcoded echo, replaced by `uri`
 	 */
-	public static function node(string $url): void
+	public static function url(string $uri): void
 	{
-		if ($_ENV['MODE_DEV']) {
-			Css::url(NODE_MODULES_URL . $url);
-		}
+		echo self::tag($uri);
 	}
 }
