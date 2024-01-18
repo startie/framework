@@ -99,7 +99,7 @@ class Asseter
 
 	public static function getRootUrl()
 	{
-		return URL_APP . self::$root;
+		return trim(URL_APP, "/") . self::$root;
 	}
 
 	public static function loadJs(string $entry): void
