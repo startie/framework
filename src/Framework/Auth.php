@@ -10,7 +10,7 @@ class Auth
 {
 	use \Startie\Bootable;
 
-	public static $conig;
+	public static $config;
 
 	public static function boot()
 	{
@@ -20,7 +20,7 @@ class Auth
 
 	public static function loadConfig()
 	{
-		Auth::$conig = Config::get('Auth');
+		self::$config = Config::get('Auth');
 	}
 
 	#
