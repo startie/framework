@@ -1,57 +1,101 @@
 <?php
+declare(strict_types=1);
 
 namespace Startie;
 
 class Modal
 {
-	public static function ButtonClass($Entity, $action)
+	/**
+	 * Generate button class
+	 * 
+	 * @param $entity Example: `Post`, `User`
+	 */
+	public static function ButtonClass(string $entity, string $action): string
 	{
-		$Entity = ucfirst($Entity);
+		$entity = ucfirst($entity);
 		$action = ucfirst($action);
-		$result = "{$Entity}{$action}ModalButton";
-		//Dump::made($result);
+		$result = "{$entity}{$action}ModalButton";
+
 		return $result;
 	}
 
-	public static function WindowId($Entity, $action, $id = "")
+	public static function WindowId(
+		string $entity, 
+		string $action, 
+		string|int $id = ""
+	): string
 	{
-		$Entity = ucfirst($Entity);
+		$entity = ucfirst($entity);
 		$action = ucfirst($action);
 
-		return "{$Entity}{$id}{$action}Modal";
+		return "{$entity}{$id}{$action}Modal";
 	}
 
-	public static function init($config)
+	/**
+	 * @params $config Syntax: `<ModelClass>::<action>`, example: `Accounts::add`
+	 */
+	public static function init(string $config): array
 	{
 		preg_match('/(\w*)::(\w*)/', $config, $matches);
-		$class = $matches[1];
+
+		$modelClass = $matches[1];
+		$modelClassWithNamespace = "\Models\\" . $modelClass;
+
 		$action = $matches[2];
+		$action = strtolower($action);
 
-		$Entity = ($class::$_);
+		$entity = $modelClassWithNamespace::$_;
 
-		$Modal = [];
-		$ModalAction = [];
-		$ModalAction['WindowId'] = Modal::WindowId($Entity, $action);
-		$ModalAction['ButtonClass'] = Modal::ButtonClass($Entity, $action);
-		$ModalAction['ButtonText'] = "+ " . Php::mb_ucfirst($action) . " " . mb_strtolower($Entity);
+		$modal = [];
+		$modalAction = [];
+		$modalAction['WindowId'] = Modal::WindowId($entity, $action);
+		$modalAction['ButtonClass'] = Modal::ButtonClass($entity, $action);
+		$modalAction['ButtonText'] = "+ "
+			. ucfirst($action)
+			. " " 
+			. strtolower($entity);
 
-		$Modal[$action] = $ModalAction;
+		$modal[$action] = $modalAction;
 
-		return $Modal;
+		return $modal;
 	}
 
+	/**
+	 * Fills any entity with modal window data strings
+	 * 
+	 * @param $entity Can be any entity as array, for example: `$account`
+	 * @param $params = [
+	 * 		'Entity' => $Entity, 
+	 * 		'action' => $action, 
+	 * 		'idIndex' => $idIndex,
+	 * ]
+	 * 'Entity' example: 'Publication'
+	 * 'action' example: 'edit'
+	 * 'idIndex' example: 'PublicationId'
+	 * 
+	 * @return Entity with additional keys:
+	 * - <Action>ModalButtonClass example: EditModalButtonClass
+	 * - <Action>ModalId, example: EditModalId
+	 * Each key will contain a string
+	 */
 	public static function complete(
-		$item,
-		$params
-		//  = [
-		// 	'Entity' => $Entity, 
-		// 	'action' => $action, 
-		// 	'idIndex' => $idIndex,
-		// ]
-	) {
+		array $entity,
+		array $params
+	): array
+	{
 		$params['action'] = ucfirst($params['action']);
-		$item[$params['action'] . 'ModalButtonClass'] = self::ButtonClass($params['Entity'], $params['action']);
-		$item[$params['action'] . 'ModalId'] = self::WindowId($params['Entity'], $params['action'], $item[$params['idIndex']]);
-		return $item;
+		
+		$entity[$params['action'] . 'ModalButtonClass'] = self::ButtonClass(
+			$params['Entity'], 
+			$params['action']
+		);
+		
+		$entity[$params['action'] . 'ModalId'] = self::WindowId(
+			$params['Entity'], 
+			$params['action'], 
+			$entity[$params['idIndex']]
+		);
+
+		return $entity;
 	}
 }
