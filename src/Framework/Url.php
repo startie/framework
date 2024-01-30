@@ -62,18 +62,22 @@ class Url
 	 * @param  null|array $fragmentParams 
 	 * @return string
 	 */
-	public static function app(string $path = "", array $queryParams = NULL, array $fragmentParams = NULL)
-	{
+	public static function app(
+		string $path = "",
+		array|null $queryParams = NULL,
+		array|null $fragmentParams = NULL,
+		$arraishQueryParams = false
+	): string {
 		$url = self::$ROOT . $path;
 
 		$query = "";
-		$query = self::buildParams($queryParams);
+		$query = self::buildParams($queryParams, $arraishQueryParams);
 		if ($query !== "") {
 			$url .= "?" . $query;
 		}
 
 		$fragment = "";
-		$fragment = self::buildParams($fragmentParams);
+		$fragment = self::buildParams($fragmentParams, $arraishQueryParams);
 		if ($fragment !== "") {
 			$url .= "#" . $fragment;
 		}
@@ -98,8 +102,15 @@ class Url
 		return $url;
 	}
 
-	public static function buildParams($params = NULL)
-	{
+	/**
+	 * @param bool $arraish If params are ['id' => [1,2]]
+	 * When `true`  we will get id[]=1&id[]=2
+	 * When `false` we will get id=1&id=2
+	 */
+	public static function buildParams(
+		$params = NULL,
+		$arraish = false
+	): string {
 		$result = "";
 
 		/* Filter empty */
@@ -126,12 +137,17 @@ class Url
 					unset($params[$i]);
 				}
 			}
+
 			if (!empty($paramsThatAreArrays)) {
 				$result = http_build_query($params);
 				foreach ($paramsThatAreArrays as $paramName => $paramValue) {
 					if (is_array($paramValue)) {
 						foreach ($paramValue as $paramVal) {
-							$result .= "&" . $paramName . "=" . $paramVal;
+							$result .= "&" . $paramName;
+							if ($arraish) {
+								$result .= "[]";
+							}
+							$result .= "=" . $paramVal;
 						}
 					} else {
 						$result .= "&" . $paramName . "=" . $paramValue;
@@ -153,12 +169,16 @@ class Url
 	 *
 	 * @param  string $RouteExpression
 	 * @param  null|array $ControllerParams
-	 * @param  null|array $getParams
+	 * @param  null|array $queryParams
 	 * @return string
 	 */
 
-	public static function controller($RouteExpression, $ControllerParams = NULL, $getParams = NULL)
-	{
+	public static function controller(
+		$RouteExpression,
+		$ControllerParams = NULL,
+		$queryParams = NULL,
+		$arraishQueryParams = false
+	) {
 		$Routs = Router::routs();
 		$foundedUrl = "";
 
@@ -184,14 +204,21 @@ class Url
 				# Form url by replacing matches
 				if ($ControllerParams[$findedVar] ?? false) {
 					$foundedUrl = str_replace(
-						$findedVar, 
-						$ControllerParams[$findedVar], 
+						$findedVar,
+						$ControllerParams[$findedVar],
 						$foundedUrl
 					);
 				}
 			}
 
-			return static::app($foundedUrl, $getParams);
+			$uri = static::app(
+				$foundedUrl,
+				$queryParams,
+				NULL,
+				$arraishQueryParams
+			);
+
+			return $uri;
 		}
 
 		# If not
@@ -203,15 +230,24 @@ class Url
 	/**
 	 * Shortcut alias for method controller()
 	 *
-	 * @param  string $RouteExpression
-	 * @param  null|array $ControllerParams
-	 * @param  null|array $getParams
+	 * @param null|array $ControllerParams
+	 * @param null|array $queryParams
+	 * @param bool $arraishQueryParams
 	 * @return string
 	 */
 
-	public static function c($RouteExpression, $ControllerParams = NULL, $getParams = NULL)
-	{
-		return Url::controller($RouteExpression, $ControllerParams, $getParams);
+	public static function c(
+		string $RouteExpression,
+		$ControllerParams = NULL,
+		$queryParams = NULL,
+		$arraishQueryParams = false
+	) {
+		return Url::controller(
+			$RouteExpression,
+			$ControllerParams,
+			$queryParams,
+			$arraishQueryParams
+		);
 	}
 
 	/**
@@ -233,13 +269,13 @@ class Url
 	 * 
 	 * Gives a structured represantation of the current query string or values of certain param.
 	 *
-	 * @param string $param If it is presented returns only that values that belongs to a certain param.
+	 * @param $param If it is presented returns only that values that belongs to a certain param.
 	 * @param string $queryString Сan be query string or the url.
 	 * @param bool $decoded To decode or not each value of pair.
 	 * @return array
 	 */
 	public static function getQueryParams(
-		string $param = NULL,
+		string|null $param = NULL,
 		string $queryString = NULL,
 		bool $decoded = false,
 		string $part = "query"
@@ -263,7 +299,9 @@ class Url
 				if (isset($urlParsedArr[$part])) {
 					$urlParsedPart = $urlParsedArr[$part];
 				} else {
-					throw new \Startie\Exception("Part '$part' is missing in the '$url'");
+					throw new \Startie\Exception(
+						"Part '$part' is missing in the '$url'"
+					);
 				}
 
 				if ($urlParsedPart) {
@@ -329,15 +367,14 @@ class Url
 	}
 
 	/**
-	 * Get query or
+	 * Get query or ...
 	 *
 	 * @deprecated No longer used. Use getQueryParams()
-	 * @param  string $url
-	 * @param  string $mode
-	 * @return array
 	 */
-	public static function paramsArr(string $url, string $mode = 'fragment'): array
-	{
+	public static function paramsArr(
+		string $url,
+		string $mode = 'fragment'
+	): array {
 		$urlPartsString = parse_url($url);
 		if (isset($urlPartsString[$mode])) {
 			$urlPartsString = $urlPartsString[$mode];
@@ -358,11 +395,8 @@ class Url
 	 * Gets title on the url
 	 * 
 	 * Utility method.
-	 *
-	 * @param  string $url
-	 * @return string
 	 */
-	public static function getTitle($url)
+	public static function getTitle(string $url): string
 	{
 		$str = file_get_contents($url);
 
@@ -381,12 +415,8 @@ class Url
 
 	/**
 	 * Finalizes url through redirects
-	 *
-	 * @param  string $url
-	 * @param  int $maxRequests
-	 * @return string
 	 */
-	public static function finalize($url, $maxRequests = 10)
+	public static function finalize(string $url, int $maxRequests = 10): string
 	{
 		$ch = curl_init();
 
