@@ -6,7 +6,6 @@ class Stats
 {
 	public static function init(): void
 	{
-
 		// Visits couner
 		$visitCounter = 2;
 

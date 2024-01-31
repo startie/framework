@@ -40,7 +40,7 @@ class Access
 					call_user_func($AccessProviderClass . "::init");
 				} else {
 					$message = "Class `$AccessProviderClass` is missing. "
-					 . "Create it in \Providers namespace";
+						. "Create it in \Providers namespace";
 
 					throw new \Startie\Exception($message);
 				}
@@ -65,7 +65,10 @@ class Access
 					. 'Access';
 
 				// Call it with argument $group
-				$hasAccess = call_user_func($AccessProviderClass . '::is', $group);
+				$hasAccess = call_user_func(
+					$AccessProviderClass . '::is',
+					$group
+				);
 
 				// If 'true' return true
 				if ($hasAccess) {

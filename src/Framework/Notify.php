@@ -9,7 +9,7 @@ class Notify
 	#
 	public static function add($text, $type)
 	{
-		#todo: why don't work class wrapper – Session
+		// TODO: why don't work class wrapper – Session
 		$_SESSION['Notify'][] = ['text' => $text, 'type' => $type];
 	}
 

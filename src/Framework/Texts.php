@@ -2,7 +2,6 @@
 
 namespace Startie;
 
-use Startie\Vocabulary;
 use Startie\Php;
 use Startie\Language;
 use Startie\App;
@@ -70,7 +69,7 @@ class Texts
 					?? $fallback
 					?? "";
 			}
-			
+
 			return $result;
 		}
 

@@ -2,6 +2,16 @@
 
 namespace Startie;
 
+/*
+
+	Examples:
+	
+	Form::start();
+		Form::text('z', Input::get('z', 'STR'));
+		Form::submit();
+	Form::end();
+ */
+
 class Form
 {
     public static function open($method = '', $action = '')
@@ -61,13 +71,3 @@ class Form
         }
     }
 }
-
-/*
-
-	Examples:
-	
-	Form::start();
-		Form::text('z', Input::get('z', 'STR'));
-		Form::submit();
-	Form::end();
- */

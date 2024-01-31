@@ -21,8 +21,13 @@ class Pagination
 	public $urlNext;
 	public $urlPrev;
 
-	function __construct($entriesPerPage, $maxPages, $align, $EntitiesCount, $controllerExpression)
-	{
+	function __construct(
+		$entriesPerPage,
+		$maxPages,
+		$align,
+		$EntitiesCount,
+		$controllerExpression
+	) {
 		$this->entriesPerPage = $entriesPerPage;
 		$this->maxPages = $maxPages;
 		$this->align = $align;
@@ -173,7 +178,10 @@ class Pagination
 			} else {
 				$activityClass = '';
 			};
-			$this->links[] = ['activityClass' => $activityClass, 'pageNumber' => $i];
+			$this->links[] = [
+				'activityClass' => $activityClass,
+				'pageNumber' => $i
+			];
 		}
 
 		foreach ($this->links as &$link) {

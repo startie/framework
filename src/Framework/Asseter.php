@@ -24,13 +24,17 @@ class Asseter
 			if (isset($config['prefixes']['js'])) {
 				self::$jsPrefix = $config['prefixes']['js'];
 			} else {
-				throw new Exception("`js` prefix for Asseter is not configured");
+				throw new Exception(
+					"`js` prefix for Asseter is not configured"
+				);
 			}
 
 			if (isset($config['prefixes']['css'])) {
 				self::$cssPrefix = $config['prefixes']['css'];
 			} else {
-				throw new Exception("`css` prefix for Asseter is not configured");
+				throw new Exception(
+					"`css` prefix for Asseter is not configured"
+				);
 			}
 		} else {
 			throw new Exception("`prefixes` for Asseter is not configured");
@@ -90,7 +94,12 @@ class Asseter
 			);
 		}
 
-		preg_match("/([a-z0-9]*)\.({$fromAssetType})/", $lastFileOfType, $matches);
+		preg_match(
+			"/([a-z0-9]*)\.({$fromAssetType})/",
+			$lastFileOfType,
+			$matches
+		);
+
 		$hash = $matches[1];
 
 		self::$hash = $hash;

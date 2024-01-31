@@ -4,7 +4,6 @@ namespace Startie;
 
 use Startie\Url;
 use Startie\Input;
-use Startie\Dump;
 use Startie\Auth;
 use DateTime;
 use DateInterval;
@@ -13,7 +12,7 @@ class Csrf
 {
 	public static function create(): void
 	{
-		# Generate token's hash
+		// Generate token's hash
 		$csrfToken = bin2hex(openssl_random_pseudo_bytes(32));
 
 		if (Input::is('POST', 'csrfUrl')) {
@@ -23,7 +22,7 @@ class Csrf
 			$url = Input::get('url', 'STR');
 		}
 
-		# Forming entity
+		// Form entity
 		$entity = [];
 
 		$entity['token'] = $csrfToken;
@@ -41,30 +40,32 @@ class Csrf
 		$createdBy = Auth::getIdInService('app');
 		$entity['createdBy'] = $createdBy;
 
-		# Store token
-		//Dump::made($entity);
-		//Dump::made($url);
+		// Store token
 		$_SESSION['csrf'][$url][] = $entity;
 	}
 
-	public static function check()
+	public static function check(): void
 	{
 		$CurrentUserId = Auth::getIdInService('app');
 		$CurrentUserId = ($CurrentUserId) ? $CurrentUserId : 0;
 
-		# Get token from POST
+		// Get token from POST
 		$tokenPOST = Input::post('csrfToken', 'STR');
 
-		# Get referer url
+		// Get referer URL
 		if (Input::is('POST', 'csrfUrl')) {
-			# from POST
+			// ... from POST
 			$csrfUrl = Input::post('csrfUrl', 'STR');
 		} else {
-			# or casually
-			$csrfUrl = str_replace(Url::app(), "", $_SERVER['HTTP_REFERER']);
+			// or casually
+			$csrfUrl = str_replace(
+				Url::app(),
+				"",
+				$_SERVER['HTTP_REFERER']
+			);
 		}
 
-		# Find url in csrf block
+		// Find URL in 'csrf' block
 		foreach ($_SESSION['csrf'] as $u => $urlConfigs) {
 			if ($csrfUrl == $u) {
 				foreach ($urlConfigs as $c => $urlConfig) {
@@ -75,25 +76,14 @@ class Csrf
 
 					# If not
 					else {
-						// Logs::create([
-						// 	'insert' => [
-						// 		['createdAt', '`UTC_TIMESTAMP()`'],
-						// 		['UserId', $CurrentUserId, 'INT'],
-						// 		['line', __LINE__],
-						// 		['file', __FILE__],
-						// 		['url', $csrfUrl],
-						// 		['message', 'Попытка CSRF c IP-адреса: ' . Users::getIpAddress(),],
-						// 		['type', 'error'],
-						// 		['object', 'security']
-						// 	]
-						// ]);
+						// TODO: log
 					}
 				}
 			}
 		}
 	}
 
-	public static function is($token)
+	public static function is(string $token): bool
 	{
 		if (hash_equals($_SESSION['csrf']['token'], $token)) {
 			return false;
@@ -102,17 +92,16 @@ class Csrf
 		}
 	}
 
-	public static function clean()
+	public static function clean(): void
 	{
 		foreach ($_SESSION['csrf'] as $u => $urlConfigs) {
-
-			# If we have url with no congigs
+			// If we have URL with no congigs
 			if (empty($urlConfigs)) {
-				# clear it
+				// ... clear it
 				unset($_SESSION['csrf'][$u]);
 			}
 
-			# Otherwise find some expired configs for url
+			// Otherwise find some expired configs for URL
 			else {
 				foreach ($urlConfigs as $c => $urlConfig) {
 					$now = new DateTime();

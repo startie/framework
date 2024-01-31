@@ -9,8 +9,13 @@ class Exception extends \Exception
     public $object;
     public $type;
 
-    public function __construct($message, $type = "error", $object = "php",  $code = 0, $previous = NULL)
-    {
+    public function __construct(
+        string $message,
+        string $type = "error",
+        string $object = "php",
+        int $code = 0,
+        $previous = NULL
+    ) {
         parent::__construct($message, intval($code), $previous);
 
         $this->type = $type;
@@ -48,6 +53,7 @@ class Exception extends \Exception
             $e->getCode(),
             $e->getPrevious()
         );
+
         return $own;
     }
 }

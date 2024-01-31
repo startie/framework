@@ -9,13 +9,13 @@ class Db
 	public static $connections = [];
 	public static $excludeFunctions;
 
-	public static function boot()
+	public static function boot(): void
 	{
 		self::$isBooted = true;
 		self::loadConfig();
 	}
 
-	public static function loadConfig()
+	public static function loadConfig(): void
 	{
 		Db::$config = Config::get("Db");
 	}
@@ -23,7 +23,7 @@ class Db
 	/**
 	 * Load config, make connections and store them
 	 */
-	public static function init()
+	public static function init(): void
 	{
 		self::requireBoot();
 
@@ -58,7 +58,7 @@ class Db
 		}
 	}
 
-	public static function connect($dsn, $driver)
+	public static function connect(string $dsn, string $driver)
 	{
 		if ($driver === "mysql") {
 			try {
@@ -90,10 +90,8 @@ class Db
 	 * Returns DSN string
 	 *
 	 * PHP >=7.4
-	 *
-	 * @return string
 	 */
-	public static function dsn(array $params)
+	public static function dsn(array $params): string
 	{
 		$dsn = "";
 

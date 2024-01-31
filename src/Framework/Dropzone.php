@@ -20,7 +20,6 @@ class Dropzone
 
 		#	(2) class
 
-
 		$e['Dropzone']['class'] = $class;
 
 		# 	(3) dropzone params

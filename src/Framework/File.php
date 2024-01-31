@@ -16,19 +16,20 @@ class File
 		return $data;
 	}
 
-	public static function saveFromUrl($url, $path)
+	public static function saveFromUrl(string $url, string $path): void
 	{
-		# 	Create path if it doesn't exist
-
+		// Create path if it doesn't exist
 		$parts = explode('/', $path);
-		$file = array_pop($parts);
+		array_pop($parts);
 		$dir = '';
 		foreach ($parts as $part)
 			if (!is_dir($dir .= "/$part")) mkdir($dir);
 
+		// Download
 		$data = self::downloadFromUrl($url);
 
-		$result = file_put_contents($path, $data);
+		// Store
+		file_put_contents($path, $data);
 	}
 
 	function initDirPath($desiredPath)
@@ -52,16 +53,17 @@ class File
 
 	public static function saveFromPath($path1, $path2)
 	{
-		# 	Create path if it doesn't exist
-
+		// Create path if it doesn't exist
 		$parts = explode('/', $path2);
-		$file = array_pop($parts);
+		array_pop($parts);
 		$dir = '';
-		foreach ($parts as $part)
-			if (!is_dir($dir .= "/$part")) mkdir($dir);
+		foreach ($parts as $part) {
+			if (!is_dir($dir .= "/$part")) {
+				mkdir($dir);
+			};
+		};
 
-		# 	Load
-
+		// Store
 		return move_uploaded_file($path1, $path2);
 	}
 
@@ -92,8 +94,10 @@ class File
 		fclose($remote);
 	}
 
-	public static function getFolders($path, $exclude = ['..', '.', '.git', '_'])
-	{
+	public static function getFolders(
+		$path,
+		$exclude = ['..', '.', '.git', '_']
+	) {
 		$files = array_diff(scandir($path), $exclude);
 		$dirs = [];
 

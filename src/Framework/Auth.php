@@ -34,7 +34,9 @@ class Auth
 		$authEntity = [];
 		$authEntity['service'] = 'app';
 		$authEntity['id'] = $UserId;
-		//Session::set('auth', [$authEntity]); #todo: почему не работает
+
+		// TODO: почему не работает
+		//Session::set('auth', [$authEntity]); 
 		$_SESSION['auth'][] = $authEntity;
 	}
 

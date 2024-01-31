@@ -112,10 +112,9 @@ class Dump
         die();
     }
 
-    #
-    #   For complex debug
-    #
-
+    /**
+     * For complex debugging
+     */
     public static function pre($var, $msg = "")
     {
         self::requireBoot();

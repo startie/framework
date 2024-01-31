@@ -97,6 +97,7 @@ class Dev
 		$result = "";
 
 		if (Access::is('developers') || Dev::isSecretMode()) {
+			// TODO: delete bootstrap dependecy
 			$result .= "<div id='DevLoadCounter' class='container-fluid text-muted'>";
 			$result .= number_format(microtime(true) - $start_time, 2) . "s";
 			$result .= "</div>";
