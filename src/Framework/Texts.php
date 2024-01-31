@@ -57,14 +57,21 @@ class Texts
 			Register utils 
 		*/
 
-		function t($str = "")
+		function t(string $str = "", string $fallback = "")
 		{
 			global $t;
-			if ($str == "") {
-				return "";
+			$result = "";
+
+			if ($str === "") {
+				$result = "";
 			} else {
-				return $t[$str] ?? $t[str_replace(" ", "_", $str)] ?? "";
+				$result = $t[$str]
+					?? $t[str_replace(" ", "_", $str)]
+					?? $fallback
+					?? "";
 			}
+			
+			return $result;
 		}
 
 		/*
@@ -113,7 +120,9 @@ class Texts
 			$v = json_decode(file_get_contents($fullPath), true);
 
 			if ($v === null && json_last_error() !== JSON_ERROR_NONE) {
-				throw new \Startie\Exception("JSON data on $fullPath of Texts incorrect");
+				throw new \Startie\Exception(
+					"JSON data on $fullPath of Texts incorrect"
+				);
 			}
 
 			# Arrifying
