@@ -60,6 +60,13 @@ class Template
             }
         }
 
+        /**
+         * Texts
+         */
+
+        global $t;
+        $data['t'] = $t;
+
         #
         #   Render
 
