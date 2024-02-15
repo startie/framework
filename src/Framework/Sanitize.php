@@ -6,6 +6,7 @@ class Sanitize
 {
 	/**
 	 * Sanitizes a value to integer or zero.
+	 * Removes illegal characters.
 	 * 
 	 * ```php
 	 * Sanitize::int("") // 0
