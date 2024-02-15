@@ -20,7 +20,7 @@ class SanitizeTest extends TestCase
         $this->assertEquals($string0, 0);
 
         $string1 = Sanitize::int("1");
-        $this->assertEquals($string1, 1);
+        $this->assertEquals($string1, 111);
 
         $stringLetterNumber = Sanitize::int("c1");
         $this->assertEquals($stringLetterNumber, 1);
