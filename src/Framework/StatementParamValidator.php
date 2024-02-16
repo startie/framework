@@ -109,9 +109,9 @@ class StatementParamValidator
             */
             foreach ($values as $value) {
                 foreach ($value as $part) {
-                    if (!is_string($part)) {
+                    if (!is_string($part) && !is_integer($part)) {
                         throw new Exception(
-                            'Part should be a string'
+                            'Part should be a string or integer for ' . $column
                         );
                     };
                 };

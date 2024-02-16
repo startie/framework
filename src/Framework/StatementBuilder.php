@@ -22,7 +22,7 @@ class StatementBuilder
             $sql .= "\t";
         }
 
-        $sql = substr($sql, 0, -3);
+        $sql = substr($sql, 0, -4);
         $sql .= "\n";
         $sql .= "\n";
         $sql .= " ";
@@ -187,7 +187,7 @@ class StatementBuilder
 		}
 	}
 
-    public static function order(string &$sql, array $order)
+    public static function order(string &$sql, array|null $order)
 	{
 		if (isset($order)) {
 
@@ -195,7 +195,7 @@ class StatementBuilder
 			$sql .= "ORDER BY";
 
 			foreach ($order as $param) {
-				$sql .= " " . $param . ",";
+				$sql .= " $param,";
 			}
 			$sql = substr($sql, 0, -1);
 			$sql .= "\n";

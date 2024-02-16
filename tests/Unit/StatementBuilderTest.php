@@ -19,7 +19,7 @@ class StatementBuilderTest extends TestCase
 
         StatementBuilder::select($sql, $select);
 
-        $expectation = " SELECT\n\t name, \n\t city,\n\n ";
+        $expectation = " SELECT\n\t name, \n\t city\n\n ";
 
         $this->assertEquals($sql, $expectation);
     }

@@ -143,7 +143,7 @@ class Model
 		StatementBuilder::where($sql, $where ?? []);
 		StatementBuilder::group($sql, $group ?? []);
 		StatementBuilder::having($sql, $having ?? []);
-		StatementBuilder::order($sql, $order ?? []);
+		StatementBuilder::order($sql, $order ?? NULL);
 		StatementBuilder::limit($sql, $limit ?? NULL);
 		StatementBuilder::offset($sql, $offset ?? NULL);
 		$sql .= "";
