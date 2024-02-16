@@ -7,7 +7,7 @@ class StatementBuilder
     /**
      * @throws Exception
      */
-    public static function select(string &$sql, array $columns = ['*'])
+    public static function select(string &$sql, array $columns)
     {
         StatementParamValidator::select($columns);
 
@@ -162,7 +162,7 @@ class StatementBuilder
     public static function where(string &$sql, array $params)
     {
         StatementParamValidator::where($params);
-        
+
         self::clause($sql, $params, "WHERE");
     }
 
