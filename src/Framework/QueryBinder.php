@@ -81,7 +81,7 @@ class QueryBinder
     /**
      * For 'where' and 'having' clauses
      */
-    public static function bindClause(&$sth, &$sql, $clause)
+    public static function clause(&$sth, &$sql, $clause)
     {
         if (isset($clause)) {
             foreach ($clause as $columnName => $columnValuesArr) {
