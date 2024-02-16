@@ -64,10 +64,10 @@ class Model
 		#
 		#	SQL generate
 
+		$table = str_replace("Models\\", "", get_called_class());
+
 		$sql = "";
-		$sql .= " INSERT INTO ";
-		$sql .= str_replace("Models\\", "", get_called_class());
-		Model::__insert($sql, $insert);
+		StatementBuilder::insert($sql, $insert, $table);
 
 		#
 		#	Debug
@@ -88,7 +88,7 @@ class Model
 		#
 		#	Bind
 
-		Model::bindInsert($sth, $sql, $insert);
+		QueryBinder::insert($sth, $sql, $insert);
 
 		#
 		#	Debug
@@ -125,7 +125,7 @@ class Model
 		#	Vars
 
 		$select = ['*'];
-		$from = str_replace("Models\\", "", get_called_class());
+		$table = str_replace("Models\\", "", get_called_class());
 		$debug = 0;
 		$die = 0;
 		$test = 0;
@@ -137,15 +137,15 @@ class Model
 		#	SQL generate
 
 		$sql = "\n";
-		Model::SELECT_($sql, $select);
-		Model::FROM_($sql, $from);
-		Model::JOIN_($sql, $join ?? []);
-		Model::WHERE_($sql, $where ?? []);
-		Model::GROUP_($sql, $group ?? []);
-		Model::HAVING_($sql, $having ?? []);
-		Model::ORDER_($sql, $order ?? NULL);
-		Model::LIMIT_($sql, $limit ?? NULL);
-		Model::OFFSET_($sql, $offset ?? NULL);
+		StatementBuilder::select($sql, $select);
+		StatementBuilder::from($sql, $table);
+		StatementBuilder::join($sql, $join ?? []);
+		StatementBuilder::where($sql, $where ?? []);
+		StatementBuilder::group($sql, $group ?? []);
+		StatementBuilder::having($sql, $having ?? []);
+		StatementBuilder::order($sql, $order ?? []);
+		StatementBuilder::limit($sql, $limit ?? NULL);
+		StatementBuilder::offset($sql, $offset ?? NULL);
 		$sql .= "";
 
 		#
@@ -182,8 +182,8 @@ class Model
 		#
 		#	Bind
 
-		Model::bindClause($sth, $sql, $where ?? NULL);
-		Model::bindClause($sth, $sql, $having ?? NULL);
+		QueryBinder::clause($sth, $sql, $where ?? NULL);
+		QueryBinder::clause($sth, $sql, $having ?? NULL);
 
 		#
 		#	Debug
@@ -235,12 +235,14 @@ class Model
 		#	SQL generate
 
 		$sql = "";
-		$sql .= " UPDATE " . str_replace("Models\\", "", get_called_class());
+		
+		$table = str_replace("Models\\", "", get_called_class());
+		$sql .= StatementBuilder::update($table);
 
 		$set = $insert ?? $fields ?? $set;
 
-		Model::SET_($sql, $set);
-		Model::WHERE_($sql, $where);
+		StatementBuilder::set($sql, $set);
+		StatementBuilder::where($sql, $where);
 
 		#
 		#	Debug
@@ -261,9 +263,9 @@ class Model
 		#
 		#	Bind
 
-		Model::bindSet($sth, $sql, $set);
-		Model::bindClause($sth, $sql, $where ?? NULL);
-		Model::bindClause($sth, $sql, $having ?? NULL);
+		QueryBinder::set($sth, $sql, $set);
+		QueryBinder::clause($sth, $sql, $where ?? NULL);
+		QueryBinder::clause($sth, $sql, $having ?? NULL);
 
 		#
 		#	Debug
@@ -304,12 +306,15 @@ class Model
 
 		extract($params);
 
+		$table = str_replace("Models\\", "", get_called_class());
+
 		#
 		#	SQL generate
 
 		$sql = "";
-		$sql .= "\nDELETE\nFROM " . str_replace("Models\\", "", get_called_class()) . " \n";
-		Model::WHERE_($sql, $where);
+		$sql .= StatementBuilder::delete();
+		StatementBuilder::from($sql, $table);
+		StatementBuilder::where($sql, $where);
 
 		#
 		#	Debug
@@ -326,7 +331,7 @@ class Model
 		#
 		#	Bind
 
-		Model::bindClause($sth, $sql, $where);
+		QueryBinder::clause($sth, $sql, $where);
 
 		#
 		#	Debug
@@ -637,422 +642,5 @@ class Model
 		}
 
 		return $entities;
-	}
-
-	#
-	#
-	#		SQL CODE GENERATORS
-	#
-	#
-
-	public static function SELECT_(&$sql, array $select)
-	{
-		$sql .= " ";
-		$sql .= "SELECT";
-		$sql .= "\n\t";
-
-		foreach ($select as $key => $value) {
-			$sql .= " " . $value . ",";
-			$sql .= "\n\t";
-		}
-		$sql = substr($sql, 0, -3);
-		$sql .= "\n\n ";
-	}
-
-	public static function FROM_(&$sql, string $from)
-	{
-		$sql .= " ";
-		$sql .= "FROM ";
-		$sql .= $from;
-		$sql .= "\n\n ";
-	}
-
-	public static function JOIN_(&$sql, array $join)
-	{
-		$sql .= " ";
-		if (isset($join)) {
-			foreach ($join as $tableName => $joinParams) {
-				if (isset($joinParams[2])) {
-					$joinType = strtoupper($joinParams[2]);
-				} else {
-					$joinType = "INNER";
-				}
-				$sql .= "$joinType JOIN ";
-				$sql .= $tableName;
-				$sql .= " ON";
-				$sql .= " $joinParams[0] = $joinParams[1]";
-				$sql .= "\n";
-			}
-			$sql .= "\n\n ";
-		}
-	}
-
-	/**
-	 * This method is required by ::WHERE_() and ::HAVING_()
-	 */
-	public static function CLAUSE_(&$sql, array $params, string $type): void
-	{
-		$sql .= " ";
-		$sql .= "{$type} \t 1 = 1 ";
-		$sql .= "\n";
-
-		if (isset($params)) {
-			foreach ($params as $columnName => $columnValuesArr) {
-				$sql .= "\t AND ( ";
-				foreach ($columnValuesArr as $i => $columnValueData) {
-					# $columnValueData[0] == sign + value (sv)
-					# $columnValueData[1] == type (t)
-
-					# Get sign
-					$signHolder = $columnValueData[0] ?? '';
-					if (strpos($signHolder, '<=') !== false) {
-						$sign = '<=';
-					} else if (strpos($signHolder, '>=') !== false) {
-						$sign = '>=';
-					} else if (strpos($signHolder, '<') !== false) {
-						$sign = '<';
-					} else if (strpos($signHolder, '>') !== false) {
-						$sign = '>';
-					} else if (strpos($signHolder, '!') !== false) {
-						$sign = '<>';
-					} else if (strpos($signHolder, '=') !== false) {
-						$sign = '=';
-					} else {
-						$sign = '=';
-					};
-
-					# A. With backticks – do not make binding
-					if (strpos($signHolder, '`') !== false) {
-						#Dump::make($sign);
-						# Delete backticks
-						$v = preg_replace('/`/', '', $signHolder);
-						# A. When has LIKE, REGEXP, IN, IS NULL, IS NOT NULL
-						if (
-							strrpos($v, 'LIKE') !== false ||
-							strrpos($v, 'REGEXP') !== false ||
-							strrpos($v, 'IN') !== false ||
-							strrpos($v, 'IS NULL') !== false ||
-							strrpos($v, 'IS NOT NULL') !== false ||
-							$v == ''
-						) {
-							$sql .=  $columnName . " " . $v;
-							$sql .= " OR ";
-						}
-
-						# B. When has not 
-						else {
-
-							# C. When with > or < 
-							if (strpos($v, '<') !== false || strpos($v, '>') !== false) {
-								$sql .=  "$columnName $v";
-								$sql .= " OR ";
-							}
-
-							# D. When without > or < 
-							else {
-								$sql .=  $columnName . " = " . $v;
-								$sql .= " OR ";
-							}
-						}
-					}
-
-					# B. Without backticks – make binding
-					else {
-						#Dump::make($sign . "mb");
-						# Если наша колонка будет указана с именеем таблицы через точку, то точка помешает, её и удаляем
-						$filteredColumnName = str_replace('.', '', $columnName);
-						# Формируем фрагмент запроса
-						$sql .=  "$columnName $sign :$filteredColumnName$i";
-						#Dump::make("$columnName $sign :$filteredColumnName$i");
-						$sql .= " OR ";
-						#Dump::make($sign);
-						#Dump::make("':$filteredColumnName$i' is waiting for bind...\n");
-					}
-				}
-				# Delete trailing "OR ("
-				$sql = substr($sql, 0, -4);
-				$sql .= " ) ";
-				$sql .= "\n";
-			}
-		}
-
-		$sql .= " ";
-	}
-
-	public static function WHERE_(&$sql, array $params)
-	{
-		Model::CLAUSE_($sql, $params, "WHERE");
-	}
-	public static function HAVING_(&$sql, array $params)
-	{
-		Model::CLAUSE_($sql, $params, "HAVING");
-	}
-
-	public static function GROUP_(&$sql, $group)
-	{
-		if (isset($group) && !empty($group)) {
-
-			$sql .= "\n";
-			$sql .= "GROUP BY";
-
-			foreach ($group as $param) {
-				$sql .= " " . $param . " , ";
-			}
-			$sql = substr($sql, 0, -2);
-			$sql .= "\n\n";
-		}
-	}
-
-	public static function ORDER_(&$sql, $order)
-	{
-		if (isset($order)) {
-
-			$sql .= "\n";
-			$sql .= "ORDER BY";
-
-			foreach ($order as $param) {
-				$sql .= " " . $param . ",";
-			}
-			$sql = substr($sql, 0, -1);
-			$sql .= "\n";
-		}
-	}
-
-	public static function LIMIT_(&$sql, $limit)
-	{
-		if (isset($limit)) {
-			$sql .= "\n";
-			$sql .= "LIMIT  " . $limit . " ";
-			$sql .= "\n\n";
-		}
-	}
-
-	public static function OFFSET_(&$sql, $offset)
-	{
-		if (isset($offset)) {
-			$sql .= "\n";
-			$sql .= "OFFSET  " . $offset . " ";
-			$sql .= "\n\n";
-		}
-	}
-
-	public static function SET_(&$sql, $set)
-	{
-		$sql .= " ";
-		$sql .= "SET ";
-		foreach ($set as $i => $data) {
-			$col = $data[0];
-			$val = $data[1];
-			$type = $data[2] ?? NULL;
-
-			# With backticks
-			if (Schema::hasBackticks($val)) {
-				# delete backticks
-				$valClean = preg_replace('/`/', '', $val);
-
-				$sql .= "$col = $valClean";
-				$sql .= ",";
-				$sql .= " ";
-			}
-
-			# Without backticks
-			else {
-				$sql .= "{$col} = :{$col}{$i}";
-				$sql .= ",";
-				$sql .= " "; # required
-			}
-		}
-		$sql = substr($sql, 0, -2); # Deleting last comma and space
-	}
-
-	public static function __insert(&$sql, $insert)
-	{
-		#
-		# 	Fields
-
-		$sql .= " ( ";
-		foreach ($insert as $insertArr) {
-			$col = $insertArr[0];
-			$sql .= "`{$col}`";
-			$sql .= ",";
-			$sql .= " "; # required
-		}
-		$sql = substr($sql, 0, -2); # Deleting last comma
-		$sql .= " ) ";
-
-		#
-		# 	Values
-
-		$sql .= " VALUES ";
-		$sql .= " ( ";
-
-		foreach ($insert as $data) {
-			$col = $data[0];
-			$val = $data[1];
-			$type = $data[2] ?? NULL;
-
-			# With backticks
-			if (Schema::hasBackticks($val)) {
-				# delete backticks
-				$valClean = preg_replace('/`/', '', $val);
-
-				$sql .= " {$valClean}";
-				$sql .= ",";
-				$sql .= " "; # required
-			}
-
-			# Without backticks
-			else {
-				$sql .= " :{$col}";
-				$sql .= ",";
-				$sql .= " "; # required
-			}
-		}
-		$sql = substr($sql, 0, -2); # Deleting last comma
-		$sql .= " ) ";
-	}
-
-	#
-	#
-	#		BIND HELPERS
-	#
-	#
-
-	public static function bindSet(&$sth, &$sql, $set)
-	{
-		if (isset($set)) {
-			foreach ($set as $i => &$data) {
-				$col = $data[0];
-				$val = $data[1];
-				$type = $data[2] ?? NULL;
-				$bindExpr = ":{$col}{$i}";
-
-				#
-				# 	With backticks
-
-				if (Schema::hasBackticks($val)) {
-					# do nothing
-				}
-
-				#
-				# 	Without backticks
-
-				else {
-					# bind type
-					if ($type) {
-						$typeConst = constant('PDO::PARAM_' . mb_strtoupper($type));
-						$sth->bindValue($bindExpr, $val, $typeConst);
-					} else {
-						$sth->bindValue($bindExpr, $val);
-					}
-				}
-
-				#
-				# 	Replace placeholders for debugging
-
-				$sql = str_replace($bindExpr, '"' . $val . '"', $sql);
-			}
-		}
-	}
-
-	public static function bindInsert(&$sth, &$sql, $insert)
-	{
-		if (isset($insert)) {
-			foreach ($insert as $i => $data) {
-				$col = $data[0];
-				$val = $data[1];
-				$type = $data[2] ?? NULL;
-
-				$bindExpr = ":{$col}";
-
-				#
-				# 	With backticks
-
-				if (Schema::hasBackticks($val)) {
-					# do nothing
-				}
-
-				#
-				# 	Without backticks
-
-				else {
-					if ($type) {
-						$typeConst = constant('PDO::PARAM_' . mb_strtoupper($type));
-						$sth->bindValue($bindExpr, $val, $typeConst);
-					} else {
-						$sth->bindValue($bindExpr, $val);
-					}
-				}
-
-				#
-				# 	Replace placeholders for debugging
-
-				$sql = str_replace($bindExpr, '"' . $val . '"', $sql);
-			}
-		}
-	}
-
-	/**
-	 * For 'WHERE' and 'HAVING' clauses
-	 */
-	public static function bindClause(&$sth, &$sql, $clause)
-	{
-		if (isset($clause)) {
-			foreach ($clause as $columnName => $columnValuesArr) {
-				foreach ($columnValuesArr as $i => $data) {
-					$signAndValue = $data[0] ?? '';
-					$type = $data[1] ?? NULL;
-
-					# If we have type
-					if (isset($type)) {
-						$valFiltered = preg_replace('/[><=!]/i', '', $signAndValue);
-						#Dump::make("Have type. Value will be = $valFiltered");
-						#echo ':' . $columnName . $i . "\n"; 
-
-						$filteredColumnName = str_replace('.', '', $columnName);
-						$typeConst = constant('PDO::PARAM_' . mb_strtoupper($type));
-						$sth->bindValue(":{$filteredColumnName}{$i}", $valFiltered, $typeConst);
-						#Dump::make("':$filteredColumnName$i' binded with $valFiltered \n");
-
-						# Replace placeholders for debugging
-						$needle = ":{$filteredColumnName}{$i}";
-						$replace = '"' . $valFiltered . '"';
-						$pos = strpos($sql, $needle);
-						if ($pos !== false) {
-							$sql = substr_replace($sql, $replace, $pos, strlen($needle));
-						}
-					}
-
-					# If we don't have type
-					else {
-						# Если есть бэктиксы
-						# - to support `< UNIX_TIMESTAMP()`
-						if (Schema::hasBackticks($signAndValue)) {
-							break (1);
-						}
-
-						# Если нет ни LIKE ни бэктиксов одновременно
-						# - to support IS NULL
-						if (strrpos($signAndValue, 'LIKE') === false && strpos($signAndValue, '`') === false) {
-							# Work
-							$valFiltered = ltrim(preg_replace('/[><=!]/i', '', $signAndValue));
-							$filteredColumnName = str_replace('.', '', $columnName);
-							#Dump::make("No type. Value will be = '$valFiltered'");
-							$sth->bindValue(":{$filteredColumnName}{$i}", $valFiltered);
-							#Dump::make("Column will be = :$filteredColumnName$i");
-							#die();		
-
-							# Replace placeholders for debugging
-							$needle = ":{$filteredColumnName}{$i}";
-							$replace = '"' . $valFiltered . '"';
-							$pos = strpos($sql, $needle);
-							if ($pos !== false) {
-								$sql = substr_replace($sql, $replace, $pos, strlen($needle));
-							}
-						}
-					}
-				}
-			}
-		}
 	}
 }
