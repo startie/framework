@@ -109,8 +109,73 @@ class StatementBuilderTest extends TestCase
         $this->assertEquals($sql, $expectation);
     }
 
-    // /** @test */
-    // public function it_generates_clause()
-    // {
-    // }
+    /** @test */
+    public function it_generates_clause_with_one_column_and_equal_sign()
+    {
+        $where = [
+            'id' => [
+                [1],
+            ],
+        ];
+
+        $sql = "";
+        StatementBuilder::clause($sql, $where, "WHERE");
+        // var_dump($sql);
+
+        $expectation = " "
+            . "WHERE \t 1 = 1 "
+            . "\n"
+            . "\t AND ( "
+            . ""
+            . "id = :id0"
+            . " ) "
+            . "\n"
+            . " ";
+        // var_dump($expectation);
+
+        $this->assertEquals($sql, $expectation);
+    }
+
+    /** @test */
+    public function it_generates_clause_with_one_column_and_greater_than_sign()
+    {
+        $where = [
+            'id' => [
+                [">1"],
+            ],
+        ];
+
+        $sql = "";
+        StatementBuilder::clause($sql, $where, "WHERE");
+        // var_dump($sql);
+
+        $expectation = " "
+            . "WHERE \t 1 = 1 "
+            . "\n"
+            . "\t AND ( "
+            . ""
+            . "id > :id0"
+            . " ) "
+            . "\n"
+            . " ";
+        // var_dump($expectation);
+
+        $this->assertEquals($sql, $expectation);
+    }
+
+    /** @test */
+    public function is_generates_raw_clauses_for_is_null()
+    {
+        $columnName = "age";
+        $signHolder = "`IS NULL`";
+
+        $sql = "";
+        $sql .= StatementBuilder::generateRawClauses($columnName, $signHolder);
+
+        $expectation = ""
+            . "age IS NULL"
+            . " OR ";
+
+        $this->assertEquals($sql, $expectation);
+    }
 }

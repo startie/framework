@@ -80,76 +80,39 @@ class StatementBuilder
             foreach ($params as $columnName => $columnValuesArr) {
                 $sql .= "\t AND ( ";
                 foreach ($columnValuesArr as $i => $columnValueData) {
-                    # $columnValueData[0] == sign + value (sv)
-                    # $columnValueData[1] == type (t)
+                    // $columnValueData[0] == sign + value (sv)
+                    // $columnValueData[1] == type (t)
 
-                    # Get sign
-                    $signHolder = $columnValueData[0] ?? '';
-                    if (strpos($signHolder, '<=') !== false) {
-                        $sign = '<=';
-                    } else if (strpos($signHolder, '>=') !== false) {
-                        $sign = '>=';
-                    } else if (strpos($signHolder, '<') !== false) {
-                        $sign = '<';
-                    } else if (strpos($signHolder, '>') !== false) {
-                        $sign = '>';
-                    } else if (strpos($signHolder, '!') !== false) {
-                        $sign = '<>';
-                    } else if (strpos($signHolder, '=') !== false) {
-                        $sign = '=';
-                    } else {
-                        $sign = '=';
+                    if(is_null($columnValueData[0])){
+                        throw new Exception(
+                            'Sign and value can not be null in params'
+                            . json_decode($columnValuesArr)
+                        );
                     };
 
-                    # A. With backticks – do not make binding
-                    if (strpos($signHolder, '`') !== false) {
-                        #Dump::make($sign);
-                        # Delete backticks
-                        $v = preg_replace('/`/', '', $signHolder);
-                        # A. When has LIKE, REGEXP, IN, IS NULL, IS NOT NULL
-                        if (
-                            strrpos($v, 'LIKE') !== false ||
-                            strrpos($v, 'REGEXP') !== false ||
-                            strrpos($v, 'IN') !== false ||
-                            strrpos($v, 'IS NULL') !== false ||
-                            strrpos($v, 'IS NOT NULL') !== false ||
-                            $v == ''
-                        ) {
-                            $sql .=  $columnName . " " . $v;
-                            $sql .= " OR ";
-                        }
+                    // Detect sign
+                    $signAndValue = $columnValueData[0];
+                    $sign = self::detectSign($signAndValue);
 
-                        # B. When has not 
-                        else {
-
-                            # C. When with > or < 
-                            if (strpos($v, '<') !== false || strpos($v, '>') !== false) {
-                                $sql .=  "$columnName $v";
-                                $sql .= " OR ";
-                            }
-
-                            # D. When without > or < 
-                            else {
-                                $sql .=  $columnName . " = " . $v;
-                                $sql .= " OR ";
-                            }
-                        }
+                    // a) With backticks: do not make binding
+                    if (strpos($signAndValue, '`') !== false) {
+                        $sql .= self::generateRawClauses(
+                            $columnName,
+                            $signAndValue, 
+                        );
                     }
 
-                    # B. Without backticks – make binding
-                    else {
-                        #Dump::make($sign . "mb");
-                        # Если наша колонка будет указана с именеем таблицы через точку, то точка помешает, её и удаляем
-                        $filteredColumnName = str_replace('.', '', $columnName);
-                        # Формируем фрагмент запроса
-                        $sql .=  "$columnName $sign :$filteredColumnName$i";
-                        #Dump::make("$columnName $sign :$filteredColumnName$i");
-                        $sql .= " OR ";
-                        #Dump::make($sign);
-                        #Dump::make("':$filteredColumnName$i' is waiting for bind...\n");
+                    // b) Without backticks: make binding
+                    if (strpos($signAndValue, '`') === false) {
+                        $sql .= self::generateBindedClauses(
+                            $columnName, 
+                            $sign, 
+                            $i,
+                        );
                     }
                 }
-                # Delete trailing "OR ("
+
+                // Delete trailing "OR ("
                 $sql = substr($sql, 0, -4);
                 $sql .= " ) ";
                 $sql .= "\n";
@@ -157,6 +120,93 @@ class StatementBuilder
         }
 
         $sql .= " ";
+    }
+
+    public static function detectSign($signHolder)
+    {
+        $sign = '';
+
+        if (strpos($signHolder, '<=') !== false) {
+            $sign = '<=';
+        } else if (strpos($signHolder, '>=') !== false) {
+            $sign = '>=';
+        } else if (strpos($signHolder, '<') !== false) {
+            $sign = '<';
+        } else if (strpos($signHolder, '>') !== false) {
+            $sign = '>';
+        } else if (strpos($signHolder, '!') !== false) {
+            $sign = '<>';
+        } else if (strpos($signHolder, '=') !== false) {
+            $sign = '=';
+        } else {
+            $sign = '=';
+        }
+
+        return $sign;
+    }
+
+    public static function generateRawClauses(
+        string $column, 
+        string $signHolder
+    ): string
+    {
+        $sql = "";
+        
+        // Delete backticks
+        $signHolder = preg_replace('/`/', '', $signHolder);
+
+        // a) when has LIKE, REGEXP, IN, IS NULL, IS NOT NULL
+        if (
+            strrpos($signHolder, 'LIKE') !== false 
+            ||
+            strrpos($signHolder, 'REGEXP') !== false 
+            ||
+            strrpos($signHolder, 'IN') !== false 
+            ||
+            strrpos($signHolder, 'IS NULL') !== false
+            ||
+            strrpos($signHolder, 'IS NOT NULL') !== false 
+            ||
+            $signHolder == ''
+        ) {
+            $sql .= "{$column} {$signHolder}";
+        }
+
+        // b) when has not those
+        else {
+
+            // a) when with > or < 
+            if (strpos($signHolder, '<') !== false 
+                || 
+                strpos($signHolder, '>') !== false
+            ) {
+                $sql .= "{$column} {$signHolder}";
+            }
+
+            // b) When without those
+            else {
+                $sql .=  "{$column} = {$signHolder}";
+            }
+        }
+
+        $sql .= " OR ";
+
+        return $sql;
+    }
+
+    public static function generateBindedClauses($column, $sign, $index)
+    {
+        $sql = "";
+
+        // Если колонка будет указана с именеем таблицы через `.`
+        // то точка помешает, её и удаляем
+        $columnFiltered = str_replace('.', '', $column);
+
+        // Формируем фрагмент запроса
+        $sql .=  "{$column} {$sign} :{$columnFiltered}{$index}";
+        $sql .= " OR ";
+
+        return $sql;
     }
 
     public static function where(string &$sql, array $params)
@@ -167,148 +217,148 @@ class StatementBuilder
     }
 
     public static function having(string &$sql, array $params)
-	{
-		self::clause($sql, $params, "HAVING");
-	}
+    {
+        self::clause($sql, $params, "HAVING");
+    }
 
     public static function group(string &$sql, array $group)
-	{
-		if (isset($group) && !empty($group)) {
-			$sql .= "\n";
-			$sql .= "GROUP BY";
+    {
+        if (isset($group) && !empty($group)) {
+            $sql .= "\n";
+            $sql .= "GROUP BY";
 
-			foreach ($group as $param) {
-				$sql .= " $param , ";
-			}
+            foreach ($group as $param) {
+                $sql .= " $param , ";
+            }
 
-			$sql = substr($sql, 0, -2);
-			$sql .= "\n";
-			$sql .= "\n";
-		}
-	}
+            $sql = substr($sql, 0, -2);
+            $sql .= "\n";
+            $sql .= "\n";
+        }
+    }
 
     public static function order(string &$sql, array|null $order)
-	{
-		if (isset($order)) {
+    {
+        if (isset($order)) {
 
-			$sql .= "\n";
-			$sql .= "ORDER BY";
+            $sql .= "\n";
+            $sql .= "ORDER BY";
 
-			foreach ($order as $param) {
-				$sql .= " $param,";
-			}
-			$sql = substr($sql, 0, -1);
-			$sql .= "\n";
-		}
-	}
+            foreach ($order as $param) {
+                $sql .= " $param,";
+            }
+            $sql = substr($sql, 0, -1);
+            $sql .= "\n";
+        }
+    }
 
     public static function limit(string &$sql, $limit)
-	{
-		if (isset($limit)) {
-			$sql .= "\n";
-			$sql .= "LIMIT  $limit ";
-			$sql .= "\n";
-			$sql .= "\n";
-		}
-	}
-
-	public static function offset(string &$sql, $offset)
-	{
-		if (isset($offset)) {
-			$sql .= "\n";
-			$sql .= "OFFSET  $offset ";
-			$sql .= "\n";
+    {
+        if (isset($limit)) {
             $sql .= "\n";
-		}
-	}
+            $sql .= "LIMIT  $limit ";
+            $sql .= "\n";
+            $sql .= "\n";
+        }
+    }
 
-	public static function set(string &$sql, $set)
-	{
-		$sql .= " ";
-		$sql .= "SET ";
+    public static function offset(string &$sql, $offset)
+    {
+        if (isset($offset)) {
+            $sql .= "\n";
+            $sql .= "OFFSET  $offset ";
+            $sql .= "\n";
+            $sql .= "\n";
+        }
+    }
 
-		foreach ($set as $index => $data) {
-			$col = $data[0];
-			$val = $data[1];
-			$type = $data[2] ?? NULL;
+    public static function set(string &$sql, $set)
+    {
+        $sql .= " ";
+        $sql .= "SET ";
 
-			# With backticks
-			if (Schema::hasBackticks($val)) {
-				# delete backticks
-				$valClean = preg_replace('/`/', '', $val);
+        foreach ($set as $index => $data) {
+            $col = $data[0];
+            $val = $data[1];
+            $type = $data[2] ?? NULL;
 
-				$sql .= "$col = $valClean";
-				$sql .= ",";
-				$sql .= " ";
-			}
+            # With backticks
+            if (Schema::hasBackticks($val)) {
+                # delete backticks
+                $valClean = preg_replace('/`/', '', $val);
 
-			# Without backticks
-			else {
-				$sql .= "{$col} = :{$col}{$index}";
-				$sql .= ",";
-				$sql .= " "; # required
-			}
-		}
+                $sql .= "$col = $valClean";
+                $sql .= ",";
+                $sql .= " ";
+            }
 
-		$sql = substr($sql, 0, -2); # Deleting last comma and space
-	}
+            # Without backticks
+            else {
+                $sql .= "{$col} = :{$col}{$index}";
+                $sql .= ",";
+                $sql .= " "; # required
+            }
+        }
 
-	public static function insert(string &$sql, array $insert)
-	{
+        $sql = substr($sql, 0, -2); # Deleting last comma and space
+    }
+
+    public static function insert(string &$sql, array $insert)
+    {
         $sql .= " ";
         $sql .= "INSERT INTO";
         $sql .= " ";
 
-		#
-		# 	Fields
+        #
+        # 	Fields
 
-		$sql .= " ( ";
-		foreach ($insert as $insertItem) {
-			$col = $insertItem[0];
-			$sql .= "`{$col}`";
-			$sql .= ",";
-			$sql .= " "; # required
-		}
-		$sql = substr($sql, 0, -2); # Deleting last comma
-		$sql .= " ) ";
+        $sql .= " ( ";
+        foreach ($insert as $insertItem) {
+            $col = $insertItem[0];
+            $sql .= "`{$col}`";
+            $sql .= ",";
+            $sql .= " "; # required
+        }
+        $sql = substr($sql, 0, -2); # Deleting last comma
+        $sql .= " ) ";
 
-		#
-		# 	Values
+        #
+        # 	Values
 
-		$sql .= " VALUES ";
-		$sql .= " ( ";
+        $sql .= " VALUES ";
+        $sql .= " ( ";
 
-		foreach ($insert as $insertItem) {
-			$column = $insertItem[0];
-			$value = $insertItem[1];
-			// $type = $insertItem[2] ?? NULL; // not used
+        foreach ($insert as $insertItem) {
+            $column = $insertItem[0];
+            $value = $insertItem[1];
+            // $type = $insertItem[2] ?? NULL; // not used
 
-			// With backticks
-			if (Schema::hasBackticks($value)) {
-				// Delete backticks
-				$valueClean = preg_replace(
-                    '/`/', 
-                    '', 
+            // With backticks
+            if (Schema::hasBackticks($value)) {
+                // Delete backticks
+                $valueClean = preg_replace(
+                    '/`/',
+                    '',
                     $value
                 );
 
-				$sql .= " {$valueClean}";
-				$sql .= ",";
-				$sql .= " "; // required
-			}
+                $sql .= " {$valueClean}";
+                $sql .= ",";
+                $sql .= " "; // required
+            }
 
-			// Without backticks
-			else {
-				$sql .= " :{$column}";
-				$sql .= ",";
-				$sql .= " "; // required
-			}
-		}
+            // Without backticks
+            else {
+                $sql .= " :{$column}";
+                $sql .= ",";
+                $sql .= " "; // required
+            }
+        }
 
         // Deleting last comma
-		$sql = substr($sql, 0, -2); 
-		$sql .= " ) ";
-	}
+        $sql = substr($sql, 0, -2);
+        $sql .= " ) ";
+    }
 
     public static function update(string $table): string
     {
