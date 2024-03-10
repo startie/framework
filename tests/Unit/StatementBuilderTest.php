@@ -178,4 +178,95 @@ class StatementBuilderTest extends TestCase
 
         $this->assertEquals($sql, $expectation);
     }
+
+    /** @test */
+    public function it_generates_insert_with_1_field()
+    {
+        $insert = [
+            ['name', 'John'],
+        ];
+        $table = "users";
+
+        $sql = "";
+        StatementBuilder::insert($sql, $insert, $table);
+
+        $expectation = ""
+            . " INSERT INTO users "
+            . " ( `name` ) "
+            . " VALUES "
+            . " (  :name ) ";
+
+        $this->assertEquals($sql, $expectation);
+    }
+
+    /** @test */
+    public function it_generates_insert_with_2_fields()
+    {
+        $insert = [
+            ['name', 'John'],
+            ['age', '30'],
+        ];
+        $table = "users";
+
+        $sql = "";
+        StatementBuilder::insert($sql, $insert, $table);
+
+        $expectation = ""
+            . " INSERT INTO users "
+            . " ( `name`, `age` ) "
+            . " VALUES "
+            . " (  :name,  :age ) ";
+
+        $this->assertEquals($sql, $expectation);
+    }
+
+    /** @test */
+    public function it_generates_insert_with_raw()
+    {
+        $insert = [
+            ['created_at', '`UTC_TIMESTAMP()`'],
+        ];
+        $table = "users";
+
+        $sql = "";
+        StatementBuilder::insert($sql, $insert, $table);
+
+        $expectation = ""
+            . " INSERT INTO users "
+            . " ( "
+            . "`created_at`"
+            . " ) "
+            . " VALUES "
+            . " (  UTC_TIMESTAMP() ) ";
+
+        $this->assertEquals($sql, $expectation);
+    }
+
+    /** @test */
+    public function it_generates_update()
+    {
+        $table = "users";
+
+        $sql = "";
+        $sql .= StatementBuilder::update($table);
+
+        $expectation = ""
+            . " UPDATE users ";
+
+        $this->assertEquals($sql, $expectation);
+    }
+
+    /** @test */
+    public function it_generates_delete()
+    {
+        $sql = "";
+        $sql .= StatementBuilder::delete();
+
+        $expectation = ""
+            . "\n"
+            . "DELETE"
+            . "\n";
+
+        $this->assertEquals($sql, $expectation);
+    }
 }

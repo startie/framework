@@ -303,11 +303,9 @@ class StatementBuilder
         $sql = substr($sql, 0, -2); # Deleting last comma and space
     }
 
-    public static function insert(string &$sql, array $insert)
+    public static function insert(string &$sql, array $insert, string $table)
     {
-        $sql .= " ";
-        $sql .= "INSERT INTO";
-        $sql .= " ";
+        $sql .= " INSERT INTO {$table} ";
 
         #
         # 	Fields
@@ -331,7 +329,6 @@ class StatementBuilder
         foreach ($insert as $insertItem) {
             $column = $insertItem[0];
             $value = $insertItem[1];
-            // $type = $insertItem[2] ?? NULL; // not used
 
             // With backticks
             if (Schema::hasBackticks($value)) {
