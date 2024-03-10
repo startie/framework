@@ -21,9 +21,11 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5",
-        "php-sage/sage": "^1.2"
+        "php-sage/sage": "^1.2",
+        "phpstan/phpstan": "^1.10"
     },
     "scripts": {
-        "test": "phpunit"
+        "test": "phpunit",
+        "a": "vendor/bin/phpstan analyse src/Framework"
     }
 }

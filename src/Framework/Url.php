@@ -403,12 +403,12 @@ class Url
 		if (strlen($str) > 0) {
 			$str = trim(preg_replace('/\s+/', ' ', $str)); // supports line breaks inside <title>
 
-			$str = mb_convert_encoding($str, 'HTML-ENTITIES', "UTF-8");
+			$str = htmlentities($str);
 
 			preg_match("/\<title\>(.*)\<\/title\>/i", $str, $title); // ignore case
 
-			$str = $title[1];
-			$str = mb_convert_encoding($str, 'UTF-8', 'HTML-ENTITIES');
+			$str = $title[1] ?? "";
+			$str = htmlentities($str);
 		}
 		return $str;
 	}
