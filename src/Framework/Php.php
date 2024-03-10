@@ -524,8 +524,10 @@ class Php
 	public static function mda_de($arr, $key, $value)
 	{
 		foreach ($arr as $k => $e) {
-			if ($e[$key] == $value) {
-				unset($arr[$k]);
+			if (isset($e[$key])) {
+				if ($e[$key] == $value) {
+					unset($arr[$k]);
+				}
 			}
 		}
 		return $arr;
