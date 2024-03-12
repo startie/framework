@@ -14,21 +14,20 @@ class Router
 
 	public static function routs()
 	{
-		$Routs = [];
+		$routs = [];
 
 		$ConfigPath = App::path("backend/Config/Router/Routs.php");
 
 		/* If there is no config – try to guess */
 
 		if (!file_exists($ConfigPath)) {
-			//throw new \Startie\Exception("Could find the file: $ConfigPath");
 			$RoutsPath = App::path("backend/Routs/");
 
 			$RoutsFiles = scandir($RoutsPath);
 			foreach ($RoutsFiles as $RoutsFile) {
-				if ($RoutsFile != "." && $RoutsFile != "..") {
+				if ($RoutsFile !== "." && $RoutsFile !== "..") {
 					$RouteContent = require App::path("backend/Routs/{$RoutsFile}");
-					$Routs = array_merge($RouteContent, $Routs);
+					$routs = array_merge($RouteContent, $routs);
 				}
 			}
 		}
@@ -43,12 +42,12 @@ class Router
 				foreach ($Config as $RouteName) {
 					$path = App::path("backend/Routs/$RouteName.php");
 					$RouteContent = require $path;
-					$Routs = array_merge($RouteContent, $Routs);
+					$routs = array_merge($RouteContent, $routs);
 				}
 			}
 		}
 
-		return $Routs;
+		return $routs;
 	}
 
 	public static function init()
@@ -125,12 +124,14 @@ class Router
 			}
 
 			if (!$url) {
-				throw new \Startie\Exception("'url' param for router not found. apache is running?");
+				throw new \Startie\Exception("
+					The 'url' param for Router is not found. Is server running?
+				");
 			}
 		}
 
 		# parse from url
-		$urlParts = Router::explodeUrl(['url' => $url]);
+		$urlParts = Router::getPathParts($url);
 		$urlPartsCount = count($urlParts);
 
 		#
@@ -144,7 +145,7 @@ class Router
 		#
 
 		foreach ($Routs as $url => $config) {
-			$routsParsedUrlParts = Router::explodeUrl(['url' => $url]);
+			$routsParsedUrlParts = Router::getPathParts($url);
 			#Dump::make($routsParsedUrlParts);
 
 			if (!isset($config['middles'])) {
@@ -365,17 +366,15 @@ class Router
 	}
 
 	/**
-	 * @param $params = ['url']
+	 * Get array of URI's path parts based on slash
 	 */
-	public static function explodeUrl(array $params)
-	{
-		extract($params); # => $url
-		# Delete all spaces
-		$url = rtrim($url, '/');
-		# Make as an array
-		$urlParts = explode('/', $url);
+	public static function getPathParts(string $path): array
+	{		
+		$path = rtrim($path, '/');
 
-		return $urlParts;
+		$parts = explode('/', $path);
+
+		return $parts;
 	}
 
 	/**
