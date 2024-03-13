@@ -338,7 +338,7 @@ class Url
 			if ($decoded) {
 				$value = urldecode($pairArr[1]);
 			} else {
-				$value = $pairArr[1];
+				$value = $pairArr[1] ?? "";
 			}
 
 			foreach ($pairArr as $key) {
