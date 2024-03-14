@@ -235,7 +235,7 @@ class Model
 		#	SQL generate
 
 		$sql = "";
-		
+
 		$table = str_replace("Models\\", "", get_called_class());
 		$sql .= StatementBuilder::update($table);
 
@@ -548,22 +548,30 @@ class Model
 		return $rows;
 	}
 
-	public static function wherify($final, $source, $configs)
+	/**
+	 * @param array $where Query builder entity that will be potentially filled
+	 * @param array $filters Simple key-value associate array
+	 * @version 0.30.0
+	 */
+	public static function wherify(array $where, array $filters, array $configs)
 	{
-		if (isset($source)) {
-			foreach ($configs as $c => $config) {
-				$field = $config[0];
-				$index = $config[1];
+		if (isset($filters)) {
+			foreach ($configs as $config) {
+				$column = $config[0];
+				$filterAttribute = $config[1];
 				$type = $config[2];
-				$value = $source[$index];
 
-				if (isset($value) && $value != "") {
-					$final[$field] = [[$value, $type]];
+				if (isset($filters[$filterAttribute])) {
+					$value = $filters[$filterAttribute];
+
+					if (isset($value) && $value != "") {
+						$where[$column] = [[$value, $type]];
+					}
 				}
 			}
 		}
 
-		return $final;
+		return $where;
 	}
 
 	/**

@@ -2,80 +2,89 @@
 
 namespace Startie;
 
+use Startie\Sql;
+
 class QueryBinder
 {
     public static function set(&$sth, &$sql, $set)
     {
+        $log = [];
+
         if (isset($set)) {
             foreach ($set as $i => &$data) {
-                $col = $data[0];
-                $val = $data[1];
+                $column = $data[0];
+                $value = $data[1];
                 $type = $data[2] ?? NULL;
-                $bindExpr = ":{$col}{$i}";
 
-                #
-                # 	With backticks
+                $bindExpr = ":{$column}{$i}";
 
-                if (Schema::hasBackticks($val)) {
-                    # do nothing
+                // With backticks	
+                if (Sql::startsWithBacktick($value)) {
+                    // ... do nothing
                 }
 
-                #
-                # 	Without backticks
-
+                // Without backticks
                 else {
-                    # bind type
-                    if ($type) {
-                        $typeConst = constant('PDO::PARAM_' . mb_strtoupper($type));
-                        $sth->bindValue($bindExpr, $val, $typeConst);
+                    // ... bind type
+                    if (!is_null($type)) {
+                        $typeConst = constant(
+                            'PDO::PARAM_' . mb_strtoupper($type)
+                        );
+                        $sth->bindValue($bindExpr, $value, $typeConst);
                     } else {
-                        $sth->bindValue($bindExpr, $val);
+                        $sth->bindValue($bindExpr, $value);
                     }
                 }
 
-                #
-                # 	Replace placeholders for debugging
-
-                $sql = str_replace($bindExpr, '"' . $val . '"', $sql);
+                $sql = self::replacePlaceholdersForDump1(
+                    $sql,
+                    $bindExpr,
+                    $value
+                );
             }
         }
+
+        return $log;
     }
 
     public static function insert(&$sth, &$sql, $insert)
     {
+        $log = [];
+
         if (isset($insert)) {
             foreach ($insert as $i => $data) {
-                $col = $data[0];
-                $val = $data[1];
+                $column = $data[0];
+                $value = $data[1];
                 $type = $data[2] ?? NULL;
 
-                $bindExpr = ":{$col}";
+                $bindExpr = ":{$column}";
 
-                #
-                # 	With backticks
-
-                if (Schema::hasBackticks($val)) {
-                    # do nothing
+                // With backticks
+                if (Sql::startsWithBacktick($value)) {
+                    // ... do nothing
                 }
 
-                #
-                # 	Without backticks
-
+                // Without backticks
                 else {
                     if ($type) {
-                        $typeConst = constant('PDO::PARAM_' . mb_strtoupper($type));
-                        $sth->bindValue($bindExpr, $val, $typeConst);
+                        $typeConst = constant(
+                            'PDO::PARAM_' . mb_strtoupper($type)
+                        );
+                        $sth->bindValue($bindExpr, $value, $typeConst);
                     } else {
-                        $sth->bindValue($bindExpr, $val);
+                        $sth->bindValue($bindExpr, $value);
                     }
                 }
 
-                #
-                # 	Replace placeholders for debugging
-
-                $sql = str_replace($bindExpr, '"' . $val . '"', $sql);
+                $sql = self::replacePlaceholdersForDump1(
+                    $sql,
+                    $bindExpr,
+                    $value
+                );
             }
         }
+
+        return $log;
     }
 
     /**
@@ -83,62 +92,119 @@ class QueryBinder
      */
     public static function clause(&$sth, &$sql, $clause)
     {
-        if (isset($clause)) {
-            foreach ($clause as $columnName => $columnValuesArr) {
-                foreach ($columnValuesArr as $i => $data) {
-                    $signAndValue = $data[0] ?? '';
-                    $type = $data[1] ?? NULL;
+        $log = [];
 
-                    # If we have type
-                    if (isset($type)) {
-                        $valFiltered = preg_replace('/[><=!]/i', '', $signAndValue);
-                        #Dump::make("Have type. Value will be = $valFiltered");
-                        #echo ':' . $columnName . $i . "\n"; 
+        if (!isset($clause)) {
+            return null;
+        }
 
-                        $filteredColumnName = str_replace('.', '', $columnName);
-                        $typeConst = constant('PDO::PARAM_' . mb_strtoupper($type));
-                        $sth->bindValue(":{$filteredColumnName}{$i}", $valFiltered, $typeConst);
-                        #Dump::make("':$filteredColumnName$i' binded with $valFiltered \n");
+        foreach ($clause as $column => $columnValuesArr) {
+            foreach ($columnValuesArr as $i => $data) {
+                $signAndValue = $data[0] ?? '';
+                $type = $data[1] ?? NULL;
 
-                        # Replace placeholders for debugging
-                        $needle = ":{$filteredColumnName}{$i}";
-                        $replace = '"' . $valFiltered . '"';
-                        $pos = strpos($sql, $needle);
-                        if ($pos !== false) {
-                            $sql = substr_replace($sql, $replace, $pos, strlen($needle));
-                        }
+                // If type exists
+                if (isset($type)) {
+                    $valueFiltered = preg_replace(
+                        '/[><=!]/i',
+                        '',
+                        $signAndValue
+                    );
+
+                    $bindExpr = ":{$column}{$i}";
+
+                    $log[] = "Have type. "
+                        . " Value for '$bindExpr' will be '$valueFiltered'";
+
+                    // Remove dot from table name
+                    $columnFiltered = str_replace('.', '', $column);
+
+                    $bindExpr = ":{$columnFiltered}{$i}";
+
+                    $typeConst = constant(
+                        'PDO::PARAM_' . mb_strtoupper($type)
+                    );
+
+                    $sth->bindValue($bindExpr, $valueFiltered, $typeConst);
+
+                    $log[] = "':$columnFiltered$i' was binded "
+                        . "with '$valueFiltered'";
+
+                    $sql = QueryBinder::replacePlaceholdersForDump2(
+                        $sql,
+                        $bindExpr,
+                        $valueFiltered,
+                    );
+                }
+
+                // If type doesn't exist
+                else {
+                    // If contains backticks:
+                    // - to support `< UNIX_TIMESTAMP()`
+                    if (Sql::startsWithBacktick($signAndValue)) {
+                        break 1;
                     }
 
-                    # If we don't have type
-                    else {
-                        # Если есть бэктиксы
-                        # - to support `< UNIX_TIMESTAMP()`
-                        if (Schema::hasBackticks($signAndValue)) {
-                            break (1);
-                        }
+                    // Если нет nor LIKE nor backtics одновременно
+                    // - to support IS NULL
+                    if (
+                        strrpos($signAndValue, 'LIKE') === false
+                        &&
+                        Sql::startsWithBacktick($signAndValue)
+                    ) {
+                        $valueFiltered = ltrim(
+                            preg_replace('/[><=!]/i', '', $signAndValue)
+                        );
 
-                        # Если нет ни LIKE ни бэктиксов одновременно
-                        # - to support IS NULL
-                        if (strrpos($signAndValue, 'LIKE') === false && strpos($signAndValue, '`') === false) {
-                            # Work
-                            $valFiltered = ltrim(preg_replace('/[><=!]/i', '', $signAndValue));
-                            $filteredColumnName = str_replace('.', '', $columnName);
-                            #Dump::make("No type. Value will be = '$valFiltered'");
-                            $sth->bindValue(":{$filteredColumnName}{$i}", $valFiltered);
-                            #Dump::make("Column will be = :$filteredColumnName$i");
-                            #die();		
+                        $columnFiltered = str_replace('.', '', $column);
 
-                            # Replace placeholders for debugging
-                            $needle = ":{$filteredColumnName}{$i}";
-                            $replace = '"' . $valFiltered . '"';
-                            $pos = strpos($sql, $needle);
-                            if ($pos !== false) {
-                                $sql = substr_replace($sql, $replace, $pos, strlen($needle));
-                            }
-                        }
+                        $bindExpr = ":{$columnFiltered}{$i}";
+
+                        $log[] = "No type. Value will be = '$valueFiltered'";
+
+                        $sth->bindValue($bindExpr, $valueFiltered);
+
+                        $log[] = "Column will be = :$columnFiltered$i";
+
+                        $sql = QueryBinder::replacePlaceholdersForDump2(
+                            $sql,
+                            $bindExpr,
+                            $valueFiltered,
+                        );
                     }
                 }
             }
         }
+
+        return $log;
+    }
+
+    public static function replacePlaceholdersForDump1(
+        $sql,
+        $bindExpr,
+        $value,
+    ): string {
+        $sql = str_replace($bindExpr, '"' . $value . '"', $sql);
+
+        return $sql;
+    }
+
+    public static function replacePlaceholdersForDump2(
+        $sql,
+        $bindExpr,
+        $value,
+    ): string {
+        $replace = '"' . $value . '"';
+        $pos = strpos($sql, $bindExpr);
+        if ($pos !== false) {
+            $sql = substr_replace(
+                $sql,
+                $replace,
+                $pos,
+                strlen($bindExpr)
+            );
+        }
+
+        return $sql;
     }
 }

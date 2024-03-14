@@ -280,10 +280,9 @@ class StatementBuilder
         foreach ($set as $index => $data) {
             $col = $data[0];
             $val = $data[1];
-            $type = $data[2] ?? NULL;
 
             # With backticks
-            if (Schema::hasBackticks($val)) {
+            if (Sql::startsWithBacktick($val)) {
                 # delete backticks
                 $valClean = preg_replace('/`/', '', $val);
 
@@ -331,7 +330,7 @@ class StatementBuilder
             $value = $insertItem[1];
 
             // With backticks
-            if (Schema::hasBackticks($value)) {
+            if (Sql::startsWithBacktick($value)) {
                 // Delete backticks
                 $valueClean = preg_replace(
                     '/`/',
@@ -370,5 +369,22 @@ class StatementBuilder
         $sql .= "DELETE";
         $sql .= "\n";
         return $sql;
+    }
+
+    /**
+     * Generates: `LIKE '%$value%'`
+     */
+    public static function like($value): string
+    {
+        $result = "";
+
+        $result .= "LIKE ";
+        $result .= "'";
+        $result .= "%";
+        $result .= $value;
+        $result .= "%";
+        $result .= "'";
+
+        return $result;
     }
 }

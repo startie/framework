@@ -2,22 +2,22 @@
 
 namespace Startie;
 
+use MySql;
+
 class Schema
 {
-    public static function hasBackticks($val)
+    /**
+     * @deprecated 0.30.0 Use `Sql::hasBackticks()`
+     */
+    public static function hasBackticks($expression)
     {
-        if (strpos($val ?? "", '`') === 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return Sql::startsWithBacktick($expression);
     }
 
-    // #todo: transfer to the new class Mysql
-    // #todo: rename to jsonRegExp
+    // TODO: transfer to the new class Mysql
+    // TODO: rename to jsonRegExp
     // since 5.6
     // alnum = letter or digit
-
     public static function regexpSearch($field, $query)
     {
         $query = mb_strtolower($query);
@@ -32,18 +32,12 @@ class Schema
         return $result;
     }
 
-    // LIKE '%$value%'
+    /**
+     * @deprecated 0.30.0 Use `Sql::like()`
+     */
     public static function like($value): string
     {
-        $result = "";
-        $result .= "`";
-        $result .= "LIKE ";
-        $result .= "'%";
-        $result .= $value;
-        $result .= "%'";
-        $result .= "`";
-
-        return $result;
+        return Sql::like($value);
     }
 
     public function truncateTable($table)
@@ -54,15 +48,10 @@ class Schema
         $sql = "SET FOREIGN_KEY_CHECKS = 0;";
         $sql .= "TRUNCATE TABLE $table";
 
-        // $sql = "TRUNCATE TABLE $table";
-
         try {
-
             $dbh->exec($sql);
-            //echo "Table '$table' trucated successfully!";
-
+            // echo "Table '$table' trucated successfully!";
         } catch (PDOException $e) {
-
             echo $e->getMessage();
         }
     }
@@ -109,10 +98,11 @@ class Schema
         }
     }
 
-    // #todo: transfer to the new class Mysql
-
+    /**
+     * @deprecated 0.30.0 Use Sql::ts()
+     */
     public static function ts()
     {
-        return '`UTC_TIMESTAMP()`';
+        return Sql::ts();
     }
 }
