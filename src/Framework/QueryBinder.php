@@ -150,7 +150,7 @@ class QueryBinder
                     if (
                         strrpos($signAndValue, 'LIKE') === false
                         &&
-                        Sql::startsWithBacktick($signAndValue)
+                        !Sql::startsWithBacktick($signAndValue)
                     ) {
                         $valueFiltered = ltrim(
                             preg_replace('/[><=!]/i', '', $signAndValue)
