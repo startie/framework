@@ -13,7 +13,7 @@ class QueryBinder
         if (isset($set)) {
             foreach ($set as $i => &$data) {
                 $column = $data[0];
-                $value = $data[1];
+                $value = $data[1] ?? "";
                 $type = $data[2] ?? NULL;
 
                 $bindExpr = ":{$column}{$i}";
@@ -54,7 +54,7 @@ class QueryBinder
         if (isset($insert)) {
             foreach ($insert as $i => $data) {
                 $column = $data[0];
-                $value = $data[1];
+                $value = $data[1] ?? "";
                 $type = $data[2] ?? NULL;
 
                 $bindExpr = ":{$column}";

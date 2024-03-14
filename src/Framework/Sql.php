@@ -19,10 +19,8 @@ class Sql
         return "`$expression`";
     }
 
-    public static function startsWithBacktick(string $val)
+    public static function startsWithBacktick($val = "")
     {
-        $val = $val ?? "";
-
         if (strpos($val, '`') === 0) {
             return true;
         } else {

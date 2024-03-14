@@ -279,7 +279,7 @@ class StatementBuilder
 
         foreach ($set as $index => $data) {
             $col = $data[0];
-            $val = $data[1];
+            $val = $data[1] ?? "";
 
             # With backticks
             if (Sql::startsWithBacktick($val)) {
@@ -327,7 +327,7 @@ class StatementBuilder
 
         foreach ($insert as $insertItem) {
             $column = $insertItem[0];
-            $value = $insertItem[1];
+            $value = $insertItem[1] ?? "";
 
             // With backticks
             if (Sql::startsWithBacktick($value)) {
