@@ -2,6 +2,9 @@
 
 namespace Startie;
 
+/**
+ * Class for generating SQL statemens
+ */
 class StatementBuilder
 {
     /**

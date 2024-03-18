@@ -27,11 +27,14 @@ class QueryBinder
                 else {
                     // ... bind type
                     if (!is_null($type)) {
+                        self::validateType($type);
+
                         $typeConst = constant(
                             'PDO::PARAM_' . mb_strtoupper($type)
                         );
                         $sth->bindValue($bindExpr, $value, $typeConst);
                     } else {
+                        // PDO::PARAM_STR will be used
                         $sth->bindValue($bindExpr, $value);
                     }
                 }
@@ -54,31 +57,28 @@ class QueryBinder
         if (isset($insert)) {
             foreach ($insert as $i => $data) {
                 $column = $data[0];
-                $value = $data[1] ?? "";
-                $type = $data[2] ?? NULL;
+                $value = $data[1] ?? NULL;
+                $type = $data[2] ?? "NULL";
 
-                $bindExpr = ":{$column}";
+                $bindExpression = ":{$column}";
 
-                // With backticks
-                if (Sql::startsWithBacktick($value)) {
-                    // ... do nothing
-                }
+                if (!Sql::startsWithBacktick($value)) {
+                    if (!is_null($type)) {
+                        $type = self::validateType($type);
 
-                // Without backticks
-                else {
-                    if ($type) {
                         $typeConst = constant(
                             'PDO::PARAM_' . mb_strtoupper($type)
                         );
-                        $sth->bindValue($bindExpr, $value, $typeConst);
+                        $sth->bindValue($bindExpression, $value, $typeConst);
                     } else {
-                        $sth->bindValue($bindExpr, $value);
+                        // PDO::PARAM_STR will be used
+                        $sth->bindValue($bindExpression, $value);
                     }
                 }
 
                 $sql = self::replacePlaceholdersForDump1(
                     $sql,
-                    $bindExpr,
+                    $bindExpression,
                     $value
                 );
             }
@@ -104,7 +104,9 @@ class QueryBinder
                 $type = $data[1] ?? NULL;
 
                 // If type exists
-                if (isset($type)) {
+                if (!is_null($type)) {
+                    $type = self::validateType($type);
+
                     $valueFiltered = preg_replace(
                         '/[><=!]/i',
                         '',
@@ -162,6 +164,7 @@ class QueryBinder
 
                         $log[] = "No type. Value will be = '$valueFiltered'";
 
+                        // PDO::PARAM_STR will be used
                         $sth->bindValue($bindExpr, $valueFiltered);
 
                         $log[] = "Column will be = :$columnFiltered$i";
@@ -177,6 +180,42 @@ class QueryBinder
         }
 
         return $log;
+    }
+
+    /**
+     * Performs fixes
+     */
+    public static function fixType(string $type): string
+    {
+        $type = strtoupper($type);
+
+        $type = str_replace("STRING", "STR", $type);
+        $type = str_replace("INTEGER", "INT", $type);
+
+        return $type;
+    }
+
+    /**
+     * Strictly validate for PDO::PARAM_INT and PDO::PARAM_STR
+     */
+    public static function isValidType(string $type): bool
+    {
+        if(in_array($type, ['INT', 'STR'])){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static function validateType(string $type)
+    {
+        $type = self::fixType($type);
+
+        if(!self::isValidType($type)){
+            throw new \Startie\Exception("$type is not valid for query binder");
+        } else {
+            return $type;
+        }
     }
 
     public static function replacePlaceholdersForDump1(
