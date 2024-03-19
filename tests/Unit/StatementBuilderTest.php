@@ -168,12 +168,7 @@ class StatementBuilderTest extends TestCase
     {
         $columnName = "age";
         $signHolder = "`IS NULL`";
-        echo "<pre>\n";var_dump(
-            $signHolder
-        );echo '</pre>';die();
         
-        
-
         $sql = "";
         $sql .= StatementBuilder::generateRawClauses($columnName, $signHolder);
 

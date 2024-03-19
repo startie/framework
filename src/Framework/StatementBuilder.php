@@ -88,30 +88,28 @@ class StatementBuilder
             foreach ($params as $columnName => $columnValuesArr) {
                 $sql .= "\t AND ( ";
                 foreach ($columnValuesArr as $i => $columnValueData) {
-                    // $columnValueData[0] == sign + value (sv)
-                    // $columnValueData[1] == type (t)
+                    $signAndValue = $columnValueData[0];
+                    // $type = $columnValueData[1] ?? NULL;
 
-                    if (is_null($columnValueData[0])) {
-                        throw new Exception(
-                            'Sign and value can not be null in params'
-                                . json_decode($columnValuesArr)
-                        );
-                    };
+                    $signAndValue = self::validateSignAndValue(
+                        $signAndValue,
+                        $columnValuesArr
+                    );
 
                     // Detect sign
-                    $signAndValue = $columnValueData[0];
-                    $sign = self::detectSign($signAndValue);
+                    $signAndValue = strval($signAndValue);
+                    $sign = self::parseSign($signAndValue);
 
-                    // a) With backticks: do not make binding
-                    if (strpos($signAndValue, '`') !== false) {
+                    // Do not make binding
+                    if (Sql::hasBacktick($signAndValue)) {
                         $sql .= self::generateRawClauses(
                             $columnName,
                             $signAndValue,
                         );
                     }
 
-                    // b) Without backticks: make binding
-                    if (strpos($signAndValue, '`') === false) {
+                    // Make binding
+                    if (!Sql::hasBacktick($signAndValue)) {
                         $sql .= self::generateBindedClauses(
                             $columnName,
                             $sign,
@@ -130,9 +128,11 @@ class StatementBuilder
         $sql .= " ";
     }
 
-    public static function detectSign(string $signHolder): string
+    public static function parseSign(int|string $signHolder): string
     {
         $sign = '';
+
+        $signHolder = strval($signHolder);
 
         if (strpos($signHolder, '<=') !== false) {
             $sign = '<=';
@@ -218,6 +218,20 @@ class StatementBuilder
         $sql .= " OR ";
 
         return $sql;
+    }
+
+    public static function validateSignAndValue(
+        int|string $data,
+        array $columnValuesArr
+    ): int|string {
+        if (is_null($data)) {
+            throw new Exception(
+                'Sign and value can not be null in params'
+                    . json_encode($columnValuesArr)
+            );
+        } else {
+            return $data;
+        }
     }
 
     public static function where(string &$sql, array $params): void

@@ -18,14 +18,8 @@ class QueryBinder
 
                 $bindExpr = ":{$column}{$i}";
 
-                // With backticks	
-                if (Sql::startsWithBacktick($value)) {
-                    // ... do nothing
-                }
-
-                // Without backticks
-                else {
-                    // ... bind type
+                // Bind type
+                if (!Sql::startsWithBacktick($value)) {
                     if (!is_null($type)) {
                         self::validateType($type);
 
@@ -62,6 +56,7 @@ class QueryBinder
 
                 $bindExpression = ":{$column}";
 
+                // Bind type
                 if (!Sql::startsWithBacktick($value)) {
                     if (!is_null($type)) {
                         $type = self::validateType($type);
@@ -200,7 +195,7 @@ class QueryBinder
      */
     public static function isValidType(string $type): bool
     {
-        if(in_array($type, ['INT', 'STR'])){
+        if (in_array($type, ['INT', 'STR'])) {
             return true;
         } else {
             return false;
@@ -211,7 +206,7 @@ class QueryBinder
     {
         $type = self::fixType($type);
 
-        if(!self::isValidType($type)){
+        if (!self::isValidType($type)) {
             throw new \Startie\Exception("$type is not valid for query binder");
         } else {
             return $type;
