@@ -12,6 +12,7 @@ class Router
 	public static Route $route;
 	public static float $initializedAt;
 
+	// TODO: test
 	public static function routs()
 	{
 		$routs = [];
@@ -50,6 +51,7 @@ class Router
 		return $routs;
 	}
 
+	// TODO: test
 	public static function init()
 	{
 		/* On service */
@@ -81,6 +83,7 @@ class Router
 		}
 	}
 
+	// TODO: test
 	public static function find()
 	{
 		#
@@ -249,6 +252,7 @@ class Router
 		return $result;
 	}
 
+	// TODO: test
 	public static function render($RouteConfig, $controllerParams)
 	{
 		/* Register utils */
@@ -335,6 +339,7 @@ class Router
 		}
 	}
 
+	// TODO: test
 	public static function bootstrap(Route $route)
 	{
 		if ($route->type) {
@@ -349,6 +354,7 @@ class Router
 		}
 	}
 
+	// TODO: test
 	public static function middles(Route $route)
 	{
 		if ($route->middles) {
@@ -367,6 +373,9 @@ class Router
 
 	/**
 	 * Get array of URI's path parts based on slash
+	 * @tested
+	 * 
+	 * TODO: test
 	 */
 	public static function getPathParts(string $path): array
 	{		
@@ -379,6 +388,8 @@ class Router
 
 	/**
 	 * Check if passed signature (controller::method) belongs to current url
+	 * 
+	 * TODO: test
 	 */
 	public static function isCurrent(string $signature): bool
 	{
@@ -390,6 +401,8 @@ class Router
 	 *
 	 * @param  int $code
 	 * @return void
+	 * 
+	 * TODO: test
 	 */
 	public static function errorPage($code)
 	{

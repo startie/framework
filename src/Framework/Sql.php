@@ -15,21 +15,17 @@ class Sql
     /**
      * Wrap expression in backticks quotes (``) 
      * "q" is short for "quotes"
+     * 
+     * @tested
      */
     public static function q($expression)
     {
         return "`$expression`";
     }
 
-    public static function startsWithBacktick($val)
-    {
-        if (strpos($val ?? '', '`') === 0) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
+    /**
+     * @tested
+     */
     public static function hasBacktick($val)
     {
         if (str_contains($val ?? '', '`')) {
@@ -39,6 +35,21 @@ class Sql
         }
     }
 
+    /**
+     * @tested
+     */
+    public static function startsWithBacktick($val)
+    {
+        if (strpos($val ?? '', '`') === 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * @tested
+     */
     public static function ts()
     {
         return Sql::q(
@@ -46,6 +57,9 @@ class Sql
         );
     }
 
+    /**
+     * @tested
+     */
     public static function like($value)
     {
         return Sql::q(

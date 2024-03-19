@@ -11,6 +11,7 @@ class StatementBuilder
 {
     /**
      * @throws Exception
+     * @tested
      */
     public static function select(string &$sql, array $columns): void
     {
@@ -33,6 +34,9 @@ class StatementBuilder
         $sql .= " ";
     }
 
+    /**
+     * @tested
+     */
     public static function from(string &$sql, string $from): void
     {
         // offset from `SELECT` OR `DELETE` part
@@ -48,6 +52,9 @@ class StatementBuilder
         $sql .= " ";
     }
 
+    /**
+     * @tested
+     */
     public static function join(string &$sql, array $join): void
     {
         StatementParamValidator::join($join);
@@ -72,6 +79,9 @@ class StatementBuilder
         }
     }
 
+    /**
+     * @tested
+     */
     public static function resolveJoinType($joinType)
     {
         if (!is_null($joinType)) {
@@ -85,6 +95,7 @@ class StatementBuilder
 
     /**
      * This method is required by ::where() and ::having()
+     * @tested
      */
     public static function clause(
         string &$sql,
@@ -139,6 +150,7 @@ class StatementBuilder
         $sql .= " ";
     }
 
+    // TODO: test
     public static function parseSign(int|string $signHolder): string
     {
         $sign = '';
@@ -164,6 +176,9 @@ class StatementBuilder
         return $sign;
     }
 
+    /**
+     * @tested
+     */
     public static function generateRawClauses(
         string $column,
         string $signHolder
@@ -213,6 +228,7 @@ class StatementBuilder
         return $sql;
     }
 
+    // TODO: test
     public static function generateBindedClauses(
         string $column,
         string $sign,
@@ -231,6 +247,7 @@ class StatementBuilder
         return $sql;
     }
 
+    // TODO: test
     public static function validateSignAndValue(
         int|string $data,
         array $columnValuesArr
@@ -245,6 +262,7 @@ class StatementBuilder
         }
     }
 
+    // TODO: test
     public static function where(string &$sql, array $params): void
     {
         StatementParamValidator::where($params);
@@ -252,11 +270,13 @@ class StatementBuilder
         self::clause($sql, $params, "WHERE");
     }
 
+    // TODO: test
     public static function having(string &$sql, array $params): void
     {
         self::clause($sql, $params, "HAVING");
     }
 
+    // TODO: test
     public static function group(string &$sql, array $group): void
     {
         if (isset($group) && !empty($group)) {
@@ -273,6 +293,7 @@ class StatementBuilder
         }
     }
 
+    // TODO: test
     public static function order(string &$sql, array|null $order): void
     {
         if (isset($order)) {
@@ -288,6 +309,7 @@ class StatementBuilder
         }
     }
 
+    // TODO: test
     public static function limit(string &$sql, $limit): void
     {
         if (isset($limit)) {
@@ -298,6 +320,7 @@ class StatementBuilder
         }
     }
 
+    // TODO: test
     public static function offset(string &$sql, $offset): void
     {
         if (isset($offset)) {
@@ -308,6 +331,7 @@ class StatementBuilder
         }
     }
 
+    // TODO: test
     public static function set(string &$sql, array $set): void
     {
         $sql .= " ";
@@ -340,6 +364,9 @@ class StatementBuilder
         $sql = substr($sql, 0, -2);
     }
 
+    /**
+     * @tested
+     */
     public static function insert(string &$sql, array $insert, string $table)
     {
         $sql .= " INSERT INTO {$table} ";
@@ -394,12 +421,18 @@ class StatementBuilder
         $sql .= " ) ";
     }
 
+    /**
+     * @tested
+     */
     public static function update(string $table): string
     {
         $sql = " UPDATE $table ";
         return $sql;
     }
 
+    /**
+     * @tested
+     */
     public static function delete(): string
     {
         $sql = "";
@@ -411,6 +444,7 @@ class StatementBuilder
 
     /**
      * Generates: `LIKE '%$value%'`
+     * TODO: test
      */
     public static function like($value): string
     {

@@ -15,6 +15,7 @@ class Sanitize
 	 *
 	 * @param  mixed $var
 	 * @return integer
+	 * @tested
 	 */
 	public static function int($var): int
 	{
@@ -40,13 +41,23 @@ class Sanitize
 	 * 
 	 * @param  mixed $var
 	 * @return float
+	 * 
+	 * TODO: test
 	 */
 	public static function float($var): float
 	{
-		return floatval(
-			filter_var($var, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION)
+		$filtered = filter_var(
+			$var,
+			FILTER_SANITIZE_NUMBER_FLOAT,
+			FILTER_FLAG_ALLOW_FRACTION
 		);
+
+		$converted = floatval($filtered);
+
+		return $converted;
 	}
+
+	// TODO: test
 	public static function double($var): float
 	{
 		return self::float($var);
@@ -61,6 +72,8 @@ class Sanitize
 	 *
 	 * @param  mixed $var
 	 * @return string
+	 * 
+	 * TODO: test
 	 */
 	public static function str($var): string
 	{
@@ -81,6 +94,8 @@ class Sanitize
 	 * 
 	 * @param  mixed $var
 	 * @return string
+	 * 
+	 * TODO: test
 	 */
 	public static function email($var): string
 	{
@@ -96,6 +111,8 @@ class Sanitize
 	 * 
 	 * @param  mixed $var
 	 * @return string
+	 * 
+	 * TODO: test
 	 */
 	public static function url($var): string
 	{
@@ -111,6 +128,8 @@ class Sanitize
 	 * 
 	 * @param  mixed $var
 	 * @return mixed
+	 * 
+	 * TODO: test
 	 */
 	public static function raw($var): mixed
 	{

@@ -7,12 +7,20 @@ use PHPUnit\Framework\TestCase;
 
 final class SqlTest extends TestCase
 {
+    /*
+        ::q()
+    */
+
     public function test_q(): void
     {
         $sql = Sql::q("count");
 
         $this->assertSame($sql, "`count`");
     }
+
+    /*
+        ::hasBacktick()
+    */
 
     public function test_has_backtick(): void
     {
@@ -28,6 +36,9 @@ final class SqlTest extends TestCase
         $this->assertSame($result, false);
     }
 
+    /*
+        ::startsWithBacktick()
+    */
     public function test_starts_with_backtick(): void
     {
         $result = Sql::startsWithBacktick("`count`");
@@ -35,12 +46,20 @@ final class SqlTest extends TestCase
         $this->assertSame($result, true);
     }
 
+    /*
+        ::ts()
+    */
+
     public function test_ts(): void
     {
         $sql = Sql::ts();
 
         $this->assertSame($sql, "`UTC_TIMESTAMP()`");
     }
+
+    /*
+        ::like()
+    */
 
     public function test_like(): void
     {

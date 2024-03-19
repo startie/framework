@@ -110,6 +110,15 @@ class StatementBuilderTest extends TestCase
     }
 
     /** @test */
+    public function is_resolves_join_type_correctly()
+    {
+        $resolvedJoinType = StatementBuilder::resolveJoinType("left");
+        $expectation = "LEFT";
+
+        $this->assertEquals($resolvedJoinType, $expectation);
+    }
+
+    /** @test */
     public function it_generates_clause_with_one_column_and_equal_sign()
     {
         $where = [
@@ -168,7 +177,7 @@ class StatementBuilderTest extends TestCase
     {
         $columnName = "age";
         $signHolder = "`IS NULL`";
-        
+
         $sql = "";
         $sql .= StatementBuilder::generateRawClauses($columnName, $signHolder);
 

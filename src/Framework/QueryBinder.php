@@ -1,13 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Startie;
 
 use Startie\Sql;
+use PDO;
 
 class QueryBinder
 {
-    public static function set(&$sth, &$sql, $set)
-    {
+    // TODO: test
+    public static function set(
+        PDOStatement &$sth,
+        string &$sql,
+        array $set
+    ): array {
         $log = [];
 
         if (isset($set)) {
@@ -44,8 +51,12 @@ class QueryBinder
         return $log;
     }
 
-    public static function insert(&$sth, &$sql, $insert)
-    {
+    // TODO: test
+    public static function insert(
+        PDOStatement &$sth,
+        string &$sql,
+        array $insert
+    ): array {
         $log = [];
 
         if (isset($insert)) {
@@ -84,9 +95,14 @@ class QueryBinder
 
     /**
      * For 'where' and 'having' clauses
+     * 
+     * TODO: test
      */
-    public static function clause(&$sth, &$sql, $clause)
-    {
+    public static function clause(
+        PDOStatement &$sth,
+        string &$sql,
+        array $clause
+    ): array {
         $log = [];
 
         if (!isset($clause)) {
@@ -179,6 +195,8 @@ class QueryBinder
 
     /**
      * Performs fixes
+     * 
+     * @tested
      */
     public static function fixType(string $type): string
     {
@@ -192,6 +210,8 @@ class QueryBinder
 
     /**
      * Strictly validate for PDO::PARAM_INT and PDO::PARAM_STR
+     * 
+     * @tested
      */
     public static function isValidType(string $type): bool
     {
@@ -202,6 +222,9 @@ class QueryBinder
         }
     }
 
+    /**
+     * @tested
+     */
     public static function validateType(string $type)
     {
         $type = self::fixType($type);
@@ -213,20 +236,22 @@ class QueryBinder
         }
     }
 
+    // TODO: test
     public static function replacePlaceholdersForDump1(
-        $sql,
-        $bindExpr,
-        $value,
+        string $sql,
+        string $bindExpr,
+        string $value,
     ): string {
         $sql = str_replace($bindExpr, '"' . $value . '"', $sql);
 
         return $sql;
     }
 
+    // TODO: test
     public static function replacePlaceholdersForDump2(
-        $sql,
-        $bindExpr,
-        $value,
+        string $sql,
+        string $bindExpr,
+        string $value,
     ): string {
         $replace = '"' . $value . '"';
         $pos = strpos($sql, $bindExpr);
