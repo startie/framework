@@ -65,7 +65,7 @@ class StatementBuilder
             foreach ($join as $tableName => $joinParams) {
                 $joinType = $joinParams[2] ?? NULL;
                 $joinType = self::resolveJoinType($joinType);
-                
+
                 $leftColumn = $joinParams[0];
                 $rightColumn = $joinParams[1];
 
@@ -241,7 +241,8 @@ class StatementBuilder
         $columnFiltered = str_replace('.', '', $column);
 
         // Формируем фрагмент запроса
-        $sql .=  "{$column} {$sign} :{$columnFiltered}{$index}";
+        $placeholder = self::generatePlaceholder($columnFiltered, $index);
+        $sql .=  "$column $sign $placeholder";
         $sql .= " OR ";
 
         return $sql;
@@ -354,9 +355,8 @@ class StatementBuilder
 
             // Without backticks
             else {
-                $sql .= "{$col} = :{$col}{$index}";
-                $sql .= ",";
-                $sql .= " "; // required
+                $placeholder = self::generatePlaceholder($col, $index);
+                $sql .= "$col = $placeholder, "; // trailing space is required
             }
         }
 
@@ -410,9 +410,8 @@ class StatementBuilder
 
             // Without backticks
             else {
-                $sql .= " :{$column}";
-                $sql .= ",";
-                $sql .= " "; // required
+                $placeholder = self::generatePlaceholder($column);
+                $sql .= " $placeholder, "; // trailing space is required
             }
         }
 
@@ -458,5 +457,18 @@ class StatementBuilder
         $result .= "'";
 
         return $result;
+    }
+
+    /**
+     * Generate identifier for named parameter
+     * 
+     * TODO: test
+     */
+    public static function generatePlaceholder(
+        string $column,
+        int|string|null $index = ""
+    ): string {
+        $placeholder = ":{$column}{$index}";
+        return $placeholder;
     }
 }

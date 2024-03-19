@@ -23,7 +23,7 @@ class QueryBinder
                 $value = $data[1] ?? "";
                 $type = $data[2] ?? NULL;
 
-                $bindExpr = ":{$column}{$i}";
+                $placeholder = StatementBuilder::generatePlaceholder($column, $i);
 
                 // Bind type
                 if (!Sql::startsWithBacktick($value)) {
@@ -33,16 +33,16 @@ class QueryBinder
                         $typeConst = constant(
                             'PDO::PARAM_' . mb_strtoupper($type)
                         );
-                        $sth->bindValue($bindExpr, $value, $typeConst);
+                        $sth->bindValue($placeholder, $value, $typeConst);
                     } else {
                         // PDO::PARAM_STR will be used
-                        $sth->bindValue($bindExpr, $value);
+                        $sth->bindValue($placeholder, $value);
                     }
                 }
 
                 $sql = self::replacePlaceholdersForDump1(
                     $sql,
-                    $bindExpr,
+                    $placeholder,
                     $value
                 );
             }
@@ -65,7 +65,7 @@ class QueryBinder
                 $value = $data[1] ?? NULL;
                 $type = $data[2] ?? "NULL";
 
-                $bindExpression = ":{$column}";
+                $placeholder = StatementBuilder::generatePlaceholder($column);
 
                 // Bind type
                 if (!Sql::startsWithBacktick($value)) {
@@ -75,16 +75,16 @@ class QueryBinder
                         $typeConst = constant(
                             'PDO::PARAM_' . mb_strtoupper($type)
                         );
-                        $sth->bindValue($bindExpression, $value, $typeConst);
+                        $sth->bindValue($placeholder, $value, $typeConst);
                     } else {
                         // PDO::PARAM_STR will be used
-                        $sth->bindValue($bindExpression, $value);
+                        $sth->bindValue($placeholder, $value);
                     }
                 }
 
                 $sql = self::replacePlaceholdersForDump1(
                     $sql,
-                    $bindExpression,
+                    $placeholder,
                     $value
                 );
             }
@@ -126,28 +126,32 @@ class QueryBinder
                         $signAndValue
                     );
 
-                    $bindExpr = ":{$column}{$i}";
+                    $placeholder = StatementBuilder::generatePlaceholder(
+                        $column, $i
+                    );
 
                     $log[] = "Have type. "
-                        . " Value for '$bindExpr' will be '$valueFiltered'";
+                        . " Value for '$placeholder' will be '$valueFiltered'";
 
                     // Remove dot from table name
                     $columnFiltered = str_replace('.', '', $column);
 
-                    $bindExpr = ":{$columnFiltered}{$i}";
+                    $placeholder =  StatementBuilder::generatePlaceholder(
+                        $columnFiltered, $i
+                    );
 
                     $typeConst = constant(
                         'PDO::PARAM_' . mb_strtoupper($type)
                     );
 
-                    $sth->bindValue($bindExpr, $valueFiltered, $typeConst);
+                    $sth->bindValue($placeholder, $valueFiltered, $typeConst);
 
                     $log[] = "':$columnFiltered$i' was binded "
                         . "with '$valueFiltered'";
 
                     $sql = QueryBinder::replacePlaceholdersForDump2(
                         $sql,
-                        $bindExpr,
+                        $placeholder,
                         $valueFiltered,
                     );
                 }
@@ -173,18 +177,21 @@ class QueryBinder
 
                         $columnFiltered = str_replace('.', '', $column);
 
-                        $bindExpr = ":{$columnFiltered}{$i}";
+                        $placeholder = StatementBuilder::generatePlaceholder(
+                            $columnFiltered,
+                            $i
+                        );
 
                         $log[] = "No type. Value will be = '$valueFiltered'";
 
                         // PDO::PARAM_STR will be used
-                        $sth->bindValue($bindExpr, $valueFiltered);
+                        $sth->bindValue($placeholder, $valueFiltered);
 
                         $log[] = "Column will be = :$columnFiltered$i";
 
                         $sql = QueryBinder::replacePlaceholdersForDump2(
                             $sql,
-                            $bindExpr,
+                            $placeholder,
                             $valueFiltered,
                         );
                     }
@@ -241,10 +248,10 @@ class QueryBinder
     // TODO: test
     public static function replacePlaceholdersForDump1(
         string $sql,
-        string $bindExpr,
+        string $placeholder,
         int|string $value,
     ): string {
-        $sql = str_replace($bindExpr, '"' . $value . '"', $sql);
+        $sql = str_replace($placeholder, '"' . $value . '"', $sql);
 
         return $sql;
     }
@@ -252,17 +259,17 @@ class QueryBinder
     // TODO: test
     public static function replacePlaceholdersForDump2(
         string $sql,
-        string $bindExpr,
+        string $placeholder,
         int|string $value,
     ): string {
         $replace = '"' . $value . '"';
-        $pos = strpos($sql, $bindExpr);
+        $pos = strpos($sql, $placeholder);
         if ($pos !== false) {
             $sql = substr_replace(
                 $sql,
                 $replace,
                 $pos,
-                strlen($bindExpr)
+                strlen($placeholder)
             );
         }
 

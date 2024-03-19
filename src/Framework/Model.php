@@ -82,11 +82,13 @@ class Model
 		try {
 			$sth = $db->prepare($sql);
 		} catch (PDOException $e) {
-			throw Exception::PDO($e, $sql);
+			throw Exception::create($e, $sql);
 		}
 
 		#
 		#	Bind
+
+		$sqlBeforeBinding = $sql;
 
 		QueryBinder::insert($sth, $sql, $insert);
 
@@ -112,7 +114,7 @@ class Model
 				return $lastInsertedId;
 			}
 		} catch (PDOException $e) {
-			throw new Exception($e);
+			self::processPdoException($e, $sql, $sqlBeforeBinding);
 		}
 	}
 
@@ -176,11 +178,13 @@ class Model
 		try {
 			$sth = $db->prepare($sql);
 		} catch (PDOException $e) {
-			throw Exception::PDO($e, $sql);
+			throw Exception::create($e, $sql);
 		}
 
 		#
 		#	Bind
+
+		$sqlBeforeBinding = $sql;
 
 		if (isset($where)) {
 			QueryBinder::clause($sth, $sql, $where);
@@ -210,7 +214,7 @@ class Model
 				return $rows;
 			}
 		} catch (PDOException $e) {
-			throw Exception::PDO($e, $sql);
+			self::processPdoException($e, $sql, $sqlBeforeBinding);
 		}
 
 		return [];
@@ -264,11 +268,13 @@ class Model
 		try {
 			$sth = $db->prepare($sql);
 		} catch (PDOException $e) {
-			throw Exception::PDO($e, $sql);
+			throw Exception::create($e, $sql);
 		}
 
 		#
 		#	Bind
+
+		$sqlBeforeBinding = $sql;
 
 		QueryBinder::set($sth, $sql, $set);
 
@@ -301,7 +307,7 @@ class Model
 				return $affectedRowsCount;
 			}
 		} catch (PDOException $e) {
-			throw Exception::PDO($e, $sql);
+			self::processPdoException($e, $sql, $sqlBeforeBinding);
 		}
 	}
 
@@ -344,6 +350,8 @@ class Model
 		#
 		#	Bind
 
+		$sqlBeforeBinding = $sql;
+
 		QueryBinder::clause($sth, $sql, $where);
 
 		#
@@ -367,7 +375,7 @@ class Model
 				return $affectedRowsCount;
 			}
 		} catch (PDOException $e) {
-			throw Exception::PDO($e, $sql);
+			self::processPdoException($e, $sql, $sqlBeforeBinding);
 		}
 	}
 
@@ -663,5 +671,32 @@ class Model
 		}
 
 		return $entities;
+	}
+
+	public static function getHint(PDOException $e): string
+	{
+		if (str_contains(
+			$e->getMessage(),
+			"Invalid parameter number: parameter was not defined"
+		)) {
+			return 'there is possible problem with placeholders, try to debug generated SQL';
+		} else {
+			return "";
+		}
+	}
+
+	public static function processPdoException($e, $sql, $sqlBeforeBinding)
+	{
+		$hint = self::getHint($e);
+		throw \Startie\Exception::create(
+			$e,
+			" "
+				. "Hint: "
+				. $hint
+				. ". SQL code before binding:"
+				. $sqlBeforeBinding
+				. ". SQL code:"
+				. $sql
+		);
 	}
 }
