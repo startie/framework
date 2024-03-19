@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Startie;
 
 /**
@@ -10,7 +12,7 @@ class StatementBuilder
     /**
      * @throws Exception
      */
-    public static function select(string &$sql, array $columns)
+    public static function select(string &$sql, array $columns): void
     {
         StatementParamValidator::select($columns);
 
@@ -31,7 +33,7 @@ class StatementBuilder
         $sql .= " ";
     }
 
-    public static function from(string &$sql, string $from)
+    public static function from(string &$sql, string $from): void
     {
         // offset from `SELECT` OR `DELETE` part
         $sql .= " ";
@@ -46,7 +48,7 @@ class StatementBuilder
         $sql .= " ";
     }
 
-    public static function join(string &$sql, array $join)
+    public static function join(string &$sql, array $join): void
     {
         StatementParamValidator::join($join);
 
@@ -73,8 +75,11 @@ class StatementBuilder
     /**
      * This method is required by ::where() and ::having()
      */
-    public static function clause(string &$sql, array $params, string $type): void
-    {
+    public static function clause(
+        string &$sql,
+        array $params,
+        string $type
+    ): void {
         $sql .= " ";
         $sql .= "{$type} \t 1 = 1 ";
         $sql .= "\n";
@@ -86,10 +91,10 @@ class StatementBuilder
                     // $columnValueData[0] == sign + value (sv)
                     // $columnValueData[1] == type (t)
 
-                    if(is_null($columnValueData[0])){
+                    if (is_null($columnValueData[0])) {
                         throw new Exception(
                             'Sign and value can not be null in params'
-                            . json_decode($columnValuesArr)
+                                . json_decode($columnValuesArr)
                         );
                     };
 
@@ -101,15 +106,15 @@ class StatementBuilder
                     if (strpos($signAndValue, '`') !== false) {
                         $sql .= self::generateRawClauses(
                             $columnName,
-                            $signAndValue, 
+                            $signAndValue,
                         );
                     }
 
                     // b) Without backticks: make binding
                     if (strpos($signAndValue, '`') === false) {
                         $sql .= self::generateBindedClauses(
-                            $columnName, 
-                            $sign, 
+                            $columnName,
+                            $sign,
                             $i,
                         );
                     }
@@ -125,7 +130,7 @@ class StatementBuilder
         $sql .= " ";
     }
 
-    public static function detectSign($signHolder)
+    public static function detectSign(string $signHolder): string
     {
         $sign = '';
 
@@ -149,26 +154,25 @@ class StatementBuilder
     }
 
     public static function generateRawClauses(
-        string $column, 
+        string $column,
         string $signHolder
-    ): string
-    {
+    ): string {
         $sql = "";
-        
+
         // Delete backticks
         $signHolder = preg_replace('/`/', '', $signHolder);
 
         // a) when has LIKE, REGEXP, IN, IS NULL, IS NOT NULL
         if (
-            strrpos($signHolder, 'LIKE') !== false 
+            strrpos($signHolder, 'LIKE') !== false
             ||
-            strrpos($signHolder, 'REGEXP') !== false 
+            strrpos($signHolder, 'REGEXP') !== false
             ||
-            strrpos($signHolder, 'IN') !== false 
+            strrpos($signHolder, 'IN') !== false
             ||
             strrpos($signHolder, 'IS NULL') !== false
             ||
-            strrpos($signHolder, 'IS NOT NULL') !== false 
+            strrpos($signHolder, 'IS NOT NULL') !== false
             ||
             $signHolder == ''
         ) {
@@ -179,8 +183,9 @@ class StatementBuilder
         else {
 
             // a) when with > or < 
-            if (strpos($signHolder, '<') !== false 
-                || 
+            if (
+                strpos($signHolder, '<') !== false
+                ||
                 strpos($signHolder, '>') !== false
             ) {
                 $sql .= "{$column} {$signHolder}";
@@ -197,8 +202,11 @@ class StatementBuilder
         return $sql;
     }
 
-    public static function generateBindedClauses($column, $sign, $index)
-    {
+    public static function generateBindedClauses(
+        string $column,
+        string $sign,
+        $index
+    ): string {
         $sql = "";
 
         // Если колонка будет указана с именеем таблицы через `.`
@@ -212,19 +220,19 @@ class StatementBuilder
         return $sql;
     }
 
-    public static function where(string &$sql, array $params)
+    public static function where(string &$sql, array $params): void
     {
         StatementParamValidator::where($params);
 
         self::clause($sql, $params, "WHERE");
     }
 
-    public static function having(string &$sql, array $params)
+    public static function having(string &$sql, array $params): void
     {
         self::clause($sql, $params, "HAVING");
     }
 
-    public static function group(string &$sql, array $group)
+    public static function group(string &$sql, array $group): void
     {
         if (isset($group) && !empty($group)) {
             $sql .= "\n";
@@ -240,22 +248,22 @@ class StatementBuilder
         }
     }
 
-    public static function order(string &$sql, array|null $order)
+    public static function order(string &$sql, array|null $order): void
     {
         if (isset($order)) {
-
             $sql .= "\n";
             $sql .= "ORDER BY";
 
             foreach ($order as $param) {
                 $sql .= " $param,";
             }
+
             $sql = substr($sql, 0, -1);
             $sql .= "\n";
         }
     }
 
-    public static function limit(string &$sql, $limit)
+    public static function limit(string &$sql, $limit): void
     {
         if (isset($limit)) {
             $sql .= "\n";
@@ -265,7 +273,7 @@ class StatementBuilder
         }
     }
 
-    public static function offset(string &$sql, $offset)
+    public static function offset(string &$sql, $offset): void
     {
         if (isset($offset)) {
             $sql .= "\n";
@@ -275,18 +283,19 @@ class StatementBuilder
         }
     }
 
-    public static function set(string &$sql, $set)
+    public static function set(string &$sql, array $set): void
     {
         $sql .= " ";
-        $sql .= "SET ";
+        $sql .= "SET";
+        $sql .= " ";
 
         foreach ($set as $index => $data) {
             $col = $data[0];
             $val = $data[1] ?? "";
 
-            # With backticks
+            // With backticks
             if (Sql::startsWithBacktick($val)) {
-                # delete backticks
+                // delete backticks
                 $valClean = preg_replace('/`/', '', $val);
 
                 $sql .= "$col = $valClean";
@@ -294,15 +303,16 @@ class StatementBuilder
                 $sql .= " ";
             }
 
-            # Without backticks
+            // Without backticks
             else {
                 $sql .= "{$col} = :{$col}{$index}";
                 $sql .= ",";
-                $sql .= " "; # required
+                $sql .= " "; // required
             }
         }
 
-        $sql = substr($sql, 0, -2); # Deleting last comma and space
+        // Delete last comma and space
+        $sql = substr($sql, 0, -2);
     }
 
     public static function insert(string &$sql, array $insert, string $table)
