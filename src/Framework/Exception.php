@@ -13,7 +13,7 @@ class Exception extends \Exception
         string $message,
         string $type = "error",
         string $object = "php",
-        int $code = 0,
+        int|string $code = 0,
         $previous = NULL
     ) {
         parent::__construct($message, intval($code), $previous);
@@ -33,8 +33,6 @@ class Exception extends \Exception
     }
 
     /**
-     * PDO
-     * 
      * Returns an exception based on PDOException
      * 
      * ```php
@@ -46,7 +44,7 @@ class Exception extends \Exception
      */
     public static function PDO(PDOException $e, $sql)
     {
-        $own = new Exception(
+        $exception = new Exception(
             $e->getMessage() . PHP_EOL . PHP_EOL . $sql . PHP_EOL . PHP_EOL,
             "error",
             "db",
@@ -54,6 +52,6 @@ class Exception extends \Exception
             $e->getPrevious()
         );
 
-        return $own;
+        return $exception;
     }
 }
