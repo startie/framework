@@ -53,23 +53,34 @@ class StatementBuilder
         StatementParamValidator::join($join);
 
         $sql .= " ";
+
         if (isset($join)) {
             foreach ($join as $tableName => $joinParams) {
-                if (isset($joinParams[2])) {
-                    $joinType = strtoupper($joinParams[2]);
-                } else {
-                    $joinType = "INNER";
-                }
-                $sql .= "$joinType JOIN ";
-                $sql .= $tableName;
-                $sql .= " ON";
-                $sql .= " $joinParams[0] = $joinParams[1]";
+                $joinType = $joinParams[2] ?? NULL;
+                $joinType = self::resolveJoinType($joinType);
+                
+                $leftColumn = $joinParams[0];
+                $rightColumn = $joinParams[1];
+
+                $sql .= "$joinType JOIN $tableName ON $leftColumn = $rightColumn";
                 $sql .= "\n";
             }
+
             $sql .= "\n";
             $sql .= "\n";
             $sql .= " ";
         }
+    }
+
+    public static function resolveJoinType($joinType)
+    {
+        if (!is_null($joinType)) {
+            $joinType = strtoupper($joinType);
+        } else {
+            $joinType = "INNER";
+        }
+
+        return $joinType;
     }
 
     /**
