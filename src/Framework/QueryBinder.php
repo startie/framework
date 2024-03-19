@@ -242,7 +242,7 @@ class QueryBinder
     public static function replacePlaceholdersForDump1(
         string $sql,
         string $bindExpr,
-        string $value,
+        int|string $value,
     ): string {
         $sql = str_replace($bindExpr, '"' . $value . '"', $sql);
 
@@ -253,7 +253,7 @@ class QueryBinder
     public static function replacePlaceholdersForDump2(
         string $sql,
         string $bindExpr,
-        string $value,
+        int|string $value,
     ): string {
         $replace = '"' . $value . '"';
         $pos = strpos($sql, $bindExpr);

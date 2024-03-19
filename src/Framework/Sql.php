@@ -40,7 +40,10 @@ class Sql
      */
     public static function startsWithBacktick($val)
     {
-        if (strpos($val ?? '', '`') === 0) {
+        $val = $val ?? '';
+        $val = strval($val);
+
+        if (strpos($val, '`') === 0) {
             return true;
         } else {
             return false;
