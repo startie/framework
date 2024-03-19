@@ -14,7 +14,21 @@ final class SqlTest extends TestCase
         $this->assertSame($sql, "`count`");
     }
 
-    public function test_startsWithBacktick(): void
+    public function test_has_backtick(): void
+    {
+        $result = Sql::hasBacktick("`count`");
+
+        $this->assertSame($result, true);
+    }
+
+    public function test_has_not_backtick(): void
+    {
+        $result = Sql::hasBacktick("count");
+
+        $this->assertSame($result, false);
+    }
+
+    public function test_starts_with_backtick(): void
     {
         $result = Sql::startsWithBacktick("`count`");
 
