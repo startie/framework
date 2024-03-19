@@ -212,6 +212,8 @@ class Model
 		} catch (PDOException $e) {
 			throw Exception::PDO($e, $sql);
 		}
+
+		return [];
 	}
 
 	/**
