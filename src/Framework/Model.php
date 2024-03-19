@@ -182,8 +182,13 @@ class Model
 		#
 		#	Bind
 
-		QueryBinder::clause($sth, $sql, $where ?? NULL);
-		QueryBinder::clause($sth, $sql, $having ?? NULL);
+		if (isset($where)) {
+			QueryBinder::clause($sth, $sql, $where);
+		}
+
+		if (isset($having)) {
+			QueryBinder::clause($sth, $sql, $having);
+		}
 
 		#
 		#	Debug
@@ -264,8 +269,14 @@ class Model
 		#	Bind
 
 		QueryBinder::set($sth, $sql, $set);
-		QueryBinder::clause($sth, $sql, $where ?? NULL);
-		QueryBinder::clause($sth, $sql, $having ?? NULL);
+
+		if (isset($where)) {
+			QueryBinder::clause($sth, $sql, $where);
+		}
+
+		if (isset($having)) {
+			QueryBinder::clause($sth, $sql, $having);
+		}
 
 		#
 		#	Debug

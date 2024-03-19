@@ -112,6 +112,8 @@ class QueryBinder
         foreach ($clause as $column => $columnValuesArr) {
             foreach ($columnValuesArr as $i => $data) {
                 $signAndValue = $data[0] ?? '';
+                $signAndValue = strval($signAndValue);
+                
                 $type = $data[1] ?? NULL;
 
                 // If type exists
