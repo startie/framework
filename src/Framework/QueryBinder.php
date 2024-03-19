@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Startie;
 
 use Startie\Sql;
-use PDO;
+use PDOStatement;
 
 class QueryBinder
 {
