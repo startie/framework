@@ -75,27 +75,30 @@ final class QueryBinderTest extends TestCase
 
     public function test_fix_validate_str_uppercase_type(): void
     {
+        $column = "id";
         $rawType = "STR";
 
-        $validatedType = QueryBinder::validateType($rawType);
+        $validatedType = QueryBinder::validateType($rawType, $column);
 
         $this->assertSame($validatedType, "STR");
     }
 
     public function test_fix_validate_str_type(): void
     {
+        $column = "id";
         $rawType = "str";
 
-        $validatedType = QueryBinder::validateType($rawType);
+        $validatedType = QueryBinder::validateType($rawType, $column);
 
         $this->assertSame($validatedType, "STR");
     }
 
     public function test_fix_validate_unknown_type(): void
     {
+        $column = "id";
         $this->expectException(\Startie\Exception::class);
         $rawType = "unknown";
         
-        QueryBinder::validateType($rawType);
+        QueryBinder::validateType($rawType, $column);
     }
 }

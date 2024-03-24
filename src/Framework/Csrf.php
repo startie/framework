@@ -94,21 +94,23 @@ class Csrf
 
 	public static function clean(): void
 	{
-		foreach ($_SESSION['csrf'] as $u => $urlConfigs) {
-			// If we have URL with no congigs
-			if (empty($urlConfigs)) {
-				// ... clear it
-				unset($_SESSION['csrf'][$u]);
-			}
+		if (isset($_SESSION['csrf'])) {
+			foreach ($_SESSION['csrf'] as $u => $urlConfigs) {
+				// If we have URL with no congigs
+				if (empty($urlConfigs)) {
+					// ... clear it
+					unset($_SESSION['csrf'][$u]);
+				}
 
-			// Otherwise find some expired configs for URL
-			else {
-				foreach ($urlConfigs as $c => $urlConfig) {
-					$now = new DateTime();
-					$expiresAt = $urlConfig['expiresAt'];
+				// Otherwise find some expired configs for URL
+				else {
+					foreach ($urlConfigs as $c => $urlConfig) {
+						$now = new DateTime();
+						$expiresAt = $urlConfig['expiresAt'];
 
-					if ($now > $expiresAt) {
-						unset($_SESSION['csrf'][$u][$c]);
+						if ($now > $expiresAt) {
+							unset($_SESSION['csrf'][$u][$c]);
+						}
 					}
 				}
 			}

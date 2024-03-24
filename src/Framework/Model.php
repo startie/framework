@@ -444,6 +444,8 @@ class Model
 	 * 		'column' => [['value', 'TYPE']]
 	 * ]);
 	 * ```
+	 * 
+	 * @deprecated 0.30.10
 	 */
 	public static function where(
 		$where,
@@ -513,6 +515,16 @@ class Model
 	#
 	#
 
+	/*
+		Return an array of columns
+		[
+			['columnName', 'columnValue', 'valueType'],
+			['columnName', 'columnValue', 'valueType'],
+			['columnName', 'columnValue', 'valueType'],
+		]
+		
+		Подойдёт для вставки в методы create и update
+	*/
 	public static function rows($exceptions = NULL)
 	{
 		$rows = [];
@@ -554,17 +566,6 @@ class Model
 
 			unset($fieldType);
 		}
-
-		/*
-			Return an array of columns
-			[
-				['columnName', 'columnValue', 'valueType'],
-				['columnName', 'columnValue', 'valueType'],
-				['columnName', 'columnValue', 'valueType'],
-			]
-			
-			Подойдёт для вставки в методы create и update
-		*/
 
 		return $rows;
 	}

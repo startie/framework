@@ -28,7 +28,7 @@ class QueryBinder
                 // Bind type
                 if (!Sql::startsWithBacktick($value)) {
                     if (!is_null($type)) {
-                        self::validateType($type);
+                        self::validateType($type, $column);
 
                         $typeConst = constant(
                             'PDO::PARAM_' . mb_strtoupper($type)
@@ -70,7 +70,7 @@ class QueryBinder
                 // Bind type
                 if (!Sql::startsWithBacktick($value)) {
                     if (!is_null($type)) {
-                        $type = self::validateType($type);
+                        $type = self::validateType($type, $column);
 
                         $typeConst = constant(
                             'PDO::PARAM_' . mb_strtoupper($type)
@@ -118,7 +118,7 @@ class QueryBinder
 
                 // If type exists
                 if (!is_null($type)) {
-                    $type = self::validateType($type);
+                    $type = self::validateType($type, $column);
 
                     $valueFiltered = preg_replace(
                         '/[><=!]/i',
@@ -234,12 +234,15 @@ class QueryBinder
     /**
      * @tested
      */
-    public static function validateType(string $type)
+    public static function validateType(string $type, $column)
     {
         $type = self::fixType($type);
 
         if (!self::isValidType($type)) {
-            throw new \Startie\Exception("$type is not valid for query binder");
+            throw new \Startie\Exception(
+                "$type is not valid for query binder"
+                . ". Debug info: column is `" . $column . "`"
+            );
         } else {
             return $type;
         }
@@ -249,7 +252,7 @@ class QueryBinder
     public static function replacePlaceholdersForDump1(
         string $sql,
         string $placeholder,
-        int|string $value,
+        int|string|null $value,
     ): string {
         $sql = str_replace($placeholder, '"' . $value . '"', $sql);
 
@@ -260,7 +263,7 @@ class QueryBinder
     public static function replacePlaceholdersForDump2(
         string $sql,
         string $placeholder,
-        int|string $value,
+        int|string|null $value,
     ): string {
         $replace = '"' . $value . '"';
         $pos = strpos($sql, $placeholder);

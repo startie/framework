@@ -128,10 +128,22 @@ class Input
 			$SanitizeType = self::$config['SanitizeTypeDefault'];
 		};
 
-		$result = call_user_func(
-			'Startie\Sanitize::' . $SanitizeType,
-			$glob[$var] ?? NULL
-		);
+		$value = $glob[$var] ?? NULL;
+
+		// if (is_array($value) && $glob === $_GET) {
+		// 	$result = "";
+		// 	foreach ($value as $item) {
+		// 		$result .= call_user_func(
+		// 			'Startie\Sanitize::' . $SanitizeType,
+		// 			$item
+		// 		);
+		// 	}
+		// } else {
+			$result = call_user_func(
+				'Startie\Sanitize::' . $SanitizeType,
+				$value
+			);
+		// }
 
 		return $result;
 	}
@@ -173,6 +185,7 @@ class Input
 	public static function get($var, $SanitizeType)
 	{
 		self::requireBoot();
+
 		return self::g($var, $SanitizeType, $_GET);
 	}
 
