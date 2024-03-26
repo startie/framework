@@ -67,6 +67,13 @@ class Sql
         );
     }
 
+    public static function isNotNull()
+    {
+        return Sql::q(
+            'IS NOT NULL'
+        );
+    }
+
     /**
      * @tested
      */
