@@ -63,7 +63,7 @@ class QueryBinder
             foreach ($insert as $i => $data) {
                 $column = $data[0];
                 $value = $data[1] ?? NULL;
-                $type = $data[2] ?? "NULL";
+                $type = $data[2] ?? NULL;
 
                 $placeholder = StatementBuilder::generatePlaceholder($column);
 
