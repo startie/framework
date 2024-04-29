@@ -28,9 +28,8 @@ class Template
                 if (is_array($value)) {
                     $valueAsExport = var_export($value, true);
                     throw new \Startie\Exception(
-                        "Value passed to the template `$templatePath`"
-                            . " can not be an array. "
-                            . "It should be a string."
+                        "One of the values passed to the template `$templatePath`"
+                            . " is an array, but expected a string."
                     );
                 }
                 return htmlspecialchars($value, ENT_COMPAT, 'UTF-8');
