@@ -4,38 +4,45 @@ namespace Startie;
 
 use Mustache_Engine;
 use Mustache_Loader_FilesystemLoader;
+
 use Startie\Input;
+use Startie\Url;
 
 class Template
 {
     public static function r($templatePath, $data, $csrf = NULL)
     {
-        #
-        #   Initialize Mustache
+        /*
+            Initialize Mustache engine
+        */
 
-        $mustache = new Mustache_Engine(array(
+        $mustache = new Mustache_Engine([
             'pragmas' => [Mustache_Engine::PRAGMA_BLOCKS],
-            'loader' => new Mustache_Loader_FilesystemLoader(BACKEND_DIR . "Templates/", [
-                'extension' => '.mst'
-            ]),
-            'escape' => function ($value) {
+            'loader' => new Mustache_Loader_FilesystemLoader(
+                BACKEND_DIR . "Templates/",
+                [
+                    'extension' => '.mst'
+                ]
+            ),
+            'escape' => function ($value) use ($templatePath, $data) {
                 if (is_array($value)) {
-                    $value = var_export($value, true);
+                    $valueAsExport = var_export($value, true);
                     throw new \Startie\Exception(
-                        "Value passed to the template can't be an array: $value"
+                        "Value passed to the template `$templatePath`"
+                            . " can not be an array. "
+                            . "It should be a string."
                     );
                 }
                 return htmlspecialchars($value, ENT_COMPAT, 'UTF-8');
             },
-        ));
+        ]);
 
-        #
-        #   Csrf protection
+        /*
+            CSRF protection
+        */
 
-        if ($csrf == 'csrf') {
-
-            # Get current url
-
+        if ($csrf === 'csrf') {
+            // Get current url
             if (Input::is('POST', 'csrfUrl')) {
                 $url = Input::post('csrfUrl', 'STR');
                 $url = str_replace(Url::app(), "", $url);
@@ -43,16 +50,13 @@ class Template
                 $url = Input::get('url', 'STR');
             }
 
-            # Get configs for this url
-
+            // Get configs for this url
             $configs = $_SESSION['csrf'][$url];
 
-            # Get id of last config
-
+            // Get id of last config
             $cnt = count($configs) - 1;
 
-            # Get config and assign its value to 'csrfToken' field in form
-
+            // Get config and assign its value to 'csrfToken' field in form
             $data['csrfToken'] = $configs[$cnt]['token'];
 
             if (Input::is('POST', 'csrfUrl')) {
@@ -60,20 +64,24 @@ class Template
             }
         }
 
-        /**
-         * Texts
-         */
+        /*
+            Texts
+        */
 
         global $t;
         $data['t'] = $t;
 
-        #
-        #   Render
+        /*
+            Render
+        */
 
         $template = $mustache->loadTemplate($templatePath);
         return $template->render($data);
     }
 
+    /**
+     * Alias 
+     */
     public static function render($templatePath, $data, $csrf = NULL)
     {
         echo self::r($templatePath, $data, $csrf);
