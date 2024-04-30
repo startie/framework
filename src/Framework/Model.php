@@ -225,6 +225,7 @@ class Model
 	 */
 	public static function update($params): int
 	{
+		$calledModelClass = get_called_class();
 		#
 		#	Vars
 
@@ -247,18 +248,18 @@ class Model
 
 		$sql = "";
 
-		$table = str_replace("Models\\", "", get_called_class());
+		$table = str_replace("Models\\", "", $calledModelClass);
 		$sql .= StatementBuilder::update($table);
 
 		$set = $insert ?? $fields ?? $set;
-
+		
 		StatementBuilder::set($sql, $set);
 		StatementBuilder::where($sql, $where);
 
 		#
 		#	Debug
 
-		Db::debug($debug, "Debugging '" . get_called_class() . "' model");
+		Db::debug($debug, "Debugging `{$calledModelClass}` model");
 		Db::debugStart($debug, $params);
 
 		#
@@ -276,7 +277,9 @@ class Model
 
 		$sqlBeforeBinding = $sql;
 
-		QueryBinder::set($sth, $sql, $set);
+		$columnTypes = $calledModelClass::$columnTypes ?? [];
+
+		QueryBinder::set($sth, $sql, $set, $columnTypes);
 
 		if (isset($where)) {
 			QueryBinder::clause($sth, $sql, $where);

@@ -69,6 +69,24 @@ final class QueryBinderTest extends TestCase
         $this->assertSame($validationResult, false);
     }
 
+    public function test_int_is_valid_type(): void
+    {
+        $rawType = "INT";
+
+        $validationResult = QueryBinder::isValidType($rawType);
+
+        $this->assertSame($validationResult, true);
+    }
+
+    public function test_null_is_valid_type(): void
+    {
+        $rawType = "NULL";
+
+        $validationResult = QueryBinder::isValidType($rawType);
+
+        $this->assertSame($validationResult, true);
+    }
+
     /*
         validateType
     */

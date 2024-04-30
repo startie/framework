@@ -333,8 +333,10 @@ class StatementBuilder
     }
 
     // TODO: test
-    public static function set(string &$sql, array $set): void
-    {
+    public static function set(
+        string &$sql,
+        array $set
+    ): void {
         $sql .= " ";
         $sql .= "SET";
         $sql .= " ";

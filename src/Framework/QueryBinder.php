@@ -13,17 +13,39 @@ class QueryBinder
     public static function set(
         PDOStatement &$sth,
         string &$sql,
-        array $set
+        array $set,
+        array $columnTypes = [],
     ): array {
         $log = [];
 
         if (isset($set)) {
             foreach ($set as $i => &$data) {
                 $column = $data[0];
-                $value = $data[1] ?? "";
-                $type = $data[2] ?? NULL;
+                /*
+                    Set NULL in case of values was not passed.
+                    
+                    Earlier NULL was replaced with "" but in case of DATE type 
+                    it leads to DBMS stopped working.
+                */
+                $value = $data[1] ?? NULL;
+                $type = $data[2] ?? $columnTypes[$column] ?? NULL;
 
-                $placeholder = StatementBuilder::generatePlaceholder($column, $i);
+                /*
+                    Nullable check
+                */
+
+                $typeIsNullable = str_ends_with($type ?? "", "|NULL");
+                if ($typeIsNullable) {
+                    $type = str_replace("|NULL", "", $type);
+                }
+                if (($value === NULL) && $typeIsNullable) {
+                    $type = "NULL";
+                }
+
+                $placeholder = StatementBuilder::generatePlaceholder(
+                    $column,
+                    $i
+                );
 
                 // Bind type
                 if (!Sql::startsWithBacktick($value)) {
@@ -55,15 +77,34 @@ class QueryBinder
     public static function insert(
         PDOStatement &$sth,
         string &$sql,
-        array $insert
+        array $insert,
+        array $columnTypes = [],
     ): array {
         $log = [];
 
         if (isset($insert)) {
             foreach ($insert as $i => $data) {
                 $column = $data[0];
+                /*
+                    Set NULL in case of values was not passed.
+                    
+                    Earlier NULL was replaced with "" but in case of DATE type 
+                    it leads to DBMS stopped working.
+                */
                 $value = $data[1] ?? NULL;
-                $type = $data[2] ?? NULL;
+                $type = $data[2] ?? $columnTypes[$column] ?? NULL;
+
+                /*
+                    Nullable check
+                */
+                
+                $typeIsNullable = str_ends_with($type ?? "", "|NULL");
+                if ($typeIsNullable) {
+                    $type = str_replace("|NULL", "", $type);
+                }
+                if (($value === NULL) && $typeIsNullable) {
+                    $type = "NULL";
+                }
 
                 $placeholder = StatementBuilder::generatePlaceholder($column);
 
@@ -113,7 +154,7 @@ class QueryBinder
             foreach ($columnValuesArr as $i => $data) {
                 $signAndValue = $data[0] ?? '';
                 $signAndValue = strval($signAndValue);
-                
+
                 $type = $data[1] ?? NULL;
 
                 // If type exists
@@ -127,7 +168,8 @@ class QueryBinder
                     );
 
                     $placeholder = StatementBuilder::generatePlaceholder(
-                        $column, $i
+                        $column,
+                        $i
                     );
 
                     $log[] = "Have type. "
@@ -137,7 +179,8 @@ class QueryBinder
                     $columnFiltered = str_replace('.', '', $column);
 
                     $placeholder =  StatementBuilder::generatePlaceholder(
-                        $columnFiltered, $i
+                        $columnFiltered,
+                        $i
                     );
 
                     $typeConst = constant(
@@ -218,13 +261,13 @@ class QueryBinder
     }
 
     /**
-     * Strictly validate for PDO::PARAM_INT and PDO::PARAM_STR
+     * Strictly validate for PDO::PARAM_INT, PDO::PARAM_STR, PDO::PARAM_NULL
      * 
      * @tested
      */
     public static function isValidType(string $type): bool
     {
-        if (in_array($type, ['INT', 'STR'])) {
+        if (in_array($type, ['INT', 'STR', 'NULL'])) {
             return true;
         } else {
             return false;
@@ -241,7 +284,7 @@ class QueryBinder
         if (!self::isValidType($type)) {
             throw new \Startie\Exception(
                 "$type is not valid for query binder"
-                . ". Debug info: column is `" . $column . "`"
+                    . ". Debug info: column is `" . $column . "`"
             );
         } else {
             return $type;
