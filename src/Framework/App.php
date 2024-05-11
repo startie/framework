@@ -19,8 +19,6 @@ class App
         */
 
         $constantsPath = App::path("backend/Config/Common/App.php");
-        var_dump($root);
-        die();
         if (file_exists($constantsPath)) {
             require $constantsPath;
         } else {
