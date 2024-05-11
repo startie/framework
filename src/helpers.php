@@ -2,7 +2,7 @@
 
 use Startie\Dump;
 
-function dd($result, $msg, $trace)
+function dd($result = NULL, $msg = NULL, $trace = NULL)
 {
     Dump::made($result, $msg, $trace);
 }
