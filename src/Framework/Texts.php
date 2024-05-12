@@ -56,6 +56,9 @@ class Texts
 			Register utils 
 		*/
 
+		/**
+		 * @deprecated Delete all namespaced imports, use global helper
+		 */
 		function t(string $str = "", string $fallback = "")
 		{
 			global $t;

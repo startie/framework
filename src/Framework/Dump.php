@@ -14,8 +14,7 @@ class Dump
     {
         self::$isBooted = true;
 
-        # Load property
-
+        // Load access property
         if ($callback) {
             self::$hasAccess = $callback();
         } else {
@@ -37,12 +36,9 @@ class Dump
         echo "</pre>";
     }
 
-    #
-    #   1. 
-    #   a) For JS network console
-    #   b) For PHP console
-    #
-
+    /**
+     * For browser network debugging and PHP console
+     */
     public static function __pre($var, $msg = "")
     {
         self::requireBoot();
@@ -52,6 +48,9 @@ class Dump
         }
     }
 
+    /**
+     * For browser network debugging and PHP console
+     */
     public static function __make($result, $die = 0, $msg = "", $trace = 0)
     {
         self::requireBoot();
@@ -64,6 +63,9 @@ class Dump
         }
     }
 
+    /**
+     * For browser network debugging and PHP console
+     */
     public static function __made($result, $msg = "", $trace = 0)
     {
         self::requireBoot();
@@ -71,10 +73,9 @@ class Dump
         die();
     }
 
-    #
-    #   For simple debug
-    #
-
+    /**
+     * For a simple debugging
+     */
     public static function _pre($var, $msg = "")
     {
         self::requireBoot();
@@ -86,6 +87,9 @@ class Dump
         }
     }
 
+    /**
+     * For a simple debugging
+     */
     public static function _make($result, $die = 0, $msg = "", $trace = 0)
     {
         self::requireBoot();
@@ -105,6 +109,9 @@ class Dump
         }
     }
 
+    /**
+     * For a simple debugging
+     */
     public static function _made($result, $msg = "", $trace = 0)
     {
         self::requireBoot();
@@ -113,7 +120,7 @@ class Dump
     }
 
     /**
-     * For complex debugging
+     * For a complex debugging
      */
     public static function pre($var, $msg = "")
     {
@@ -126,12 +133,17 @@ class Dump
         }
     }
 
+    /**
+     * For a complex debugging
+     * 
+     * TODO: remove vscode openning hardcode
+     */
     public static function make($result, $die = 0, $msg = "", $trace = 0)
     {
         self::requireBoot();
         $backTrace = "";
-        $backTrace .= "<mark>";
 
+        $linkStyles = "font-size: 15px; line-height: 22px";
         $backTraceArr = debug_backtrace();
         $backTraceArr = array_reverse($backTraceArr);
         for ($i = 0; $i < count($backTraceArr); $i++) {
@@ -143,12 +155,19 @@ class Dump
             ) {
                 $line = $backTraceArr[$i]['line'] ?? 0;
                 $file = $backTraceArr[$i]['file'] ?? "";
-                $backTrace .= "[$line]";
-                $backTrace .= "\t{$file}\n";
+                if ($file !== "") {
+                    $path = "";
+                    $path .= "{$file}";
+                    $path .= ":$line";
+                    $url = "vscode://file$path";
+
+                    $backTrace .= "<a style='$linkStyles' href='$url'>";
+                    $backTrace .= $path;
+                    $backTrace .= "</a>";
+                    $backTrace .= "\n";
+                }
             }
         }
-
-        $backTrace .= "</mark>";
 
         if (self::hasAccess()) {
             Dump::pre($result, $msg . $backTrace);
@@ -159,6 +178,9 @@ class Dump
         }
     }
 
+    /**
+     * For a complex debugging
+     */
     public static function made($result, $msg = "", $trace = 0)
     {
         self::requireBoot();
@@ -166,6 +188,9 @@ class Dump
         die();
     }
 
+    /**
+     * Start debugging with the openning for <pre>
+     */
     public static function start($var)
     {
         self::requireBoot();
@@ -176,6 +201,9 @@ class Dump
         }
     }
 
+    /**
+     * Continue debugging
+     */
     public static function next($var)
     {
         self::requireBoot();
@@ -185,6 +213,9 @@ class Dump
         }
     }
 
+    /**
+     * End debugging
+     */
     public static function end($var)
     {
         self::requireBoot();
