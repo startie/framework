@@ -27,7 +27,9 @@ class Router
 			$RoutsFiles = scandir($RoutsPath);
 			foreach ($RoutsFiles as $RoutsFile) {
 				if ($RoutsFile !== "." && $RoutsFile !== "..") {
-					$RouteContent = require App::path("backend/Routs/{$RoutsFile}");
+					$RouteContent = require App::path(
+						"backend/Routs/{$RoutsFile}"
+					);
 					$routs = array_merge($RouteContent, $routs);
 				}
 			}
@@ -38,7 +40,9 @@ class Router
 		if (file_exists($ConfigPath)) {
 			$Config = require $ConfigPath;
 			if ($Config == 1) {
-				throw new \Startie\Exception("File $ConfigPath should return an array");
+				throw new \Startie\Exception(
+					"File $ConfigPath should return an array"
+				);
 			} else if (is_array($Config)) {
 				foreach ($Config as $RouteName) {
 					$path = App::path("backend/Routs/$RouteName.php");
@@ -104,19 +108,26 @@ class Router
 
 		# Get 'url' param from apache
 		$url = Php::input('GET', 'url', 'str');
-		
+
 		# Get 'url' param from server request uri
 		if (!$url) {
 			if ($_SERVER['REQUEST_URI'] === "/") {
 				$url = "/";
-			} elseif (str_starts_with($_SERVER['REQUEST_URI'], "/index.php")){
+			} elseif (str_starts_with($_SERVER['REQUEST_URI'], "/index.php")) {
 				header("Location: /");
 			} else {
 				if (strpos($_SERVER['REQUEST_URI'], '?') != false) {
 					$questionMarkPos = strpos($_SERVER['REQUEST_URI'], '?');
-					$url = mb_substr($_SERVER['REQUEST_URI'], 1, $questionMarkPos - 1);
+					$url = mb_substr(
+						$_SERVER['REQUEST_URI'],
+						1,
+						$questionMarkPos - 1
+					);
 				} else {
-					$url = mb_substr($_SERVER['REQUEST_URI'], 1);
+					$url = mb_substr(
+						$_SERVER['REQUEST_URI'],
+						1
+					);
 				}
 
 				//$url = str_replace($url, $_ENV['DOMAIN'], ""); #wtf
@@ -199,12 +210,17 @@ class Router
 							$routePartType = $routePartPieces[1];
 
 							# Check if is it numeric
-							if ($routePartType == 'int' || $routePartType == 'integer' || $routePartType == 'number') {
+							if (
+								$routePartType == 'int'
+								|| $routePartType == 'integer'
+								|| $routePartType == 'number'
+							) {
 								$routePartType = 'numeric';
 							}
 
 							# Form validation procedure
-							$routePartValidateClassMethodExpression = "Startie\Validate::" . $routePartType;
+							$routePartValidateClassMethodExpression
+								= "Startie\Validate::" . $routePartType;
 
 							# Validate url part by "Validate::$routePartType()"
 							$isValid = call_user_func_array(
@@ -289,17 +305,23 @@ class Router
 		/* Content */
 
 		if (!file_exists($route->controllerFilePath)) {
-			throw new \Exception("File on '{$route->controllerFilePath}' doesn't exsists");
+			throw new \Exception(
+				"File on '{$route->controllerFilePath}' doesn't exsists"
+			);
 		} else {
 			require $route->controllerFilePath;
 		}
 
 
 		if (!class_exists($route->controllerNamespacedClass)) {
-			throw new \Exception("Class '{$route->controllerNamespacedClass}' doesn't exsists");
+			throw new \Exception(
+				"Class '{$route->controllerNamespacedClass}' doesn't exsists"
+			);
 		}
 		if (!method_exists($route->controllerNamespacedClass, $route->method)) {
-			throw new \Exception("Controller method '{$route->classMethodExecution}' doesn't exsists");
+			throw new \Exception(
+				"Controller method '{$route->classMethodExecution}' doesn't exsists"
+			);
 		}
 
 		/* If we don't have params */
@@ -311,7 +333,10 @@ class Router
 
 		/* If we have params */
 		if (!empty($controllerParams)) {
-			$content = call_user_func_array("\Controllers\\" . $route->classMethodExecution, [$controllerParams]);
+			$content = call_user_func_array(
+				"\Controllers\\" . $route->classMethodExecution,
+				[$controllerParams]
+			);
 		}
 
 		/* Fill blocks */
@@ -345,11 +370,15 @@ class Router
 		if ($route->type) {
 			$RouteTypeUCFirst = ucfirst(strtolower($route->type));
 
-			$BootstrapPath = App::path("backend/Config/Bootstrap/$RouteTypeUCFirst.php");
+			$BootstrapPath = App::path(
+				"backend/Config/Bootstrap/$RouteTypeUCFirst.php"
+			);
 			if (file_exists($BootstrapPath)) {
 				require $BootstrapPath;
 			} else {
-				throw new \Startie\Exception("Path '$BootstrapPath' is missing");
+				throw new \Startie\Exception(
+					"Path '$BootstrapPath' is missing"
+				);
 			}
 		}
 	}
@@ -365,7 +394,9 @@ class Router
 				if (file_exists($MiddlePath)) {
 					require $MiddlePath;
 				} else {
-					throw new \Startie\Exception("Path '$MiddlePath' is missing");
+					throw new \Startie\Exception(
+						"Path '$MiddlePath' is missing"
+					);
 				}
 			}
 		};
@@ -378,7 +409,7 @@ class Router
 	 * TODO: test
 	 */
 	public static function getPathParts(string $path): array
-	{		
+	{
 		$path = rtrim($path, '/');
 
 		$parts = explode('/', $path);
@@ -409,21 +440,29 @@ class Router
 		$ConfigRouterPagesPath = App::path("backend/Config/Router/Pages.php");
 
 		if (file_exists($ConfigRouterPagesPath)) {
-			$ConfigRouterPages = require App::path("backend/Config/Router/Pages.php");
+			$ConfigRouterPages = require App::path(
+				"backend/Config/Router/Pages.php"
+			);
 
 			if (isset($ConfigRouterPages[$code])) {
 				if (isset($ConfigRouterPages[$code]['view'])) {
 					$view = $ConfigRouterPages[$code]['view'];
 				} else {
-					throw new \Startie\Exception("View for '$code' error not found");
+					throw new \Startie\Exception(
+						"View for '$code' error not found"
+					);
 				}
 			} else {
-				throw new \Startie\Exception("Configuration for '$code' not found");
+				throw new \Startie\Exception(
+					"Configuration for '$code' not found"
+				);
 			}
 
 			echo View::r($view);
 		} else {
-			throw new \Startie\Exception("Error page for code '$code' is not cofigured in 'backend/Config/Router/Pages.php'");
+			throw new \Startie\Exception(
+				"Error page for code '$code' is not cofigured in 'backend/Config/Router/Pages.php'"
+			);
 		}
 	}
 }

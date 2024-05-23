@@ -16,10 +16,7 @@ class Logger
     {
         self::$config = \Startie\Config::get("Logs");
 
-        /*
-            Check storage type
-        */
-
+        // Check storage type
         switch (self::$config['storage']['type']) {
             case "db":
                 break;

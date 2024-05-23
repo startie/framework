@@ -33,10 +33,15 @@ class Route
         $this->method = explode("::", $signature)[1];
 
         //$this->classMethodExecution = "{$this->class}_Controller::" . strtolower($this->method);
-        $this->classMethodExecution = "{$this->class}_Controller::{$this->method}";
-        $this->classFull = "{$this->class}_Controller";
-        $this->controllerNamespacedClass = "\Controllers\\{$this->classFull}";
+        $this->classMethodExecution
+            = "{$this->class}_Controller::{$this->method}";
 
-        $this->controllerFilePath = App::path("backend/Controllers/{$this->classFull}.php");
+        $this->classFull = "{$this->class}_Controller";
+
+        $this->controllerNamespacedClass
+            = "\Controllers\\{$this->classFull}";
+
+        $this->controllerFilePath
+            = App::path("backend/Controllers/{$this->classFull}.php");
     }
 }

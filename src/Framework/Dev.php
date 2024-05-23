@@ -7,11 +7,6 @@ class Dev
 	public static $start = 0;
 	public static $stop = 0;
 
-	#
-	#	Vars:
-	# 	$global – global's name (string)
-	#
-
 	public static function start()
 	{
 		static::$start = 0;
@@ -27,6 +22,9 @@ class Dev
 		echo "<br>";
 	}
 
+	/**
+	 * @param array $global Global array
+	 */
 	public static function renderGlobal($global)
 	{
 		ksort($global, SORT_NATURAL | SORT_FLAG_CASE);

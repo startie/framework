@@ -4,11 +4,12 @@ namespace Startie;
 
 class Dropzone
 {
-	#
-	#	It takes entity, adds to it some data-params for requests,
-	#	then it takes images of this entity and also adds  some data-params to them.
-	#
-
+	/**
+	 * Takes an entity, adds some data-params to it for requests,
+	 * then it takes images of this entity and also adds  some data-params to them.
+	 * 
+	 * TODO: create `::initParams()` like `::initImages()`
+	 */
 	public static function init(
 		$e,
 		$class,
@@ -16,13 +17,7 @@ class Dropzone
 		$imagesIndex,
 		$imagesParams
 	) {
-		#	(1) $e
-
-		#	(2) class
-
 		$e['Dropzone']['class'] = $class;
-
-		# 	(3) dropzone params
 
 		$e['Dropzone']['params'] = [];
 		$paramsStr = "";
@@ -30,15 +25,12 @@ class Dropzone
 			$dataName = strtolower($param[0]);
 			$dataValue = $e[$param[1]];
 			$paramsStr .= "data-$dataName='$dataValue'";
-			$paramsStr .= " "; # spacing between data params
+			// spacing between data params
+			$paramsStr .= " ";
 		}
 		$e['Dropzone']['params'] = $paramsStr;
 
-		# 	(4, 5) images params
-
 		$e[$imagesIndex] = self::initImages($e[$imagesIndex], $imagesParams);
-
-		# 	return
 
 		return $e;
 	}
@@ -53,7 +45,8 @@ class Dropzone
 				$dataName = strtolower($param[0]);
 				$dataValue = $image[$param[1]];
 				$paramsStr .= "data-$dataName='$dataValue'";
-				$paramsStr .= " "; # spacing between data params
+				// spacing between data params
+				$paramsStr .= " ";
 			}
 			$image['Dropzone']['params'] = $paramsStr;
 		}

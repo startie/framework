@@ -4,8 +4,9 @@ namespace Startie;
 
 class DumpStyle
 {
-    # Source: https://gist.github.com/sunel/5368b7b18a84829b06e4
-
+    /**
+     * Source: https://gist.github.com/sunel/5368b7b18a84829b06e4
+     */
     public static $color = "#005BFF";
     public static $color2 = "#999";
     public static $css = "
@@ -115,7 +116,6 @@ class DumpStyle
      * @param  mixed $var The variable to dump
      * @return string
      */
-
     public static function var_dump_plain($var, $expLevel, $depth = 0, $done = array())
     {
         $html = '';
