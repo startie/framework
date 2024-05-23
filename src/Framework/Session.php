@@ -7,12 +7,11 @@ class Session
     public static function init()
     {
         session_start();
-        //session_destroy();
     }
 
     public static function dump()
     {
-        Dump::make($_SESSION);
+        dd($_SESSION);
     }
 
     public static function is($var)
@@ -30,8 +29,9 @@ class Session
             if (Session::is($var)) {
                 return Input::session($var, $type);
             } else {
-                throw new \Exception("Unable to get session's item '$var', it doesn't exists");
-                //die(); // after throw die is not reachable
+                throw new \Exception(
+                    "Unable to get session's item '$var', it doesn't exists"
+                );
             }
         }
         return $_SESSION;
@@ -42,6 +42,11 @@ class Session
         $_SESSION[$key] = $value;
     }
 
+    public static function push($key, $value)
+    {
+        $_SESSION[$key][] = $value;
+    }
+
     public static function delete($var)
     {
         unset($_SESSION[$var]);
@@ -49,7 +54,7 @@ class Session
 
     public static function view()
     {
-        Dump::make($_SESSION);
+        dump($_SESSION);
     }
 
     public static function destroy()
