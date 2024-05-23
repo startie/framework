@@ -4,15 +4,22 @@ namespace Startie;
 
 class Notify
 {
-	#
-	#	$types = success, info, warning/alert, danger
-	#
-	public static function add($text, $type)
+	/**
+	 * @param string $type Possible values: 
+	 * - 'success'
+	 * - 'info'
+	 * - 'warning' or 'alert'
+	 * - 'danger'
+	 */
+	public static function add(string $text, string $type)
 	{
-		// TODO: why don't work class wrapper – Session
-		$_SESSION['Notify'][] = ['text' => $text, 'type' => $type];
+		$messageData = ['text' => $text, 'type' => $type];
+		Session::push('Notify', $messageData);
 	}
 
+	/**
+	 * Will render a notification
+	 */
 	public static function check()
 	{
 		if (Session::is('Notify')) {
@@ -25,18 +32,18 @@ class Notify
 					Template::render('Notify/Index', $notification);
 				}
 			}
+			unset($notification);
 		}
+
 		Session::delete('Notify');
 	}
 
-	#
-	# 	Params:
-	# 	$params = ['text', 'type']
-	# 	
-	# 	Example:
-	#	::display(['text' => 'Hello', 'type' => 'success']);
-	#
-
+	/**
+	 * @param array $params ['text', 'type']
+	 * 
+	 * Example: 
+	 * `::display(['text' => 'Hello', 'type' => 'success'])`
+	 */
 	public static function display($params)
 	{
 		if (empty($params['type'])) {
