@@ -35,7 +35,7 @@ class Config
 		$path = is_file($path) ? $path : App::path("$pathStart/Common.php");
 		
 		if (!is_file($path)) {
-			throw new Exception("Config path for `$name` was not found" . $path);
+			throw new \Exception("Config path for `$name` was not found" . $path);
 		} else {
 			return require $path;
 		}

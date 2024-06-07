@@ -8,81 +8,73 @@ use Startie\App;
 
 class Texts
 {
-	public static function init()
-	{
-		/*
-			Get current language
-		*/
+	use \Startie\Bootable;
 
+	/**
+	 * Default config
+	 */
+	public static $config = [
+		'autoFallback' => false,
+	];
+
+	public static function loadConfig()
+	{
+		try {
+			$config = Config::get('Texts');
+			self::$config = $config;
+		} catch (\Exception $e) {
+			// Do nothing since config is not required
+		}
+	}
+
+	/**
+	 * Boot is required
+	 */
+	public static function boot()
+	{
+		self::loadConfig();
+
+		// Get current language
 		$LanguageCode = Language::code();
 
-		/*
-			Load texts
-		*/
-
-		$TextsPaths = []; // ['Common/ru', 'Users/ru', ... ]
-
-		/*
-			a) if there is no config: by scanning backend/Texts directory
-		*/
-
-		$ConfigPath = App::path('backend/Config/Texts/Common.php');
-		if (!file_exists($ConfigPath)) {
-			$TextsPath = App::path("backend/Texts/");
-
-			$TextsFiles = scandir($TextsPath);
-			foreach ($TextsFiles as $TextsFile) {
-				if ($TextsFile != "." && $TextsFile != "..") {
-					$TextsPaths[] = "{$TextsFile}/$LanguageCode";
-				}
+		// Load texts from `backend/Texts`
+		$textsPaths = []; // ['Common/ru', 'Users/ru', ... ]
+		$textsPath = App::path("backend/Texts/");
+		$textsFiles = scandir($textsPath);
+		foreach ($textsFiles as $textsFile) {
+			if ($textsFile !== "." && $textsFile !== "..") {
+				$textsPaths[] = "{$textsFile}/$LanguageCode";
 			}
 		}
 
-		/*
-			b) if there is config: by loading config
-		*/
-
-		if (file_exists($ConfigPath)) {
-			$ConfigTexts = require $ConfigPath;
-
-			$TextsPaths = array_map(
-				function ($name) use ($LanguageCode) {
-					return $name . "/$LanguageCode";
-				},
-				$ConfigTexts
-			);
-		}
-		/* 
-			Register utils 
-		*/
-
+		// Register the util
 		/**
-		 * @deprecated Delete all namespaced imports, use global helper
+		 * Short for `translate`
+		 * 
+		 * @deprecated In project delete all namespaced imports, 
+		 * and use global helper
+		 * 
+		 * But don't delete it from source code of a framework
+		 * for backward compatability
 		 */
-		function t(string $str = "", string $fallback = "")
+		function t(string $target = "", string $fallback = "")
 		{
-			global $t;
-			$result = "";
-
-			if ($str === "") {
-				$result = "";
-			} else {
-				$result = $t[$str]
-					?? $t[str_replace(" ", "_", $str)]
-					?? $fallback
-					?? "";
-			}
-
-			return $result;
+			return \Startie\Texts::translate($target, $fallback);
 		}
 
-		/*
-			Collect texts
-		*/
-
-		$t = self::collect($TextsPaths);
-
+		// Collect texts
+		$t = self::collect($textsPaths);
 		$GLOBALS['t'] = $t;
+
+		self::$isBooted = true;
+	}
+
+	/**
+	 * @deprecated Use `boot()`
+	 */
+	public static function init()
+	{
+		self::boot();
 	}
 
 	public static function getPhrase($path, $phrase, $params = [])
@@ -146,5 +138,26 @@ class Texts
 
 			throw new \Startie\Exception("Texts on $fullPath doesn't exists");
 		}
+	}
+
+	public static function translate(string $target = "", string $fallback = "")
+	{
+		if ($fallback === "" && self::$config['autoFallback']) {
+			$fallback = $target;
+		}
+
+		global $t;
+		$result = "";
+
+		if ($target === "") {
+			$result = "";
+		} else {
+			$result = $t[$target]
+				?? $t[str_replace(" ", "_", $target)]
+				?? $fallback
+				?? "";
+		}
+
+		return $result;
 	}
 }

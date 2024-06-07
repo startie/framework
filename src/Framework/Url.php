@@ -237,14 +237,14 @@ class Url
 	 */
 
 	public static function c(
-		string $RouteExpression,
-		$ControllerParams = NULL,
+		string $routeExpression,
+		$controllerParams = NULL,
 		$queryParams = NULL,
 		$arraishQueryParams = false
 	) {
 		return Url::controller(
-			$RouteExpression,
-			$ControllerParams,
+			$routeExpression,
+			$controllerParams,
 			$queryParams,
 			$arraishQueryParams
 		);
@@ -395,6 +395,7 @@ class Url
 	 * Gets title on the url
 	 * 
 	 * Utility method.
+	 * TODO:
 	 */
 	public static function getTitle(string $url): string
 	{

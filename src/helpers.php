@@ -14,17 +14,24 @@ function dd($result = NULL, $msg = NULL, $trace = NULL)
 
 function t(string $str = "", string $fallback = "")
 {
-    global $t;
-    $result = "";
+    return \Startie\Texts::translate($str, $fallback);
+}
 
-    if ($str === "") {
-        $result = "";
-    } else {
-        $result = $t[$str]
-            ?? $t[str_replace(" ", "_", $str)]
-            ?? $fallback
-            ?? "";
-    }
+function v($name, array $data = [], bool $trimSpaces = false)
+{
+    return \Startie\View::r($name, $data, $trimSpaces);
+}
 
-    return $result;
+function url(
+    string $routeExpression,
+    $controllerParams = NULL,
+    $queryParams = NULL,
+    $arraishQueryParams = false
+) {
+    return \Startie\Url::controller(
+        $routeExpression,
+        $controllerParams,
+        $queryParams,
+        $arraishQueryParams
+    );
 }
