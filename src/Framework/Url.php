@@ -4,9 +4,17 @@ namespace Startie;
 
 class Url
 {
+	use \Startie\Bootable;
+
 	public static $ROOT;
 
-	public static function init()
+	public static function boot()
+	{
+		self::$isBooted = true;
+		self::defineConstants();
+	}
+
+	public static function defineConstants()
 	{
 		/* Load */
 
@@ -65,6 +73,8 @@ class Url
 		array|null $fragmentParams = NULL,
 		$arraishQueryParams = false
 	): string {
+		self::requireBoot();
+
 		$url = self::$ROOT . $path;
 
 		$query = "";
@@ -256,6 +266,8 @@ class Url
 	 */
 	public static function current()
 	{
+		self::requireBoot();
+		
 		$url = APP_PROTOCOL . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 		return $url;
 	}
