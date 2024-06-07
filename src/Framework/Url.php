@@ -45,12 +45,9 @@ class Url
 		/* Constants */
 
 		define("APP_PROTOCOL", $protocol);
-
 		define("URL_APP", $protocol . $server . $domain);
 		Url::$ROOT = URL_APP;
-
 		define("PUBLIC_URL", URL_APP . "public/");
-
 		define("STORAGE_URL", URL_APP . "storage/");
 	}
 
@@ -129,7 +126,7 @@ class Url
 		/* Build params */
 
 		if ($params && is_array($params)) {
-			# 1. Parse params as array
+			// 1. Parse params as array
 			$paramsThatAreArrays = [];
 			foreach ($params as $i => &$param) {
 				if (is_array($param)) {
@@ -155,7 +152,7 @@ class Url
 				}
 			}
 
-			# 2. Parse params as simple string
+			// 2. Parse params as simple string
 			else {
 				$result = http_build_query($params);
 			}
@@ -167,31 +164,31 @@ class Url
 	/**
 	 * Url from controller expression
 	 *
-	 * @param  string $RouteExpression
+	 * @param  string $routeExpression
 	 * @param  null|array $ControllerParams
 	 * @param  null|array $queryParams
 	 * @return string
 	 */
-
 	public static function controller(
-		$RouteExpression,
+		$routeExpression,
 		$ControllerParams = NULL,
 		$queryParams = NULL,
 		$arraishQueryParams = false
 	) {
-		$Routs = Router::routes();
 		$foundedUrl = "";
 
-		# Find route config
-		foreach ($Routs as $RouteUrl => $RouteData) {
-			if ($RouteData['controller'] == $RouteExpression) {
-				$foundedUrl = $RouteUrl;
+		$routes = Router::routes();
+
+		// Find route config
+		foreach ($routes as $routeUrl => $routeData) {
+			if ($routeData['controller'] == $routeExpression) {
+				$foundedUrl = $routeUrl;
 			}
 		}
 
-		# If found
+		// If found
 		if ($foundedUrl) {
-			# Find vars of route
+			// Find vars of route
 			$findedVars = [];
 			preg_match_all('/\$[a-zA-Z]*/', $foundedUrl, $findedVars);
 
@@ -221,9 +218,9 @@ class Url
 			return $uri;
 		}
 
-		# If not
+		// If not
 		else {
-			throw new \Exception("Can't find a route for '$RouteExpression'");
+			throw new \Exception("Can't find a route for '$routeExpression'");
 		}
 	}
 
@@ -395,7 +392,7 @@ class Url
 	 * Gets title on the url
 	 * 
 	 * Utility method.
-	 * TODO:
+	 * @deprecated Will be moved to another class, because it is mostly a parser
 	 */
 	public static function getTitle(string $url): string
 	{
@@ -416,6 +413,7 @@ class Url
 
 	/**
 	 * Finalizes url through redirects
+	 * @deprecated Will be moved to another class, because it is mostly a parser
 	 */
 	public static function finalize(string $url, int $maxRequests = 10): string
 	{
