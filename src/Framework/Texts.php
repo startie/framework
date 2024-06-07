@@ -10,20 +10,16 @@ class Texts
 {
 	use \Startie\Bootable;
 
-	/**
-	 * Default config
-	 */
-	public static $config = [
-		'autoFallback' => false,
-	];
-
 	public static function loadConfig()
 	{
 		try {
 			$config = Config::get('Texts');
 			self::$config = $config;
 		} catch (\Exception $e) {
-			// Do nothing since config is not required
+			// Use default config
+			self::$config = [
+				'autoFallback' => false,
+			];
 		}
 	}
 

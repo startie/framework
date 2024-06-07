@@ -17,6 +17,11 @@ function t(string $str = "", string $fallback = "")
     return \Startie\Texts::translate($str, $fallback);
 }
 
+function view($name, array $data = [], bool $trimSpaces = false)
+{
+    return \Startie\View::r($name, $data, $trimSpaces);
+}
+
 function v($name, array $data = [], bool $trimSpaces = false)
 {
     return \Startie\View::r($name, $data, $trimSpaces);

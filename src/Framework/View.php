@@ -12,13 +12,6 @@ class View
 	 */
 	use \Startie\Bootable;
 
-	/**
-	 * Default config
-	 */
-	public static $config = [
-		'trimSpaces' => false
-	];
-
 	public static function boot()
 	{
 		self::loadConfig();
@@ -29,16 +22,21 @@ class View
 	{
 		try {
 			self::$config = Config::get('View');
-		} catch(\Exception $e){
-			// Do nothing since config is not required
+		} catch (\Exception $e) {
+			// Use default config
+			self::$config = [
+				'trimSpaces' => false
+			];
 		}
 	}
 
-	/**
-	 * r - return
-	 */
-	public static function r($name, array $data = [], bool $trimSpaces = false)
-	{
+	public static function return(
+		$name,
+		array $data = [],
+		bool|null $trimSpaces = NULL
+	) {
+		$trimSpaces = $trimSpaces ?? self::$config['trimSpaces'];
+
 		$path = App::path("backend/Views/{$name}.php");
 
 		if (!is_file($path)) {
@@ -52,24 +50,42 @@ class View
 		require($path);
 
 		$content = ob_get_contents();
-
-		/*
-			Fix spaces
-			Experimental, not tested well, there is a risk of spoiling view
-			Requires third paramether as true or config with global setting
-		*/
-
-		if ($trimSpaces || self::$config['trimSpaces']) {
-			$content = str_replace("\n", "", $content);
-			$content = str_replace("\t", "", $content);
-			$content = preg_replace("/ {2,}/m", "", $content);
-		}
+		$content = $trimSpaces ? self::trim($content) : $content;
 
 		ob_end_clean();
 
 		return $content;
 	}
 
+	public static function r(
+		$name,
+		array $data = [],
+		bool|null $trimSpaces = NULL
+	) {
+		return self::return($name, $data, $trimSpaces);
+	}
+
+	/*
+		Fix spaces
+		Experimental, not tested well, there is a risk of spoiling view
+	*/
+	public static function trim($content)
+	{
+		// d($content);
+		$content = str_replace("\n", "", $content);
+		$content = str_replace("\t", "", $content);
+
+		// Delete spaces between the tags
+		$content = preg_replace("/([a-z]>)( +)(<[a-z])/m", "$1$3", $content);
+
+		// dd($content);
+
+		return $content;
+	}
+
+	/**
+	 * @deprecated Use `view()` helper
+	 */
 	public static function render($name, array $data = [])
 	{
 		$path = App::path("backend/Views/{$name}.php");

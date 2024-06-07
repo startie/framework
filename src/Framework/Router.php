@@ -13,9 +13,9 @@ class Router
 	public static float $initializedAt;
 
 	// TODO: test
-	public static function routs()
+	public static function routes()
 	{
-		$routs = [];
+		$routes = [];
 
 		$ConfigPath = App::path("backend/Config/Router/Routs.php");
 
@@ -30,7 +30,7 @@ class Router
 					$RouteContent = require App::path(
 						"backend/Routs/{$RoutsFile}"
 					);
-					$routs = array_merge($RouteContent, $routs);
+					$routes = array_merge($RouteContent, $routes);
 				}
 			}
 		}
@@ -47,12 +47,12 @@ class Router
 				foreach ($Config as $RouteName) {
 					$path = App::path("backend/Routs/$RouteName.php");
 					$RouteContent = require $path;
-					$routs = array_merge($RouteContent, $routs);
+					$routes = array_merge($RouteContent, $routes);
 				}
 			}
 		}
 
-		return $routs;
+		return $routes;
 	}
 
 	// TODO: test
@@ -98,9 +98,9 @@ class Router
 		$findedRouteConfig = [];
 		$controllerParams = [];
 
-		/* Export all routs */
+		/* Export all routes */
 
-		$Routs = Router::routs();
+		$routes = Router::routes();
 
 		#
 		# 	1. Parse url
@@ -149,16 +149,16 @@ class Router
 		$urlPartsCount = count($urlParts);
 
 		#
-		# 	2. Parse routs		
+		# 	2. Parse routes		
 		# 
 
 		$routsParsed = [];
 
 		#
-		#	Set up routs
+		#	Set up routes
 		#
 
-		foreach ($Routs as $url => $config) {
+		foreach ($routes as $url => $config) {
 			$routsParsedUrlParts = Router::getPathParts($url);
 			#Dump::make($routsParsedUrlParts);
 
@@ -271,10 +271,6 @@ class Router
 	// TODO: test
 	public static function render($RouteConfig, $controllerParams)
 	{
-		/* Register utils */
-
-		View::utils();
-
 		/* Route */
 
 		$route = new Route($RouteConfig);
