@@ -35,7 +35,7 @@ class View
 		array $data = [],
 		bool|null $trimSpaces = NULL
 	) {
-		$trimSpaces = $trimSpaces ?? self::$config['trimSpaces'];
+		$trimSpaces = $trimSpaces ?? self::$config['trimSpaces'] ?? false;
 
 		$path = App::path("backend/Views/{$name}.php");
 
