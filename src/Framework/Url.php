@@ -179,7 +179,7 @@ class Url
 		$queryParams = NULL,
 		$arraishQueryParams = false
 	) {
-		$Routs = Router::routs();
+		$Routs = Router::routes();
 		$foundedUrl = "";
 
 		# Find route config
