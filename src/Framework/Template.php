@@ -10,7 +10,7 @@ use Startie\Url;
 
 class Template
 {
-    public static function r($templatePath, $data, $csrf = NULL)
+    public static function return($templatePath, $data, $csrf = NULL)
     {
         /*
             Initialize Mustache engine
@@ -79,10 +79,22 @@ class Template
     }
 
     /**
-     * Alias 
+     * Synonym for `Template::return()`
+     * 
+     * @deprecated Use helper `template()`
+     */
+    public static function r($templatePath, $data, $csrf = NULL)
+    {
+        return self::return($templatePath, $data, $csrf);
+    }
+
+    /**
+     * Shorthand for `Template::return()`
+     * 
+     * @deprecated Use helper `template()`
      */
     public static function render($templatePath, $data, $csrf = NULL)
     {
-        echo self::r($templatePath, $data, $csrf);
+        echo self::return($templatePath, $data, $csrf);
     }
 }

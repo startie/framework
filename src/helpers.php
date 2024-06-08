@@ -40,3 +40,8 @@ function url(
         $arraishQueryParams
     );
 }
+
+function template($templatePath, $data, $csrf = NULL)
+{
+    \Startie\Template::return($templatePath, $data, $csrf);
+}
