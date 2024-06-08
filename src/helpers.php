@@ -43,5 +43,5 @@ function url(
 
 function template($templatePath, $data, $csrf = NULL)
 {
-    \Startie\Template::return($templatePath, $data, $csrf);
+    return \Startie\Template::return($templatePath, $data, $csrf);
 }
