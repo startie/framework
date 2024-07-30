@@ -16,6 +16,8 @@ class Sql
      * Wrap expression in backticks quotes (``) 
      * "q" is short for "quotes"
      * 
+     * Used for raw SQL expressions
+     * 
      * @tested
      */
     public static function q($expression)
@@ -82,5 +84,22 @@ class Sql
         return Sql::q(
             StatementBuilder::like($value)
         );
+    }
+
+    /**
+     * @tested
+     */
+    public static function regexp($pattern)
+    {
+        $query = "";
+
+        $query .= "REGEXP ";
+        $query .= "'"; // delimeter for pattern
+        $query .= $pattern;
+        $query .= "'"; // delimeter for pattern
+
+        $query = Sql::q($query);
+
+        return $query;
     }
 }
