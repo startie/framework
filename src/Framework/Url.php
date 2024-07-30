@@ -10,8 +10,8 @@ class Url
 
 	public static function boot()
 	{
-		self::$isBooted = true;
-		self::defineConstants();
+		Url::$isBooted = true;
+		Url::defineConstants();
 	}
 
 	public static function defineConstants()
@@ -73,18 +73,22 @@ class Url
 		array|null $fragmentParams = NULL,
 		$arraishQueryParams = false
 	): string {
-		self::requireBoot();
+		Url::requireBoot();
 
-		$url = self::$ROOT . $path;
+		// Fix of double slashes like:
+		// http://domain.test//?q=go
+		if ($path === "/") $path = "";
+
+		$url = Url::$ROOT . $path;
 
 		$query = "";
-		$query = self::buildParams($queryParams, $arraishQueryParams);
+		$query = Url::buildParams($queryParams, $arraishQueryParams);
 		if ($query !== "") {
 			$url .= "?" . $query;
 		}
 
 		$fragment = "";
-		$fragment = self::buildParams($fragmentParams, $arraishQueryParams);
+		$fragment = Url::buildParams($fragmentParams, $arraishQueryParams);
 		if ($fragment !== "") {
 			$url .= "#" . $fragment;
 		}
@@ -218,7 +222,7 @@ class Url
 				}
 			}
 
-			$uri = static::app(
+			$uri = Url::app(
 				$foundedUrl,
 				$queryParams,
 				NULL,
@@ -266,8 +270,8 @@ class Url
 	 */
 	public static function current()
 	{
-		self::requireBoot();
-		
+		Url::requireBoot();
+
 		$url = APP_PROTOCOL . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 		return $url;
 	}
