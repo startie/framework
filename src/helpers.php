@@ -5,7 +5,7 @@ use Startie\Dump;
 /**
  * Shortcut for `Dump::make()`
  */
-function d($result = NULL, $die = 0, $msg = NULL, $trace = NULL)
+function d($result = null, $die = 0, $msg = null, $trace = null): void
 {
     Dump::make($result, $die, $msg, $trace);
 }
@@ -13,7 +13,7 @@ function d($result = NULL, $die = 0, $msg = NULL, $trace = NULL)
 /**
  * Shortcut for `Dump::make()`
  */
-function dump($result = NULL, $die = 0, $msg = NULL, $trace = NULL)
+function dump($result = null, $die = 0, $msg = null, $trace = null): void
 {
     Dump::make($result, $die, $msg, $trace);
 }
@@ -21,7 +21,7 @@ function dump($result = NULL, $die = 0, $msg = NULL, $trace = NULL)
 /**
  * Shortcut for `Dump::made()`
  */
-function dd($result = NULL, $msg = NULL, $trace = NULL)
+function dd($result = null, $msg = null, $trace = null): void
 {
     Dump::made($result, $msg, $trace);
 }
@@ -29,7 +29,7 @@ function dd($result = NULL, $msg = NULL, $trace = NULL)
 /**
  * Shortcut for `Texts::translate()`
  */
-function t(string $str = "", string $fallback = "")
+function t(string $str = "", string $fallback = ""): string
 {
     return \Startie\Texts::translate($str, $fallback);
 }
@@ -38,6 +38,13 @@ function t(string $str = "", string $fallback = "")
  * Shortcut for `View::r()`
  */
 function view($name, array $data = [], bool $trimSpaces = false)
+{
+    return \Startie\View::r($name, $data, $trimSpaces);
+}
+/**
+ * Shortcut for `View::r()`
+ */
+function v($name, array $data = [], bool $trimSpaces = false): string
 {
     return \Startie\View::r($name, $data, $trimSpaces);
 }
@@ -51,22 +58,14 @@ function title(string $title): void
 }
 
 /**
- * Shortcut for `View::r()`
- */
-function v($name, array $data = [], bool $trimSpaces = false)
-{
-    return \Startie\View::r($name, $data, $trimSpaces);
-}
-
-/**
  * Shortcut for `Url::controller()`
  */
 function url(
     string $routeExpression,
-    $controllerParams = NULL,
-    $queryParams = NULL,
+    $controllerParams = null,
+    $queryParams = null,
     $arraishQueryParams = false
-) {
+): string {
     return \Startie\Url::controller(
         $routeExpression,
         $controllerParams,
@@ -78,7 +77,7 @@ function url(
 /**
  * Shortcut for `Template::return()`
  */
-function template($templatePath, $data, $csrf = NULL)
+function template($templatePath, $data, $csrf = null): string
 {
     return \Startie\Template::return($templatePath, $data, $csrf);
 }

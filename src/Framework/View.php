@@ -121,7 +121,7 @@ class View
     }
 
     /**
-     * @deprecated Use setTitle
+     * @deprecated Use `::setTitle()` or `title()` global helper
      */
     public static function titleChange(string $title): void
     {
