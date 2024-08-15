@@ -49,16 +49,18 @@ class Auth
 
 		# When we are connected
 		// else {
-		if (Session::is('auth')) {
+		
+		if (Session::has('auth')) {
 			return true;
 		}
+
 		return false;
 		// }
 	}
 
 	public static function isWithService($serviceName): bool
 	{
-		if (Session::is('auth')) {
+		if (Session::has('auth')) {
 			foreach (Session::get('auth') as $authEntity) {
 				if (isset($authEntity['service'])) {
 					if ($authEntity['service'] == $serviceName) {
@@ -75,8 +77,8 @@ class Auth
 	 */
 	public static function getIdInService($serviceName)
 	{
-		if (Session::is('auth')) {
-			if (Session::is('auth')) {
+		if (Session::has('auth')) {
+			if (Session::has('auth')) {
 				foreach (Session::get('auth') as $authEntity) {
 					if ($authEntity['service'] == $serviceName) {
 						return $authEntity['id'];

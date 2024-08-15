@@ -22,7 +22,7 @@ class Notify
 	 */
 	public static function check()
 	{
-		if (Session::is('Notify')) {
+		if (Session::has('Notify')) {
 			foreach (Session::get('Notify') as $number => &$notification) {
 
 				if (!empty($notification['type'])) {

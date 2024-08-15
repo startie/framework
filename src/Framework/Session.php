@@ -4,29 +4,34 @@ namespace Startie;
 
 class Session
 {
-    public static function init()
+    public static function init(): void
     {
         session_start();
     }
 
-    public static function dump()
-    {
-        dd($_SESSION);
-    }
-
-    public static function is($var)
+    public static function has(string $var)
     {
         if (isset($_SESSION[$var])) {
             if ($_SESSION[$var] != "") {
                 return true;
             }
         }
+
+        return false;
     }
 
-    public static function get($var = "", $type = "raw")
+    /**
+     * @deprecated
+     */
+    public static function is(string $var)
+    {
+        return self::has($var);
+    }
+
+    public static function get(string $var = "", string $type = "raw")
     {
         if ($var !== "") {
-            if (Session::is($var)) {
+            if (Session::has($var)) {
                 return Input::session($var, $type);
             } else {
                 throw new \Exception(
@@ -34,32 +39,51 @@ class Session
                 );
             }
         }
+
         return $_SESSION;
     }
 
-    public static function set($key, $value)
+    public static function set($key, $value): void
     {
         $_SESSION[$key] = $value;
     }
 
-    public static function push($key, $value)
+    public static function push($key, $value): void
     {
         $_SESSION[$key][] = $value;
     }
 
-    public static function delete($var)
+    public static function delete($var): void
     {
         unset($_SESSION[$var]);
     }
 
-    public static function view()
+    public static function dump(): void
     {
         dump($_SESSION);
     }
 
-    public static function destroy()
+    public static function d(): void
     {
-        $_SESSION = array();
+        dd($_SESSION);
+    }
+
+    public static function dd(): void
+    {
+        dd($_SESSION);
+    }
+
+    public static function destroy(): void
+    {
+        $_SESSION = [];
         session_destroy();
+    }
+
+    /**
+     * @deprecated Use `::dump()` or `::d()`
+     */
+    public static function view(): void
+    {
+        dump($_SESSION);
     }
 }
