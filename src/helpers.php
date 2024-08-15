@@ -43,6 +43,14 @@ function view($name, array $data = [], bool $trimSpaces = false)
 }
 
 /**
+ * Shortcut for `View::setTitle()`
+ */
+function title(string $title): void
+{
+    \Startie\View::setTitle($title);
+}
+
+/**
  * Shortcut for `View::r()`
  */
 function v($name, array $data = [], bool $trimSpaces = false)
