@@ -16,13 +16,18 @@ class Logger
     {
         self::$config = \Startie\Config::get("Logs");
 
-        // Check storage type
+        /*
+            Validate config
+        */
+        
+        // - storage type
         switch (self::$config['storage']['type']) {
             case "db":
                 break;
             default:
                 throw new Exception(
-                    "Unsupported storage type for logs: " . self::$config['storage']['type']
+                    "Unsupported storage type for logs: "
+                        . self::$config['storage']['type']
                 );
         }
     }
