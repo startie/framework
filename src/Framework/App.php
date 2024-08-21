@@ -2,14 +2,16 @@
 
 namespace Startie;
 
-use Startie\Dump;
-
 class App
 {
-    public static $root;
+    /**
+     * @var string App's root path
+     */
+    public static string $root;
+
     public static float $initializedAt;
 
-    public static function init($root)
+    public static function init(string $root)
     {
         self::$root = $root;
         self::$initializedAt = microtime(true);
@@ -33,7 +35,10 @@ class App
         $dotenv->load();
     }
 
-    public static function path($path = "")
+    /**
+     * Returns absolute path
+     */
+    public static function path(string $path = ""): string
     {
         return self::$root . "/$path";
     }
