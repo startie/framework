@@ -1,5 +1,6 @@
 <?php
 
+use Startie\Asseter;
 use Startie\Dump;
 
 /**
@@ -80,4 +81,28 @@ function url(
 function template($templatePath, $data, $csrf = null): string
 {
     return \Startie\Template::return($templatePath, $data, $csrf);
+}
+
+/**
+ * Shorcut for `Js::uri()` and `Js::public()`
+ */
+function js(string $path): string
+{
+    if (Asseter::isExternal($path)) {
+        return \Startie\Js::uri($path);
+    } else {
+        return \Startie\Js::public($path);
+    }
+}
+
+/**
+ * Shorcut for `Css::uri()` and `Css::public()`
+ */
+function css(string $path): string
+{
+    if (Asseter::isExternal($path)) {
+        return \Startie\Css::uri($path);
+    } else {
+        return \Startie\Css::public($path);
+    }
 }

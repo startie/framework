@@ -108,7 +108,11 @@ class Asseter
 
 	public static function getRootUrl()
 	{
-		return trim(URL_APP, "/") . self::$root;
+		if (isset(self::$root)) {
+			return trim(URL_APP, "/") . self::$root;
+		} else {
+			return trim(URL_APP, "/") . "/";
+		}
 	}
 
 	public static function loadJs(string $entry): void
@@ -170,6 +174,19 @@ class Asseter
 		$hash = self::resolveHash();
 		$assetUrl = self::getRootUrl() . "css/Rewrite{$entry}{$prefix}.{$hash}.css";
 		echo "<link rel='stylesheet' href='{$assetUrl}'>";
+	}
+
+	public static function isExternal($path)
+	{
+		if (
+			str_starts_with($path, "https://")
+			||
+			str_starts_with($path, "http://")
+		) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	/**
