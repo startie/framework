@@ -191,7 +191,7 @@ class Url
 	) {
 		$foundedUrl = "";
 
-		$routes = Router::routes();
+		$routes = Router::getRoutes();
 
 		// Find route config
 		foreach ($routes as $routeUrl => $routeData) {
@@ -451,5 +451,16 @@ class Url
 
 		curl_close($ch);
 		return $url;
+	}
+
+	public static function cleanFromQueryString($path)
+	{
+		$questionMarkPosition = mb_strpos($path, '?');
+
+		if ($questionMarkPosition !== false) {
+			$path = mb_substr($path, 1, $questionMarkPosition - 1);
+		}
+
+		return $path;
 	}
 }
