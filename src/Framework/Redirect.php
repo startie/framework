@@ -2,6 +2,8 @@
 
 namespace Startie;
 
+use Startie\Output;
+
 class Redirect
 {
     public static function to(string $url): void
@@ -68,8 +70,11 @@ class Redirect
         return $_SERVER["HTTP_REFERER"];
     }
 
-    public static function e404()
+    /**
+     * @deprecated Use `Output::error()`
+     */
+    public static function e404(): void
     {
-        header("HTTP/1.0 404 Not Found");
+        Output::error(404);
     }
 }
