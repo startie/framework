@@ -4,74 +4,131 @@ namespace Startie;
 
 class Validate
 {
-	public static function bool($var)
-	{
-		return intval(filter_var($var, FILTER_VALIDATE_BOOLEAN));
-	}
+    
+    /*
+    
+            Boolean returns
+    
+    */
+    
+    public static function str($value): bool
+    {
+        return is_string($value);
+    }
 
-	public static function int($var)
-	{
-		return is_int($var);
-	}
+    /**
+     * Alias for `Validate::str()`
+     */
+    public static function string($value): bool
+    {
+        return Validate::str($value);
+    }
 
-	public static function intStr($var)
-	{
-		return filter_var($var, FILTER_VALIDATE_INT);
-	}
+    public static function int($value): bool
+    {
+        return is_int($value);
+    }
 
-	public static function integer($var)
-	{
-		Validate::int($var);
-	}
+    /**
+     * Alias for `Validate::int()`
+     */
+    public static function integer($value): bool
+    {
+        return Validate::int($value);
+    }
 
-	public static function number($var)
-	{
-		Validate::int($var);
-	}
+    /**
+     * Alias for `Validate::int()`
+     */
+    public static function number($value): bool
+    {
+        return Validate::int($value);
+    }
 
-	public static function numeric($var)
-	{
-		return is_numeric($var);
-	}
+    public static function numeric($value): bool
+    {
+        return is_numeric($value);
+    }
 
-	public static function float($var)
-	{
-		$temp_var = str_replace(".", ",", $var);
-		return filter_var($temp_var, FILTER_VALIDATE_FLOAT, array('options' => array('decimal' => ',')));
-	}
+    /*
+        
+            Based on `filter_var()`
 
-	public static function ip($var)
-	{
-		return filter_var($var, FILTER_VALIDATE_IP);
-	}
+    */
 
-	public static function mac($var)
-	{
-		return filter_var($var, FILTER_VALIDATE_MAC);
-	}
+    public static function boolean($value): bool|null
+    {
+        return filter_var(
+            $value,
+            FILTER_VALIDATE_BOOLEAN,
+            FILTER_NULL_ON_FAILURE
+        );
+    }
 
-	public static function str($var)
-	{
-		return is_string($var);
-	}
+    /**
+     * Even if $value will be a string, float will be returned
+     * @tested
+     */
+    public static function float($value): float|false
+    {
+        $temp_var = str_replace(".", ",", $value);
 
-	public static function string($var)
-	{
-		Validate::str($var);
-	}
+        return filter_var(
+            $temp_var,
+            FILTER_VALIDATE_FLOAT,
+            [
+                'options' => [
+                    'decimal' => ','
+                ]
+            ]
+        );
+    }
 
-	public static function email($var)
-	{
-		return filter_var($var, FILTER_VALIDATE_EMAIL);
-	}
+    public static function intStr($value): int|false
+    {
+        return filter_var($value, FILTER_VALIDATE_INT);
+    }
 
-	public static function url($var)
-	{
-		return filter_var($var, FILTER_VALIDATE_URL);
-	}
+    public static function ip($value): string|false
+    {
+        return filter_var($value, FILTER_VALIDATE_IP);
+    }
 
-	public static function regexp($var)
-	{
-		return filter_var($var, FILTER_VALIDATE_REGEXP);
-	}
+    public static function mac($value): string|false
+    {
+        return filter_var($value, FILTER_VALIDATE_MAC);
+    }
+
+    public static function email($value): string|false
+    {
+        return filter_var($value, FILTER_VALIDATE_EMAIL);
+    }
+
+    public static function url($value): string|false
+    {
+        return filter_var($value, FILTER_VALIDATE_URL);
+    }
+
+    public static function regexp($value): string|false
+    {
+        return filter_var($value, FILTER_VALIDATE_REGEXP);
+    }
+
+    /**
+     * @deprecated Use `Validate::boolean()`
+     * 
+     * Buggy nature
+     * `filter_var` returns `null` if it is not boolean
+     * but later this `null` will be converted to `false`
+     * Therefore some random string, like "php" will pass validation
+     * as bool `false`
+     * 
+     * @tested
+     */
+    public static function bool($value): int
+    {
+        return intval(
+            filter_var($value, FILTER_VALIDATE_BOOLEAN)
+        );
+    }
 }
