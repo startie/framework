@@ -19,7 +19,7 @@ trait Bootable
     public static function requireBoot()
     {
         if (!self::$isBooted) {
-            throw new \Startie\Exception(get_class() . " was never booted");
+            throw new \Startie\Exception(__CLASS__ . " was never booted");
         }
     }
 }
