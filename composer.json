@@ -1,7 +1,6 @@
 {
     "name": "startie/framework",
     "description": "Educational PHP framework",
-    "version": "0.44.0",
     "license": "MIT",
     "autoload": {
         "psr-4": {
