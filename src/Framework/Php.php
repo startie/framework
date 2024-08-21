@@ -98,60 +98,61 @@ class Php
 	#
 	#
 
-	#
-	# 	Checks if (super) global array has variable
-	#
+	/**
+	 * Check if the superglobal variable has a certain variable
+	 */
+	public static function isg(
+		string $superGlobalVariableName,
+		string $needleName
+	): bool {
+		$superGlobalVariableName = strtoupper($superGlobalVariableName);
 
-	public static function isg($glob, $name)
-	{
-		$glob = strtoupper($glob);
-
-		switch ($glob) {
+		switch ($superGlobalVariableName) {
 
 			case 'COOKIE':
-				if (isset($_COOKIE[$name])) {
+				if (isset($_COOKIE[$needleName])) {
 					return true;
 				}
 				return false;
 
 			case 'ENV':
-				if (isset($_ENV[$name])) {
+				if (isset($_ENV[$needleName])) {
 					return true;
 				}
 				return false;
 
 			case 'FILES':
-				if (isset($_FILES[$name])) {
+				if (isset($_FILES[$needleName])) {
 					return true;
 				}
 				return false;
 
 			case 'GET':
-				if (isset($_GET[$name])) {
+				if (isset($_GET[$needleName])) {
 					return true;
 				}
 				return false;
 
 			case 'POST':
-				if (isset($_POST[$name])) {
+				if (isset($_POST[$needleName])) {
 					return true;
 				}
 				return false;
 
 			case 'REQUEST':
-				if (isset($_REQUEST[$name])) {
+				if (isset($_REQUEST[$needleName])) {
 					return true;
 				}
 				return false;
 
 			case 'SERVER':
-				if (isset($_SERVER[$name])) {
+				if (isset($_SERVER[$needleName])) {
 					return true;
 				}
 				return false;
 
 			case 'SESSION':
-				if (isset($_SESSION[$name])) {
+				if (isset($_SESSION[$needleName])) {
 					return true;
 				}
 				return false;
@@ -222,38 +223,74 @@ class Php
 	#	Doesn't: FILES, REQUEST, SESSION
 	#
 
-	public static function input($glob, $name, $type)
+	/**
+	 * Wrapper around `filter_input()`
+	 */
+	public static function input($glob, $variableName, $type)
 	{
 		$glob = strtoupper($glob);
 
-		if (self::isg($glob, $name)) {
+		$superGlobalHasVariable = Php::isg($glob, $variableName);
 
-			$glob = 'INPUT_' . $glob;
+		if ($superGlobalHasVariable) {
+			$typeConstName = 'INPUT_' . $glob;
+			$typeConstValue = constant($typeConstName);
 
-			if ($type == "int") {
-				return intval(filter_input(constant($glob), $name, FILTER_SANITIZE_NUMBER_INT));
+			$type = strtolower($type);
+
+			if ($type === "int") {
+				// Deleted `intval` here, since false will be interpreted as 0
+				// return intval(filter_input(
+				return filter_input(
+					$typeConstValue,
+					$variableName,
+					FILTER_SANITIZE_NUMBER_INT
+				);
+				// ));
 			}
 
-			if ($type == "float") {
-				return filter_input(constant($glob), $name, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+			if ($type === "float") {
+				return filter_input(
+					$typeConstValue,
+					$variableName,
+					FILTER_SANITIZE_NUMBER_FLOAT,
+					FILTER_FLAG_ALLOW_FRACTION
+				);
 			}
 
-			if ($type = "str" || $type = "string") {
-				return filter_input(constant($glob), $name, FILTER_UNSAFE_RAW);
+			if ($type === "str" || $type === "string") {
+				return filter_input(
+					$typeConstValue,
+					$variableName,
+					FILTER_UNSAFE_RAW
+				);
 			}
 
-			if ($type = "email") {
-				return filter_input(constant($glob), $name, FILTER_SANITIZE_EMAIL);
+			if ($type === "email") {
+				return filter_input(
+					$typeConstValue,
+					$variableName,
+					FILTER_SANITIZE_EMAIL
+				);
 			}
 
-			if ($type = "url") {
-				return filter_input(constant($glob), $name, FILTER_SANITIZE_URL);
+			if ($type === "url") {
+				return filter_input(
+					$typeConstValue,
+					$variableName,
+					FILTER_SANITIZE_URL
+				);
 			}
 
-			if ($type = "raw") {
-				return filter_input(constant($glob), $name, FILTER_UNSAFE_RAW);
+			if ($type === "raw") {
+				return filter_input(
+					$typeConstValue,
+					$variableName,
+					FILTER_UNSAFE_RAW
+				);
 			}
 		}
+
 		return false;
 	}
 
@@ -328,12 +365,128 @@ class Php
 	public static function transliterate($textcyr = NULL, $textlat = NULL)
 	{
 		$cyr = array(
-			'ж',  'ч',  'щ',   'ш',  'ю',  'а', 'б', 'в', 'г', 'д', 'е', 'з', 'и', 'й', 'к', 'л', 'м', 'н', 'о', 'п', 'р', 'с', 'т', 'у', 'ф', 'х', 'ц', 'ъ', 'ь', 'я',
-			'Ж',  'Ч',  'Щ',   'Ш',  'Ю',  'А', 'Б', 'В', 'Г', 'Д', 'Е', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ъ', 'Ь', 'Я'
+			'ж',
+			'ч',
+			'щ',
+			'ш',
+			'ю',
+			'а',
+			'б',
+			'в',
+			'г',
+			'д',
+			'е',
+			'з',
+			'и',
+			'й',
+			'к',
+			'л',
+			'м',
+			'н',
+			'о',
+			'п',
+			'р',
+			'с',
+			'т',
+			'у',
+			'ф',
+			'х',
+			'ц',
+			'ъ',
+			'ь',
+			'я',
+			'Ж',
+			'Ч',
+			'Щ',
+			'Ш',
+			'Ю',
+			'А',
+			'Б',
+			'В',
+			'Г',
+			'Д',
+			'Е',
+			'З',
+			'И',
+			'Й',
+			'К',
+			'Л',
+			'М',
+			'Н',
+			'О',
+			'П',
+			'Р',
+			'С',
+			'Т',
+			'У',
+			'Ф',
+			'Х',
+			'Ц',
+			'Ъ',
+			'Ь',
+			'Я'
 		);
 		$lat = array(
-			'zh', 'ch', 'sht', 'sh', 'yu', 'a', 'b', 'v', 'g', 'd', 'e', 'z', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'r', 's', 't', 'u', 'f', 'h', 'c', 'y', 'x', 'q',
-			'Zh', 'Ch', 'Sht', 'Sh', 'Yu', 'A', 'B', 'V', 'G', 'D', 'E', 'Z', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'F', 'H', 'c', 'Y', 'X', 'Q'
+			'zh',
+			'ch',
+			'sht',
+			'sh',
+			'yu',
+			'a',
+			'b',
+			'v',
+			'g',
+			'd',
+			'e',
+			'z',
+			'i',
+			'j',
+			'k',
+			'l',
+			'm',
+			'n',
+			'o',
+			'p',
+			'r',
+			's',
+			't',
+			'u',
+			'f',
+			'h',
+			'c',
+			'y',
+			'x',
+			'q',
+			'Zh',
+			'Ch',
+			'Sht',
+			'Sh',
+			'Yu',
+			'A',
+			'B',
+			'V',
+			'G',
+			'D',
+			'E',
+			'Z',
+			'I',
+			'J',
+			'K',
+			'L',
+			'M',
+			'N',
+			'O',
+			'P',
+			'R',
+			'S',
+			'T',
+			'U',
+			'F',
+			'H',
+			'c',
+			'Y',
+			'X',
+			'Q'
 		);
 		if ($textcyr) return str_replace($cyr, $lat, $textcyr);
 		else if ($textlat) return str_replace($lat, $cyr, $textlat);
