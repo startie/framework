@@ -42,4 +42,21 @@ class App
     {
         return self::$root . "/$path";
     }
+
+    public static function getCurrentVersion() {
+        $version = exec('git describe --tags --abbrev=0');
+        $version = trim($version);
+
+        return $version;
+    }
+
+    public static function getLastUpdateDate()
+    {
+        $commitDate = new \DateTime(trim(exec('git log -n1 --pretty=%ci HEAD')));
+        $commitDate->setTimezone(new \DateTimeZone('UTC'));
+
+        $date = $commitDate->format('Y-m-d H:i:s');
+
+        return $date;
+    }
 }
