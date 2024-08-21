@@ -27,9 +27,9 @@ class Notify
 
 				if (!empty($notification['type'])) {
 					$notification['type'] == "info";
-					Template::render('Notify/Index', $notification);
+					echo template('Notify/Index', $notification);
 				} else {
-					Template::render('Notify/Index', $notification);
+					echo template('Notify/Index', $notification);
 				}
 			}
 			unset($notification);
@@ -51,7 +51,7 @@ class Notify
 		}
 
 		if (!empty($params['text'])) {
-			Template::render('Notify/Index', $params);
+			echo template('Notify/Index', $params);
 		}
 	}
 }
