@@ -177,7 +177,9 @@ class Router
         $requestedPath = In::server('REQUEST_URI', 'STR');
 
         // Delete domain (for sites like http://localhost:8080/startie-project/)
-        $requestedPath = str_replace(In::env('DOMAIN'), "", $requestedPath);
+        if (In::env('DOMAIN') !== "/") {
+            $requestedPath = str_replace(In::env('DOMAIN'), "", $requestedPath);
+        }
 
         $location = Url::cleanFromQueryString($requestedPath);
 
@@ -262,42 +264,42 @@ class Router
         // Check each route
         foreach ($parsedRoutes as $routeParsed) {
             $controllerParams = [];
-            if (!$hasFound) {
-                $successChecks = 0;
 
-                // Compare each part of route
-                for (
-                    $partIndex = 0;
-                    $partIndex < $urlPartsCount;
-                    $partIndex++
-                ) {
-                    $currentUrlPart = $urlParts[$partIndex];
-                    $currentRoutePart = $routeParsed['urlParts'][$partIndex];
+            $successChecks = 0;
 
-                    if (Router::partHasVariable($currentRoutePart)) {
-                        $variableName = Router::getVariableName(
-                            $currentUrlPart,
-                            $currentRoutePart,
-                        );
+            // Compare each part of route
+            for (
+                $partIndex = 0;
+                $partIndex < $urlPartsCount;
+                $partIndex++
+            ) {
+                $currentUrlPart = $urlParts[$partIndex];
+                $currentRoutePart = $routeParsed['urlParts'][$partIndex];
 
-                        if (!is_null($variableName)) {
-                            $successChecks++;
-                            $controllerParams[$variableName] = $currentUrlPart;
-                        }
-                    }
+                if (Router::partHasVariable($currentRoutePart)) {
+                    $variableName = Router::getVariableName(
+                        $currentUrlPart,
+                        $currentRoutePart,
+                    );
 
-                    if (!Router::partHasVariable($currentRoutePart)) {
-                        if ($currentUrlPart === $currentRoutePart) {
-                            $successChecks++;
-                        }
+                    if (!is_null($variableName)) {
+                        $successChecks++;
+                        $controllerParams[$variableName] = $currentUrlPart;
                     }
                 }
 
-                // Check count of successfull checks with parts count
-                if ($successChecks === $urlPartsCount) {
-                    $findedRouteConfig = $routeParsed;
-                    $hasFound = true;
+                if (!Router::partHasVariable($currentRoutePart)) {
+                    if ($currentUrlPart === $currentRoutePart) {
+                        $successChecks++;
+                    }
                 }
+            }
+
+            // Check count of successfull checks with parts count
+            if ($successChecks === $urlPartsCount) {
+                $findedRouteConfig = $routeParsed;
+                $hasFound = true;
+                break; // from foreach
             }
         }
 
