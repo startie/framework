@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Startie;
@@ -12,20 +13,20 @@ class Favicon
 
 	private static function getHash(): string
 	{
-		if(self::$hash === ""){
+		if (self::$hash === "") {
 			self::$hash = Php::hash(10);
-		} 
+		}
 
 		return self::$hash;
 	}
 
 	public static function href(string $filename): string
-	{	
+	{
 		$hash = self::getHash();
 		$root = Asseter::getRootUrl();
 
 		$href = "href='{$root}favicons/{$filename}?v={$hash}'";
-		
+
 		return $href;
 	}
 
@@ -35,7 +36,7 @@ class Favicon
 		$root = Asseter::getRootUrl();
 
 		$content = "content='{$root}favicons/{$filename}?v={$hash}'";
-		
+
 		return $content;
 	}
 }

@@ -12,7 +12,7 @@ class View
      */
     use \Startie\Bootable;
 
-    public static function boot()
+    public static function boot(): void
     {
         self::loadConfig();
         self::$isBooted = true;

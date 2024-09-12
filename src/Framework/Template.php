@@ -10,7 +10,7 @@ use Startie\Url;
 
 class Template
 {
-    public static function return($templatePath, $data, $csrf = NULL)
+    public static function return(string $templatePath, $data, $csrf = null)
     {
         /*
             Initialize Mustache engine

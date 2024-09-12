@@ -43,7 +43,8 @@ class App
         return self::$root . "/$path";
     }
 
-    public static function getCurrentVersion() {
+    public static function getCurrentVersion()
+    {
         $version = exec('git describe --tags --abbrev=0');
         $version = trim($version);
 

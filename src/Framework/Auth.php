@@ -49,7 +49,7 @@ class Auth
 
 		# When we are connected
 		// else {
-		
+
 		if (Session::has('auth')) {
 			return true;
 		}

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Startie;
@@ -20,11 +21,10 @@ class Modal
 	}
 
 	public static function WindowId(
-		string $entity, 
-		string $action, 
+		string $entity,
+		string $action,
 		string|int $id = ""
-	): string
-	{
+	): string {
 		$entity = ucfirst($entity);
 		$action = ucfirst($action);
 
@@ -52,7 +52,7 @@ class Modal
 		$modalAction['ButtonClass'] = Modal::ButtonClass($entity, $action);
 		$modalAction['ButtonText'] = "+ "
 			. ucfirst($action)
-			. " " 
+			. " "
 			. strtolower($entity);
 
 		$modal[$action] = $modalAction;
@@ -81,18 +81,17 @@ class Modal
 	public static function complete(
 		array $entity,
 		array $params
-	): array
-	{
+	): array {
 		$params['action'] = ucfirst($params['action']);
-		
+
 		$entity[$params['action'] . 'ModalButtonClass'] = self::ButtonClass(
-			$params['Entity'], 
+			$params['Entity'],
 			$params['action']
 		);
-		
+
 		$entity[$params['action'] . 'ModalId'] = self::WindowId(
-			$params['Entity'], 
-			$params['action'], 
+			$params['Entity'],
+			$params['action'],
 			$entity[$params['idIndex']]
 		);
 

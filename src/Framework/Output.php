@@ -17,7 +17,6 @@ class Output
         try {
             self::$config = \Startie\Config::get("Output");
         } catch (\Exception $e) {
-            
         }
     }
 

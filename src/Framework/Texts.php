@@ -10,7 +10,7 @@ class Texts
 {
 	use \Startie\Bootable;
 
-	public static function loadConfig()
+	public static function loadConfig(): void
 	{
 		try {
 			$config = Config::get('Texts');
@@ -26,7 +26,7 @@ class Texts
 	/**
 	 * Boot is required
 	 */
-	public static function boot()
+	public static function boot(): void
 	{
 		self::loadConfig();
 

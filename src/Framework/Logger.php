@@ -19,7 +19,7 @@ class Logger
         /*
             Validate config
         */
-        
+
         // - storage type
         switch (self::$config['storage']['type']) {
             case "db":

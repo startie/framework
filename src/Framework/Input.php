@@ -139,10 +139,10 @@ class Input
 		// 		);
 		// 	}
 		// } else {
-			$result = call_user_func(
-				'Startie\Sanitize::' . $SanitizeType,
-				$value
-			);
+		$result = call_user_func(
+			'Startie\Sanitize::' . $SanitizeType,
+			$value
+		);
 		// }
 
 		return $result;

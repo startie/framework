@@ -4,13 +4,13 @@ namespace Startie;
 
 class Validate
 {
-    
+
     /*
     
             Boolean returns
     
     */
-    
+
     public static function str($value): bool
     {
         return is_string($value);

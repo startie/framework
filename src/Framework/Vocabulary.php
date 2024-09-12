@@ -4,7 +4,7 @@ namespace Startie;
 
 class Vocabulary
 {
-	public static function get($path, $params = [])
+	public static function get(string $path, array $params = [])
 	{
 		$v = "";
 		$fullPath = App::path("backend/Vocabularies/{$path}.json");
@@ -37,7 +37,7 @@ class Vocabulary
 		}
 	}
 
-	public static function getFolder($path)
+	public static function getFolder(string $path)
 	{
 		$dirPath = STORAGE_DIR . "vocabularies/$path";
 		$vocabularyNames = scandir($dirPath);

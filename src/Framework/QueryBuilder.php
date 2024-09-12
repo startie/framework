@@ -2,6 +2,4 @@
 
 namespace Startie;
 
-class QueryBuilder
-{
-}
+class QueryBuilder {}

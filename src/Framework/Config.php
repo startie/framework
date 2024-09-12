@@ -33,7 +33,7 @@ class Config
 		$path = App::path("$pathStart/{$stage}_{$machine}.php");
 		$path = is_file($path) ? $path : App::path("$pathStart/*.php");
 		$path = is_file($path) ? $path : App::path("$pathStart/Common.php");
-		
+
 		if (!is_file($path)) {
 			throw new \Exception("Config path for `$name` was not found" . $path);
 		} else {

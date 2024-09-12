@@ -253,7 +253,7 @@ class Model
 		$sql .= StatementBuilder::update($table);
 
 		$set = $insert ?? $fields ?? $set;
-		
+
 		StatementBuilder::set($sql, $set);
 		StatementBuilder::where($sql, $where);
 

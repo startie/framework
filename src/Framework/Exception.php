@@ -47,7 +47,7 @@ class Exception extends \Exception
         $message = $e->getMessage()
             . ". "
             . $sql;
-            
+
         $exception = new Exception(
             $message,
             "error",

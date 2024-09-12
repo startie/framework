@@ -10,7 +10,7 @@ class Js
 	{
 		return "<script type='text/javascript' src='$uri'></script>";
 	}
-	
+
 	public static function uri(string $uri): string
 	{
 		$tag = self::tag($uri);
@@ -34,7 +34,7 @@ class Js
 
 		Asseter::loadPageJs($nameNew);
 	}
-	
+
 	public static function frontend(string $name): void
 	{
 		$html = "";

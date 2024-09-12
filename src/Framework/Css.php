@@ -31,7 +31,7 @@ class Css
 		foreach ($nameArr as $nameEntity) {
 			$nameNew .= $nameEntity;
 		}
-		
+
 		Asseter::loadPageCss($nameNew);
 	}
 

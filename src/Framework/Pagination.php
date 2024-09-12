@@ -74,7 +74,8 @@ class Pagination
 			array_merge(
 				$this->getParams,
 				[
-					'page' => 1, 'per' => $this->per
+					'page' => 1,
+					'per' => $this->per
 				]
 			)
 		);
@@ -85,7 +86,8 @@ class Pagination
 			array_merge(
 				$this->getParams,
 				[
-					'page' => $this->page - 1, 'per' => $this->per
+					'page' => $this->page - 1,
+					'per' => $this->per
 				]
 			)
 		);
@@ -96,7 +98,8 @@ class Pagination
 			array_merge(
 				$this->getParams,
 				[
-					'page' => $this->page + 1, 'per' => $this->per
+					'page' => $this->page + 1,
+					'per' => $this->per
 				]
 			)
 		);
@@ -107,7 +110,8 @@ class Pagination
 			array_merge(
 				$this->getParams,
 				[
-					'page' => $this->totalPages, 'per' => $this->per
+					'page' => $this->totalPages,
+					'per' => $this->per
 				]
 			)
 		);
