@@ -16,7 +16,7 @@ class Dropzone
 		array $e,
 		string $class,
 		array $params,
-		int $imagesIndex,
+		string $imagesIndex,
 		array $imagesParams
 	): array {
 		$e['Dropzone']['class'] = $class;

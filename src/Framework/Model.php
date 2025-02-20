@@ -55,12 +55,12 @@ class Model
 		#
 		#	Vars
 
-		$debug = 0;
-		$die = 0;
+		$die = false;
 		$test = 0;
 
 		extract($params);
 
+		$debug ??= false;
 		$insert = $fields ?? $insert;
 		$insert = $set ?? $insert;
 
@@ -134,12 +134,13 @@ class Model
 
 		$select = ['*'];
 		$table = str_replace("Models\\", "", get_called_class());
-		$debug = 0;
-		$die = 0;
+		$die = false;
 		$test = 0;
 		$excludeFunctions = 0;
 
 		extract($params);
+
+		$debug ??= false;
 
 		#
 		#	SQL generate
@@ -326,11 +327,12 @@ class Model
 		#
 		#	Vars
 
-		$debug = false;
 		$die = false;
 		$test = false;
 
 		extract($params);
+
+		$debug ??= false;
 
 		$table = str_replace("Models\\", "", get_called_class());
 
@@ -466,7 +468,7 @@ class Model
 	 */
 	public static function where(
 		array $where,
-		array $options = ['debug' => 0, 'die' => 0, 'test' => 0]
+		array $options = ['debug' => false, 'die' => 0, 'test' => 0]
 	): array {
 		extract($options);
 
@@ -493,7 +495,7 @@ class Model
 	 */
 	public static function field(
 		array $where,
-		array $options = ['limit' => 1, 'debug' => 0, 'die' => 0, 'test' => 0]
+		array $options = ['limit' => 1, 'debug' => false, 'die' => 0, 'test' => 0]
 	) {
 		extract($options);
 
@@ -522,7 +524,7 @@ class Model
 			'select' => [$column],
 			'order' => [$column . ' DESC'],
 			'limit' => 1,
-			#'debug' => 1
+			#'debug' => true
 		])[0][$column];
 	}
 
