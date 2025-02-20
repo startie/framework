@@ -103,7 +103,7 @@ class Router
         }
     }
 
-    public static function getRoutes()
+    public static function getRoutes(): array
     {
         $routesRoot = Router::resolveRoutesRoot();
         $routerConfigPath = Router::resolveRouterConfigPath();
@@ -122,8 +122,9 @@ class Router
         return $routes;
     }
 
-    public static function collectRoutesBasedOnRoot($rootPathRelative)
-    {
+    public static function collectRoutesBasedOnRoot(
+        string $rootPathRelative
+    ): array {
         $routes = [];
 
         $rootPathAbsolute = App::path($rootPathRelative);
@@ -142,9 +143,9 @@ class Router
     }
 
     public static function collectRoutesBasedOnConfig(
-        $routerConfigPath,
-        $routesRoot
-    ) {
+        string $routerConfigPath,
+        string $routesRoot
+    ): array {
         $routes = [];
 
         $routerConfig = require $routerConfigPath;
@@ -312,7 +313,7 @@ class Router
         return $result;
     }
 
-    public static function partHasVariable($part)
+    public static function partHasVariable(string $part): bool
     {
         if (strpos($part, '$') !== false) {
             return true;
@@ -361,8 +362,10 @@ class Router
         }
     }
 
-    public static function render($routeData, $controllerParams)
-    {
+    public static function render(
+        array $routeData,
+        array $controllerParams
+    ): void {
         /* Route */
 
         $route = new Route($routeData);
@@ -471,7 +474,7 @@ class Router
         }
     }
 
-    public static function middles(Route $route)
+    public static function middles(Route $route): void
     {
         if (isset($route->middles)) {
             $middlesStr = str_replace(" ", "", $route->middles);

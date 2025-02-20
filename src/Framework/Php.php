@@ -231,7 +231,7 @@ class Php
 		string $glob,
 		string $variableName,
 		string $type
-	): mixed 	{
+	): mixed {
 		$glob = strtoupper($glob);
 
 		$superGlobalHasVariable = Php::isg($glob, $variableName);
@@ -543,7 +543,7 @@ string $encoding = 'UTF-8'
 		array $arr,
 		string $key,
 		string|null $str = null
-	): bool 	{
+	): bool {
 		if (isset($arr[$key])) {
 			if ($str) {
 				if ($key == $str) {
@@ -579,7 +579,7 @@ string $encoding = 'UTF-8'
 		string|int $property,
 		mixed $value,
 		array $flag = ['selected' => 'selected']
-	): array 	{
+	): array {
 		foreach ($collection as $i => &$element) {
 			if ($property != "") {
 				if ($element[$property] == $value) {
@@ -616,7 +616,7 @@ string $encoding = 'UTF-8'
 		array $arr,
 		string|int $prop,
 		mixed $val
-	): int 	{
+	): int {
 		$index = array_search($val, array_column($arr, $prop));
 		if ($index === false) {
 			$index = -1;
@@ -668,7 +668,7 @@ string $encoding = 'UTF-8'
 		array &$arr,
 		string|int $prop,
 		mixed $val
-	): array 	{
+	): array {
 
 		$i = Php::smda($arr, $prop, $val);
 		$el = $arr[$i];
@@ -703,7 +703,7 @@ string $encoding = 'UTF-8'
 	public static function a_dev(
 		array &$arr,
 		mixed $value
-	): void 	{
+	): void {
 		if (($key = array_search($value, $arr)) !== false) {
 			unset($arr[$key]);
 		}

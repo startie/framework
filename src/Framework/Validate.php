@@ -109,7 +109,7 @@ class Validate
         return filter_var($value, FILTER_VALIDATE_URL);
     }
 
-    public static function regexp($value): string|false
+    public static function regexp(mixed $value, string $regexp): string|false
     {
         return filter_var($value, FILTER_VALIDATE_REGEXP);
     }

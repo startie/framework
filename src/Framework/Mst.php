@@ -4,10 +4,9 @@ namespace Startie;
 
 class Mst
 {
-	public static function ify($arr)
+	public static function ify(array $array): array
 	{
-		if (is_array($arr)) {
-			if (count($arr)) {
+		if (count($arr)) {
 				# First
 				$arr[0]['first'] = 1;
 				$arr[0]['isFirst'] = 1;

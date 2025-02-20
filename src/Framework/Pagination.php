@@ -4,29 +4,29 @@ namespace Startie;
 
 class Pagination
 {
-	public $entriesPerPage;
-	public $maxPages;
-	public $align;
-	public $EntitiesCount;
-	public $controllerExpression;
-	public $page;
-	public $offset;
-	public $per;
-	public $totalEntities;
-	public $totalPages;
-	public $links;
-	public $getParams;
-	public $urlFirst;
-	public $urlLast;
-	public $urlNext;
-	public $urlPrev;
+	public int $entriesPerPage;
+	public int $maxPages;
+	public string $align;
+	public int $EntitiesCount;
+	public string $controllerExpression;
+	public int $page;
+	public int $offset;
+	public int $per;
+	public int $totalEntities;
+	public int $totalPages;
+	public array $links = [];
+	public array $getParams;
+	public string $urlFirst;
+	public string $urlLast;
+	public string $urlNext;
+	public string $urlPrev;
 
 	function __construct(
-		$entriesPerPage,
-		$maxPages,
-		$align,
-		$EntitiesCount,
-		$controllerExpression
+		int $entriesPerPage,
+		int $maxPages,
+		string $align,
+		int $EntitiesCount,
+		string $controllerExpression
 	) {
 		$this->entriesPerPage = $entriesPerPage;
 		$this->maxPages = $maxPages;
@@ -117,36 +117,36 @@ class Pagination
 		);
 	}
 
-	public function cut($EntitiesArr)
+	public function cut(array $EntitiesArr): array
 	{
 		return array_slice($EntitiesArr, $this->offset, $this->per);
 	}
 
-	public function offset()
+	public function offset(): int
 	{
 		return $this->offset;
 	}
 
-	public function limit()
+	public function limit(): int
 	{
 		return $this->per;
 	}
 
-	public function ify($params)
+	public function ify(array $params): array
 	{
 		$params['offset'] = $this->offset();
 		$params['limit'] = $this->limit();
 		return $params;
 	}
 
-	public function r()
+	public function r(): string
 	{
 		return View::r('Pagination/Common', [
 			'Pagination' => $this,
 		]);
 	}
 
-	public function numbers()
+	public function numbers(): void
 	{
 		if ($this->totalPages < $this->maxPages) {
 			$this->maxPages = $this->totalPages;

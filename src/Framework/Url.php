@@ -277,8 +277,9 @@ class Url
 	 * 
 	 * Gives a structured represantation of the current query string or values of certain param.
 	 *
-	 * @param $param If it is presented returns only that values that belongs to a certain param.
-	 * @param string $queryString Сan be query string or the url.
+	 * @param string|null $param If it is presented returns only that values 
+	 * that belongs to a certain param.
+	 * @param string|null $queryString Сan be query string or the url.
 	 * @param bool $decoded To decode or not each value of pair.
 	 * @return array
 	 */

@@ -6,13 +6,13 @@ class Output
 {
     use \Startie\Bootable;
 
-    public static function boot()
+    public static function boot(): void
     {
         self::$isBooted = true;
         self::loadConfig();
     }
 
-    public static function loadConfig()
+    public static function loadConfig(): void
     {
         try {
             self::$config = \Startie\Config::get("Output");
@@ -20,7 +20,7 @@ class Output
         }
     }
 
-    public static function json($data): string
+    public static function json(array $data): string
     {
         return json_encode($data);
     }

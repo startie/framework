@@ -11,26 +11,26 @@ class Model
 
 	public static $config;
 
-	public static $storage;
+	public static array $columnTypes;
 
-	public static $types;
+	public static array $types;
 
-	public static $testModeMessage = "Test mode: no write to db";
+	public static string $testModeMessage = "Test mode: no write to db";
 
-	public static $excludeFunctions;
+	public static array $excludeFunctions;
 
-	public static function boot()
+	public static function boot(): void
 	{
 		self::$isBooted = true;
 		self::loadConfig();
 	}
 
-	public static function loadConfig()
+	public static function loadConfig(): void
 	{
 		Model::$config = Config::get('Model');
 	}
 
-	public static function storage()
+	public static function storage(): \PDO
 	{
 		$name = Model::$config['storage']['name']; // e.g 'logs', 'common', etc.
 		$connection = Db::$connections[$name];
@@ -224,7 +224,7 @@ class Model
 	/**
 	 * Updates rows and returns count of affected rows
 	 */
-	public static function update($params): int
+	public static function update(array $params): int
 	{
 		$calledModelClass = get_called_class();
 		
@@ -318,7 +318,7 @@ class Model
 	 * Deletes rows and returns count of affected rows
 * Return 0 if in test mode
 	 */
-	public static function delete($params): int
+	public static function delete(array $params): int
 	{
 		#
 		#	Vars
@@ -392,8 +392,10 @@ class Model
 	/**
 	 * Get count of records filtered by params
 	 */
-	public static function count(array $params, string|null $customSelect = NULL): int
-	{
+	public static function count(
+		array $params,
+		string|null $customSelect = null
+	): int {
 		$select = $params['select'] ?? '';
 		if ($customSelect) {
 			$select = ["count($customSelect) as count"];
@@ -414,8 +416,10 @@ class Model
 	 * 
 	 * Tells if exists entity with params or not
 	 */
-	public static function is(array $params, string|null $customSelect = NULL): bool
-	{
+	public static function is(
+		array $params,
+		string|null $customSelect = NULL
+	): bool {
 		$count = self::count($params, $customSelect);
 		if ($count <= 0) {
 			return false;
@@ -427,8 +431,11 @@ class Model
 	/**
 	 * Returns a first row for specified id in the table
 	 */
-	public static function id($id, $debug = 0, $die = 0): array
-	{
+	public static function id(
+		int $id,
+		int $debug = 0,
+		int $die = 0
+	): array {
 		$rows = self::read([
 			'where' => [
 				'id' => [[$id, 'INT']]
@@ -452,8 +459,8 @@ class Model
 	 * @deprecated 0.30.10
 	 */
 	public static function where(
-		$where,
-		$options = ['debug' => 0, 'die' => 0, 'test' => 0]
+		array $where,
+		array $options = ['debug' => 0, 'die' => 0, 'test' => 0]
 	): array {
 		extract($options);
 
@@ -479,8 +486,8 @@ class Model
 	 * @deprecated
 	 */
 	public static function field(
-		$where,
-		$options = ['limit' => 1, 'debug' => 0, 'die' => 0, 'test' => 0]
+		array $where,
+		array $options = ['limit' => 1, 'debug' => 0, 'die' => 0, 'test' => 0]
 	) {
 		extract($options);
 
@@ -503,7 +510,7 @@ class Model
 	 * 
 	 * @deprecated
 	 */
-	public static function cnt($column)
+	public static function cnt(string $column): int
 	{
 		return Model::read([
 			'select' => [$column],
@@ -527,10 +534,11 @@ class Model
 * 				['columnName', 'columnValue', 'valueType'],
 		* ]
 	 * 		
-	 * 		Подойдёт для вставки в методы create и update
-	*/
-	public static function rows($exceptions = NULL)
-	{
+	 * Подойдёт для вставки в методы create и update
+	 */
+	public static function rows(
+		array|null $exceptions = null
+	): array {
 		$rows = [];
 
 		# Получаем конфиг типов данных из текущей модели
@@ -579,9 +587,12 @@ class Model
 	 * @param array $filters Simple key-value associate array
 	 * @version 0.30.0
 	 */
-	public static function wherify(array $where, array $filters, array $configs)
-	{
-		if (isset($filters)) {
+	public static function wherify(
+		array $where,
+		array $filters,
+		array $configs
+	): array {
+		if ($filters !== []) {
 			foreach ($configs as $config) {
 				$column = $config[0];
 				$filterAttribute = $config[1];
@@ -618,12 +629,12 @@ class Model
 	}
 
 	public static function whereFromInput(
-		$where,
-		$global,
-		$type,
-		$keyInGlobal,
-		$keyInWhere
-	) {
+		array $where,
+		string $global,
+		string $type,
+		string $keyInGlobal,
+		string|int $keyInWhere
+	): array {
 		if (Input::is($global, $keyInGlobal)) {
 			$global = strtolower($global);
 			$where[$keyInWhere] = [
@@ -636,8 +647,12 @@ class Model
 		return $where;
 	}
 
-	public static function detach($selectFields, $table, $e, $eIndex)
-	{
+	public static function detach(
+		array $selectFields,
+		string $table,
+		array $e,
+		string|int $eIndex
+	): array {
 		$fieldsNeeded = [];
 
 		foreach ($selectFields as $fieldExpr) {
@@ -690,8 +705,11 @@ class Model
 		}
 	}
 
-	public static function processPdoException($e, $sql, $sqlBeforeBinding)
-	{
+	public static function processPdoException(
+		\PDOException $e,
+		string $sql,
+		string $sqlBeforeBinding
+	): string {
 		$hint = self::getHint($e);
 		throw \Startie\Exception::create(
 			$e,

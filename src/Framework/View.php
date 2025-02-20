@@ -96,7 +96,7 @@ class View
     /**
      * @deprecated Use `view()` helper
      */
-    public static function render($name, array $data = [])
+    public static function render(string $name, array $data = []): void
     {
         $path = App::path("backend/Views/{$name}.php");
         global $t;

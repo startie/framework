@@ -34,6 +34,9 @@ class QueryBinder
                     Nullable check
                 */
 
+                /**
+                 * @var bool $typeIsNullable
+                 */
                 $typeIsNullable = str_ends_with($type ?? "", "|NULL");
                 if ($typeIsNullable) {
                     $type = str_replace("|NULL", "", $type);
@@ -98,6 +101,9 @@ class QueryBinder
                     Nullable check
                 */
 
+                /**
+                 * @var bool $typeIsNullable
+                 */
                 $typeIsNullable = str_ends_with($type ?? "", "|NULL");
                 if ($typeIsNullable) {
                     $type = str_replace("|NULL", "", $type);

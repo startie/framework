@@ -6,8 +6,8 @@ class Procedure
 {
 	public static function inc(
 		string $name,
-array $data = []
-	): void 	{
+		array $data = []
+	): void {
 		extract($data);
 		$path = App::path("backend/Procedures/{$name}.php");
 		global $t;
@@ -16,8 +16,8 @@ array $data = []
 
 	public static function return(
 		string $name,
-array $data = []
-	): string 	{
+		array $data = []
+	): string {
 		$path = App::path("backend/Procedures/{$name}.php");
 
 		if (is_file($path)) {

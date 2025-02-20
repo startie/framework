@@ -13,7 +13,7 @@ class Asseter
 	public static string|null $root;
 	public static string $hash = "";
 
-	public static function init()
+	public static function init(): void
 	{
 		self::loadConfig();
 	}
@@ -131,7 +131,7 @@ class Asseter
 		echo "<script src='$filename'></script>";
 	}
 
-	public static function loadPageJs(string|null $entry = NULL)
+	public static function loadPageJs(string|null $entry = null): void
 	{
 		$prefix = self::$jsPrefix;
 		$hash = self::resolveHash();

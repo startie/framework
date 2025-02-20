@@ -60,7 +60,7 @@ class Redirect
         }
     }
 
-    public static function referer($RedirectUrl = NULL)
+    public static function referer(string|null $redirectUrl = null): void
     {
         if (!$RedirectUrl) {
             $RedirectUrl = Redirect::getReferer();
@@ -69,7 +69,7 @@ class Redirect
         Redirect::to($RedirectUrl);
     }
 
-    public static function getReferer()
+    public static function getReferer(): string
     {
         return $_SERVER["HTTP_REFERER"];
     }

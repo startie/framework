@@ -9,7 +9,7 @@ class Session
         session_start();
     }
 
-    public static function has(string $var)
+    public static function has(string $var): bool
     {
         if (isset($_SESSION[$var])) {
             if ($_SESSION[$var] != "") {
