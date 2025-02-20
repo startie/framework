@@ -135,7 +135,7 @@ class Url
 
 		$paramsFiltered = [];
 
-		if (!empty($params)) {
+		if ($params !== null && $params !== []) {
 			foreach ($params as $i => $param) {
 				if ($param != "") {
 					$paramsFiltered[$i] = $param;
@@ -146,7 +146,7 @@ class Url
 
 		/* Build params */
 
-		if ($params && is_array($params)) {
+		if ($params !== [] && is_array($params)) {
 			// 1. Parse params as array
 			$paramsThatAreArrays = [];
 			foreach ($params as $i => &$param) {
@@ -203,7 +203,7 @@ class Url
 		}
 
 		// If found
-		if ($foundedUrl) {
+		if ($foundedUrl !== "") {
 			// Find vars of route
 			$findedVars = [];
 			preg_match_all('/\$[a-zA-Z]*/', $foundedUrl, $findedVars);
@@ -214,14 +214,19 @@ class Url
 			foreach ($findedVars[0] as $findedVar) {
 				$findedVar = str_replace("$", "", $findedVar);
 
-				# Form url by replacing matches
-				if ($ControllerParams[$findedVar] ?? false) {
+				// Form url by replacing matches
+				$varValue = $ControllerParams[$findedVar] ?? "";
+				if ($varValue !== "") {
 					$foundedUrl = str_replace(
 						$findedVar,
-						$ControllerParams[$findedVar],
+						$varValue,
 						$foundedUrl
 					);
 				}
+			}
+
+			if (is_array($foundedUrl)) {
+				throw new Exception("Url cannot by an array");
 			}
 
 			$uri = Url::app(
@@ -322,9 +327,11 @@ class Url
 			}
 		}
 
-		if (!$queryString) {
+		if ($queryString === "") {
 			return [];
 		}
+
+		$queryString = (string) $queryString;
 
 		// 2. Set up
 		// Initial variables
@@ -365,7 +372,7 @@ class Url
 		// 5. Return
 		// Return either all pairs for all params or only for the exact one
 
-		if (!$param) {
+		if ($param === "null") {
 			return $result;
 		} else {
 			if (isset($result[$param])) {
@@ -386,8 +393,9 @@ class Url
 		string $mode = 'fragment'
 	): array {
 		$urlPartsString = parse_url($url);
+
 		if (isset($urlPartsString[$mode])) {
-			$urlPartsString = $urlPartsString[$mode];
+			$urlPartsString = (string) $urlPartsString[$mode];
 			$urlPartsArr = explode("&", $urlPartsString);
 			$urlParamsArr = [];
 			foreach ($urlPartsArr as $urlPart) {
