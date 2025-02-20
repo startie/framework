@@ -150,39 +150,39 @@ class Db
 	}
 
 	public static function debugStart(
-		bool|int $debug = false,
-		mixed $object = null
+		bool $debug = false,
+		mixed $data = null
 	): void {
-		if ((bool) $debug === false) {
-			Dump::start($object);
+		if ($debug) {
+			Dump::start($data);
 		}
 	}
 
 	public static function debugContinue(
-		bool|int $debug = false,
-		mixed $object = null
+		bool $debug = false,
+		mixed $data = null
 	): void {
-		if ((bool) $debug === false) {
-			Dump::next($object);
+		if ($debug) {
+			Dump::next($data);
 		}
 	}
 
 	public static function debugEnd(
-		bool|int $debug = false,
-		mixed $object = null
+		bool $debug = false,
+		mixed $data = null
 	): void {
-		if ((bool) $debug === false) {
-			Dump::end($object);
+		if ($debug) {
+			Dump::end($data);
 		}
 	}
 
 	public static function debug(
-		bool|int $debug = false,
-		mixed $object = null,
+		bool $debug = false,
+		mixed $data = null,
 		string $message = ""
 	): void {
-		if ((bool) $debug) {
-			Dump::make($object, $die = false, $message);
+		if ($debug) {
+			Dump::make($data, $die = false, $message);
 		}
 	}
 }
