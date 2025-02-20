@@ -39,7 +39,7 @@ class Js
 	{
 		$html = "";
 		if ($_ENV['MODE_DEV']) {
-			$path = FRONTEND_DIR . "{$name}.js";
+			$path = App::$FRONTEND_DIR . "{$name}.js";
 			$html .= "<script>";
 			$html .= file_get_contents($path);
 			$html .= "</script>";

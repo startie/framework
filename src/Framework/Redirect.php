@@ -26,13 +26,16 @@ class Redirect
         string|null $queryString = null
     ): void {
         if (empty($pagePath)) {
-            Redirect::to(URL_APP);
+            Redirect::to(App::$URL_APP);
         }
 
-        if (!empty($queryString)) {
-            Redirect::to(URL_APP . $pagePath . $queryString);
+        $queryString ??= "";
+        if ($queryString !== "") {
+            Redirect::to(
+                App::$URL_APP . $pagePath . $queryString
+            );
         } else {
-            Redirect::to(URL_APP . $pagePath);
+            Redirect::to(App::$URL_APP . $pagePath);
         }
     }
 
