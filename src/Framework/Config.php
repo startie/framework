@@ -104,7 +104,7 @@ class Config
 // 		define('TIMEZONE', $_ENV['TIMEZONE']);
 // 		define('LOCALE', $_ENV['LOCALE']);
 
-App::$DATE_TIMEZONE = $_ENV['DATE_TIMEZONE'];
+		App::$DATE_TIMEZONE = $_ENV['DATE_TIMEZONE'];
 		App::$TIMEZONE = $_ENV['TIMEZONE'];
 		App::$LOCALE = $_ENV['LOCALE'];
 

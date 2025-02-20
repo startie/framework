@@ -6,7 +6,7 @@ namespace Startie;
 
 class App
 {
-public static string $DIR_APP;
+    public static string $DIR_APP;
     public static string $FRONTEND_DIR;
     public static string $BACKEND_DIR;
     public static string $PUBLIC_DIR;

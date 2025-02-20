@@ -20,10 +20,13 @@ class Php
 				if ($var == $val) {
 					return true;
 				}
+
 				return false;
 			}
+
 			return false;
 		}
+
 		return false;
 	}
 
@@ -88,6 +91,8 @@ class Php
 		$namespace .= "\\";
 		foreach (get_declared_classes() as $name)
 			if (strpos($name, $namespace) === 0) return true;
+		}
+
 		return false;
 	}
 
@@ -213,6 +218,8 @@ class Php
 					return true;
 				}
 				return false;
+			default:
+				return false;
 		}
 	}
 
@@ -311,6 +318,7 @@ class Php
 		$strlen = mb_strlen($string, $encoding);
 		$firstChar = mb_substr($string, 0, 1, $encoding);
 		$then = mb_substr($string, 1, $strlen - 1, $encoding);
+
 		return mb_strtoupper($firstChar, $encoding) . $then;
 	}
 
@@ -618,6 +626,7 @@ string $encoding = 'UTF-8'
 		mixed $val
 	): int {
 		$index = array_search($val, array_column($arr, $prop));
+
 		if ($index === false) {
 			$index = -1;
 		}
@@ -811,6 +820,7 @@ string $encoding = 'UTF-8'
 		//$date_from_timestamp = date("d-m-Y H:i:s",$current_timestamp_fndate);
 		# 12:11:32
 		$date_from_timestamp = date("H:i:s.u", $current_timestamp_fndate);
+
 		return $date_from_timestamp;
 	}
 

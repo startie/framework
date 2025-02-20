@@ -227,7 +227,7 @@ class Model
 	public static function update(array $params): int
 	{
 		$calledModelClass = get_called_class();
-		
+
 		// Vars
 
 		$debug = 0;
@@ -245,9 +245,7 @@ class Model
 		}
 
 		// SQL generate
-
 		$sql = "";
-
 		$table = str_replace("Models\\", "", $calledModelClass);
 		$sql .= StatementBuilder::update($table);
 
@@ -639,11 +637,16 @@ class Model
 			$global = strtolower($global);
 			$where[$keyInWhere] = [
 				[
-					call_user_func('\Startie\Input::' . $global, $keyInGlobal, $type),
+					call_user_func(
+						'\Startie\Input::' . $global,
+						$keyInGlobal,
+						$type
+					),
 					$type
 				]
 			];
 		}
+
 		return $where;
 	}
 
