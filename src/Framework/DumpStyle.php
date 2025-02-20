@@ -189,7 +189,7 @@ class DumpStyle
                 }
                 foreach ($var as $key => $value) {
                     if (is_numeric($key)) {
-                        $html .= str_repeat(' ', $indent) . str_pad($key, $longest_key, ' ');
+                        $html .= str_repeat(' ', $indent) . str_pad((string) $key, $longest_key, ' ');
                     } else {
                         $html .= str_repeat(' ', $indent) . str_pad('"' . self::htmlentities($key) . '"', $longest_key, ' ');
                     }

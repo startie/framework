@@ -160,7 +160,7 @@ class Model
 		#	Exclude functions
 
 		# Env settings
-		if (Db::$excludeFunctions) {
+		if (isset(Db::$excludeFunctions)) {
 			# Param
 			if ($excludeFunctions) {
 				#Dump::make($sql);
