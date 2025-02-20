@@ -41,13 +41,18 @@ class Vocabulary
 
 	public static function getFolder(string $path): array
 	{
-		$dirPath = STORAGE_DIR . "vocabularies/$path";
+		$dirPath = App::$STORAGE_DIR . "vocabularies/$path";
 		$vocabularyNames = scandir($dirPath);
 		array_splice($vocabularyNames, 0, 2);
 
 		$arr = [];
 		foreach ($vocabularyNames as $vocabularyName) {
-			$arr[intval($vocabularyName)] = json_decode(file_get_contents(STORAGE_DIR . 'vocabularies/' . $path . '/' . $vocabularyName), true);
+			$arr[intval($vocabularyName)] = json_decode(
+				file_get_contents(
+					App::$STORAGE_DIR . 'vocabularies/' . $path . '/' . $vocabularyName
+				),
+				true
+			);
 		}
 		return $arr;
 	}
@@ -57,7 +62,11 @@ class Vocabulary
 		if (!$lang) {
 			$lang = Cookie::get('LanguageCode');
 		}
-		$this->collection = json_decode(file_get_contents(STORAGE_DIR . "vocabularies/$name.json"), true);
+
+		$this->collection = json_decode(
+			file_get_contents(App::$STORAGE_DIR . "vocabularies/$name.json"),
+			true
+		);
 	}
 
 	public static function collect(array $arr): array

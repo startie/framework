@@ -50,13 +50,19 @@ class Url
 			throw new Exception("Enviroment 'DOMAIN' is missing");
 		}
 
-		/* Constants */
+		// Constants
+		// define("APP_PROTOCOL", $protocol);
+		// define("URL_APP", $protocol . $server . $domain);
+		// Url::$ROOT = URL_APP;
+		// define("PUBLIC_URL", URL_APP . "public/");
+		// define("STORAGE_URL", URL_APP . "storage/");
 
-		define("APP_PROTOCOL", $protocol);
-		define("URL_APP", $protocol . $server . $domain);
-		Url::$ROOT = URL_APP;
-		define("PUBLIC_URL", URL_APP . "public/");
-		define("STORAGE_URL", URL_APP . "storage/");
+		App::$APP_PROTOCOL = $protocol;
+		App::$URL_APP = $protocol . $server . $domain;
+		Url::$ROOT = App::$URL_APP;
+		App::$PUBLIC_URL = App::$URL_APP . "public/";
+		App::$STORAGE_URL = App::$URL_APP . "storage/";
+		App::$NODE_MODULES_URL = App::$URL_APP . "node_modules/";
 	}
 
 	/**

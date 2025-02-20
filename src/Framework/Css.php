@@ -41,7 +41,7 @@ class Css
 	{
 		$html = "";
 		if ($_ENV['MODE_DEV']) {
-			$path = FRONTEND_DIR . "$name.css";
+			$path = App::$FRONTEND_DIR . "$name.css";
 			$html .= "<style>";
 			$html .= file_get_contents($path);
 			$html .= "</style>";
@@ -53,7 +53,7 @@ class Css
 	public static function node(string $uri): void
 	{
 		if ($_ENV['MODE_DEV']) {
-			echo self::uri(NODE_MODULES_URL . $uri);
+			echo self::uri(App::$NODE_MODULES_URL . $uri);
 		}
 	}
 

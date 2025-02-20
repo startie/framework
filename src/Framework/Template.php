@@ -22,7 +22,7 @@ class Template
         $mustache = new Mustache_Engine([
             'pragmas' => [Mustache_Engine::PRAGMA_BLOCKS],
             'loader' => new Mustache_Loader_FilesystemLoader(
-                BACKEND_DIR . "Templates/",
+                App::$BACKEND_DIR . "Templates/",
                 [
                     'extension' => '.mst'
                 ]

@@ -6,6 +6,25 @@ namespace Startie;
 
 class App
 {
+public static string $DIR_APP;
+    public static string $FRONTEND_DIR;
+    public static string $BACKEND_DIR;
+    public static string $PUBLIC_DIR;
+    public static string $STORAGE_DIR;
+    public static string $VENDOR_DIR;
+
+    public static string $DATE_TIMEZONE;
+    public static string $TIMEZONE;
+    public static string $LOCALE;
+
+    public static string $APP_PROTOCOL;
+    public static string $URL_APP;
+    public static string $PUBLIC_URL;
+    public static string $STORAGE_URL;
+    /* @deprecated 0.46.0 */
+    public static string $NODE_MODULES_URL;
+        
+
     /**
      * @var string App's root path
      */

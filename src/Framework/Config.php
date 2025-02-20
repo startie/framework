@@ -78,13 +78,20 @@ class Config
 			);
 		}
 
-		// Define constants
-		define("DIR_APP", $dirRoot);
-		define("FRONTEND_DIR", DIR_APP . "frontend/");
-		define("BACKEND_DIR", DIR_APP . "backend/");
-		define("PUBLIC_DIR", DIR_APP . "public/");
-		define("STORAGE_DIR", DIR_APP . "storage/");
-		define("VENDOR_DIR", DIR_APP . "vendor/");
+		// Constants
+		// define("DIR_APP", $dirRoot);
+		// define("FRONTEND_DIR", DIR_APP . "frontend/");
+		// define("BACKEND_DIR", DIR_APP . "backend/");
+		// define("PUBLIC_DIR", DIR_APP . "public/");
+		// define("STORAGE_DIR", DIR_APP . "storage/");
+		// define("VENDOR_DIR", DIR_APP . "vendor/");
+
+		App::$DIR_APP = $dirRoot;
+		App::$FRONTEND_DIR = App::$DIR_APP . "frontend/";
+		App::$BACKEND_DIR = App::$DIR_APP . "backend/";
+		App::$PUBLIC_DIR = App::$DIR_APP . "public/";
+		App::$STORAGE_DIR = App::$DIR_APP . "storage/";
+		App::$VENDOR_DIR = App::$DIR_APP . "vendor/";
 	}
 
 	/**
@@ -92,10 +99,18 @@ class Config
 	 */
 	public static function defineRegionConstants(): void
 	{
-		define('DATE_TIMEZONE', $_ENV['DATE_TIMEZONE']);
-		define('TIMEZONE', $_ENV['TIMEZONE']);
-		define('LOCALE', $_ENV['LOCALE']);
+// Constants
+		// 		define('DATE_TIMEZONE', $_ENV['DATE_TIMEZONE']);
+// 		define('TIMEZONE', $_ENV['TIMEZONE']);
+// 		define('LOCALE', $_ENV['LOCALE']);
 
+App::$DATE_TIMEZONE = $_ENV['DATE_TIMEZONE'];
+		App::$TIMEZONE = $_ENV['TIMEZONE'];
+		App::$LOCALE = $_ENV['LOCALE'];
+
+		$_ENV['DATE_DEFAULT_TIMEZONE'] ??= "";
+
+		if ($_ENV['DATE_DEFAULT_TIMEZONE'] !== "") {
 		date_default_timezone_set($_ENV['DATE_DEFAULT_TIMEZONE']);
 		setlocale(LC_ALL, $_ENV['LOCALE']);
 	}

@@ -58,7 +58,7 @@ class Asseter
 			return self::$hash;
 		}
 
-		$PUBLIC_JS_DIR = PUBLIC_DIR . "$fromAssetType/";
+		$PUBLIC_JS_DIR = App::$PUBLIC_DIR . "$fromAssetType/";
 		$typeFiles = scandir($PUBLIC_JS_DIR);
 
 		if ($typeFiles === false) {
@@ -114,9 +114,9 @@ class Asseter
 	public static function getRootUrl(): string
 	{
 		if (isset(self::$root)) {
-			return trim(URL_APP, "/") . self::$root;
+			return trim(App::$URL_APP, "/") . self::$root;
 		} else {
-			return trim(URL_APP, "/") . "/";
+			return trim(App::$URL_APP, "/") . "/";
 		}
 	}
 
@@ -124,7 +124,10 @@ class Asseter
 	{
 		$prefix = self::$jsPrefix;
 		$hash = self::resolveHash();
-		$filename = URL_APP . self::root . "js/{$entry}{$prefix}.{$hash}.js";
+		$filename = App::$URL_APP
+			. (self::$root ?? "")
+			. "js/{$entry}{$prefix}.{$hash}.js";
+
 		echo "<script src='$filename'></script>";
 	}
 
@@ -147,7 +150,7 @@ class Asseter
 			$filePath = "js/Pages{$entry}{$prefix}.{$hash}.js";
 		}
 
-		$fileDir = PUBLIC_DIR . $filePath;
+		$fileDir = App::$PUBLIC_DIR . $filePath;
 
 		if (file_exists($fileDir)) {
 			$assetUrl = self::getRootUrl() . $filePath;

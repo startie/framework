@@ -51,7 +51,9 @@ class Js
 	public static function node(string $url): void
 	{
 		if ($_ENV['MODE_DEV']) {
-			Js::url(NODE_MODULES_URL . $url);
+			echo Js::uri(
+				App::$NODE_MODULES_URL . $url
+			);
 		}
 	}
 
