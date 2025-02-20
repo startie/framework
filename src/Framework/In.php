@@ -91,14 +91,28 @@ class In
         array $if = [],
         array $processing = [],
         array $replacements = []
-    ): mixed     {
-        return In::e("cookie", $key, $sanitizeType, $if, $processing, $replacements);
+    ): mixed {
+        return In::e(
+            "cookie",
+            $key,
+            $sanitizeType,
+            $if,
+            $processing,
+            $replacements
+        );
     }
 
     /**
      * Short-hand method
-     */
-    public static function env(
+    ): mixed {
+        return In::e(
+            "env",
+            $key,
+            $sanitizeType,
+            $if,
+            $processing,
+            $replacements
+        );
         string $key,
         string $sanitizeType = '',
         array $if = [],
@@ -117,8 +131,15 @@ class In
         array $if = [],
         array $processing = [],
         array $replacements = []
-    ): mixed     {
-        return In::e("files", $key, $sanitizeType, $if, $processing, $replacements);
+    ): mixed {
+        return In::e(
+            "files",
+            $key,
+            $sanitizeType,
+            $if,
+            $processing,
+            $replacements
+        );
     }
 
     /**
@@ -130,8 +151,15 @@ class In
         array $if = [],
         array $processing = [],
         array $replacements = []
-    ): mixed     {
-        return In::e("get", $key, $sanitizeType, $if, $processing, $replacements);
+    ): mixed {
+        return In::e(
+            "get",
+            $key,
+            $sanitizeType,
+            $if,
+            $processing,
+            $replacements
+        );
     }
 
     /**
@@ -143,8 +171,15 @@ class In
         array $if = [],
         array $processing = [],
         array $replacements = []
-    ): mixed     {
-        return In::e("post", $key, $sanitizeType, $if, $processing, $replacements);
+    ): mixed {
+        return In::e(
+            "post",
+            $key,
+            $sanitizeType,
+            $if,
+            $processing,
+            $replacements
+        );
     }
 
     /**
@@ -156,8 +191,15 @@ class In
         array $if = [],
         array $processing = [],
         array $replacements = []
-    ): mixed     {
-        return In::e("request", $key, $sanitizeType, $if, $processing, $replacements);
+    ): mixed {
+        return In::e(
+            "request",
+            $key,
+            $sanitizeType,
+            $if,
+            $processing,
+            $replacements
+        );
     }
 
     /**
@@ -169,8 +211,15 @@ class In
         array $if = [],
         array $processing = [],
         array $replacements = []
-    ): mixed     {
-        return In::e("server", $key, $sanitizeType, $if, $processing, $replacements);
+    ): mixed {
+        return In::e(
+            "server",
+            $key,
+            $sanitizeType,
+            $if,
+            $processing,
+            $replacements
+        );
     }
 
     /**
@@ -182,7 +231,14 @@ class In
         array $if = [],
         array $processing = [],
         array $replacements = []
-    ): mixed     {
-        return In::e("session", $key, $sanitizeType, $if, $processing, $replacements);
+    ): mixed {
+        return In::e(
+            "session",
+            $key,
+            $sanitizeType,
+            $if,
+            $processing,
+            $replacements
+        );
     }
 }

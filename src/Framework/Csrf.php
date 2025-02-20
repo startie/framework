@@ -49,7 +49,7 @@ class Csrf
 	public static function check(): void
 	{
 		$CurrentUserId = Auth::getIdInService('app');
-		$CurrentUserId = ($CurrentUserId) ? $CurrentUserId : 0;
+		$CurrentUserId = ($CurrentUserId === false) ? $CurrentUserId : 0;
 
 		// Get token from POST
 		$tokenPOST = Input::post('csrfToken', 'STR');
@@ -63,7 +63,7 @@ class Csrf
 			$csrfUrl = str_replace(
 				Url::app(),
 				"",
-				$_SERVER['HTTP_REFERER']
+				$_SERVER['HTTP_REFERER'] ?? ""
 			);
 		}
 
@@ -76,7 +76,7 @@ class Csrf
 						unset($_SESSION['csrf'][$u][$c]);
 					}
 
-					# If not
+					// If not
 					else {
 						// TODO: log
 					}

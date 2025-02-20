@@ -19,6 +19,7 @@ class Cookie
         if (Cookie::is($var)) {
             return Input::cookie($var, $type);
         }
+
         return false;
     }
 

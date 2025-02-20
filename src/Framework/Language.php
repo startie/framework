@@ -7,7 +7,8 @@ class Language
     public static function code(): string
     {
         $code = Cookie::get('LanguageCode');
-        if (!$code) {
+
+        if ($code === false) {
             if (isset($_ENV['LANGUAGE_CODE'])) {
                 $code = $_ENV['LANGUAGE_CODE'];
             } else {
