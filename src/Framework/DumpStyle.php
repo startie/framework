@@ -37,8 +37,11 @@ class DumpStyle
 
     private static bool $hasArray = false;
 
-    public static function var_dump($var, $return = false, $expandLevel = 1)
-    {
+    public static function var_dump(
+        mixed $var,
+        bool $return = false,
+        int $expandLevel = 1
+    ): string {
         self::$hasArray = false;
         $toggScript =
             '

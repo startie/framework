@@ -38,7 +38,7 @@ class Dev
 		}
 	}
 
-	public static function globals()
+	public static function globals(): array|null
 	{
 		if (Access::is('developers')) {
 			$globalsArr = array(
