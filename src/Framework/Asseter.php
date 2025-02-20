@@ -136,26 +136,7 @@ class Asseter
 		$prefix = self::$jsPrefix;
 		$hash = self::resolveHash();
 
-		if ($entry !== null) {
-			$debug_backtrace = debug_backtrace();
-
-			// TODO: Find right index
-			$controllerClass = $debug_backtrace[2]['class'] ?? "";
-
-			if ($controllerClass === "") {
-				throw new Exception("Class was not found");
-			}
-
-			$controllerClass = str_replace("_Controller", "", $controllerClass);
-
-			$controllerFunction = debug_backtrace()[2]['function'];
-			$controllerFunction = ucfirst($controllerFunction);
-
-			$filePath = "js/Pages{$controllerClass}"
-				. "{$controllerFunction}{$prefix}.{$hash}.js";
-		} else {
-			$filePath = "js/Pages{$entry}{$prefix}.{$hash}.js";
-		}
+		$filePath = "js/Pages{$entry}{$prefix}.{$hash}.js";
 
 		$fileDir = App::$PUBLIC_DIR . $filePath;
 
