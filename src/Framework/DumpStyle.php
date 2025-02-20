@@ -184,7 +184,7 @@ class DumpStyle
                     if (is_string($key)) {
                         $longest_key = max($longest_key, strlen($key) + 2);
                     } else {
-                        $longest_key = max($longest_key, strlen($key));
+                        $longest_key = max($longest_key, strlen((string) $key));
                     }
                 }
                 foreach ($var as $key => $value) {
@@ -233,7 +233,7 @@ class DumpStyle
                 if (is_string($key)) {
                     $longest_key = max($longest_key, strlen($key) + 2);
                 } else {
-                    $longest_key = max($longest_key, strlen($key));
+                    $longest_key = max($longest_key, strlen((string) $key));
                 }
             }
             foreach ($varArray as $key => $value) {
