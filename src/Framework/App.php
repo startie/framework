@@ -70,9 +70,14 @@ public static string $DIR_APP;
     public static function getCurrentVersion(): string
     {
         $version = exec('git describe --tags --abbrev=0');
-        $version = trim($version);
 
-        return $version;
+        if ($version !== false) {
+            $version = trim($version);
+
+            return $version;
+        } else {
+            return "";
+        }
     }
 
     /**
@@ -80,11 +85,18 @@ public static string $DIR_APP;
      */
     public static function getLastUpdateDate(): string
     {
-        $commitDate = new \DateTime(trim(exec('git log -n1 --pretty=%ci HEAD')));
-        $commitDate->setTimezone(new \DateTimeZone('UTC'));
+        $output = exec('git log -n1 --pretty=%ci HEAD');
 
-        $date = $commitDate->format('Y-m-d H:i:s');
+        if (is_string($output)) {
+            $output = trim($output);
+            $commitDate = new \DateTime($output);
+            $commitDate->setTimezone(new \DateTimeZone('UTC'));
 
-        return $date;
+            $date = $commitDate->format('Y-m-d H:i:s');
+
+            return $date;
+        } else {
+            return "";
+        }
     }
 }
