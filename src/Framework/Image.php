@@ -4,6 +4,9 @@ namespace Startie;
 
 class Image
 {
+	/**
+	 * @deprecated 0.46.0
+	 */
 	public static function convertImage(
 		string $originalImage,
 		null|string $outputImage,

@@ -50,6 +50,9 @@ class Css
 		echo $html;
 	}
 
+	/**
+	 * @deprecated 0.46.0
+	 */
 	public static function node(string $uri): void
 	{
 		if ($_ENV['MODE_DEV']) {
