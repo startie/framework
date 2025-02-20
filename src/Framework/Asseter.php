@@ -78,7 +78,7 @@ class Asseter
 
 		$listOfFilesNew = [];
 		foreach ($listOfFiles as $file) {
-			if (strpos($file, ".{$fromAssetType}")) {
+			if (strpos($file, ".{$fromAssetType}") !== false) {
 				$listOfFilesNew[] = $file;
 			}
 		}
@@ -136,16 +136,23 @@ class Asseter
 		$prefix = self::$jsPrefix;
 		$hash = self::resolveHash();
 
-		// TODO: Find right index
+		if ($entry !== null) {
+			$debug_backtrace = debug_backtrace();
 
-		if (!$entry) {
-			$controllerClass = debug_backtrace()[2]['class'];
+			// TODO: Find right index
+			$controllerClass = $debug_backtrace[2]['class'] ?? "";
+
+			if ($controllerClass === "") {
+				throw new Exception("Class was not found");
+			}
+
 			$controllerClass = str_replace("_Controller", "", $controllerClass);
 
 			$controllerFunction = debug_backtrace()[2]['function'];
 			$controllerFunction = ucfirst($controllerFunction);
 
-			$filePath = "js/Pages{$controllerClass}{$controllerFunction}{$prefix}.{$hash}.js";
+			$filePath = "js/Pages{$controllerClass}"
+				. "{$controllerFunction}{$prefix}.{$hash}.js";
 		} else {
 			$filePath = "js/Pages{$entry}{$prefix}.{$hash}.js";
 		}
