@@ -71,7 +71,7 @@ class Csrf
 		foreach ($_SESSION['csrf'] as $u => $urlConfigs) {
 			if ($csrfUrl == $u) {
 				foreach ($urlConfigs as $c => $urlConfig) {
-					# If ok
+					// If ok
 					if (Csrf::is($tokenPOST)) {
 						unset($_SESSION['csrf'][$u][$c]);
 					}

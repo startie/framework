@@ -53,6 +53,9 @@ class Db
 		}
 	}
 
+	/**
+	 * Returns empty string when param doesn't exists in config
+	 */
 	public static function config(string|null $name = null): string
 	{
 		if (isset($name)) {

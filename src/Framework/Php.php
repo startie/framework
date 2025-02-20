@@ -10,10 +10,9 @@ class Php
 	#
 	#
 
-	#
-	# 	Checks if variable is set and has a certain value
-	#
-
+	/**
+	 * Checks if variable is set and has a certain value
+	 */
 	public static function isve(mixed $var, mixed $val = null): bool
 	{
 		if (isset($var)) {
@@ -28,14 +27,14 @@ class Php
 		return false;
 	}
 
-	#
-	#	Checks if two variables has smth in common
-	#	todo: support for double, float
-	#
+	/**
+	 * Checks if two variables has smth in common
+	 * TODO: support for double, float
+	 */
 
 	public static function hasInCommon(mixed $one, mixed $two): bool
 	{
-		# Array
+		// Array
 		if (is_array($one) && is_array($two)) {
 			$intersect = array_intersect_key($one, $two);
 			if (!empty($intersect)) {
@@ -45,7 +44,7 @@ class Php
 			}
 		}
 
-		# Bool
+		// Bool
 		else if (is_bool($one) && is_bool($two)) {
 			if ($one == $two) {
 				return true;
@@ -54,7 +53,7 @@ class Php
 			}
 		}
 
-		# Int, float
+		// Int, float
 		else if (is_numeric($one) && is_numeric($two)) {
 			if ($one == $two) {
 				return true;
@@ -63,12 +62,12 @@ class Php
 			}
 		}
 
-		# Null
+		// Null
 		else if (is_null($one) && is_null($two)) {
 			return true;
 		}
 
-		# String
+		// String
 		else if (is_string($one) && is_string($two)) {
 			if ($one == $two) {
 				return true;
@@ -80,8 +79,8 @@ class Php
 		}
 	}
 
-	/*  
-		source: https://stackoverflow.com/questions/5225971/is-it-possible-to-get-list-of-defined-namespaces
+	/**
+	 * @source https://stackoverflow.com/questions/5225971/is-it-possible-to-get-list-of-defined-namespaces
 	*/
 
 	public static function namespaceExists(string $namespace): bool
@@ -159,10 +158,9 @@ class Php
 		}
 	}
 
-	#
-	# 	Checks if (super) global has a variable with ceratain value is exists
-	#
-
+	/**
+	 * Checks if (super) global has a variable with ceratain value is exists
+	 */
 	public static function isgve(mixed $glob, string $var, mixed $value): bool
 	{
 		$glob = strtoupper($glob);
@@ -224,6 +222,9 @@ class Php
 	#
 
 	/**
+	 * Supports: COOKIE, ENV, GET, POST, SERVER
+	 * Does not support: FILES, REQUEST, SESSION
+	 * 
 	 * Wrapper around `filter_input()`
 	 */
 	public static function input(
@@ -535,10 +536,9 @@ string $encoding = 'UTF-8'
 	#
 	#
 
-	#
-	# 	Checks if array has a key [with certain value]
-	#
-
+	/**
+	 * Checks if array has a key [with certain value]
+	 */
 	public static function isake(
 		array $arr,
 		string $key,
@@ -556,10 +556,9 @@ string $encoding = 'UTF-8'
 		return false;
 	}
 
-	#
-	#	Flags each element of $collection
-	#
-
+	/**
+	 * Flags each element of $collection
+	 */
 	public static function mark(
 		array $arr,
 		int|string $index,
@@ -572,10 +571,9 @@ string $encoding = 'UTF-8'
 		return $arr;
 	}
 
-	#
-	#	Makes flagged $collection[$property] with $value
-	#
-
+	/**
+	 * Makes flagged $collection[$property] with $value
+	 */
 	public static function flag(
 		array $collection,
 		string|int $property,
@@ -596,25 +594,24 @@ string $encoding = 'UTF-8'
 		return $collection;
 	}
 
-	#
-	# 	Returns: 
-	# 	- index (from 0 to ...) of element in multi-dimensional array with certain value of a property
-	# 	- -1 when not found
-	# 	(s=search, m=multi, d=dimensional, a=array)
-	# 	
-	#	Example:
-	# 	$Users = [
-	#  		['name' => 'Pete', 'age' => 9],
-	#		['name' => 'Kate', 'age' => 23],
-	#		['name' => 'John', 'age' => 25],
-	#		['name' => 'Kim', 'age' => 38],
-	#	];
-	#	
-	#	$index = Php::smda($Users, 'age', 9); // => 0 (Pete)
-	#		
-	#	works only when all element has this prop
-	#						
-
+	/**
+	 * Returns: 
+	 * - index (from 0 to ...) of element in multi-dimensional array with certain value of a property
+	 * - -1 when not found
+	 * (s=search, m=multi, d=dimensional, a=array)
+	 * 	# 	
+	 * Example:
+	 * $Users = [
+	 * 	['name' => 'Pete', 'age' => 9],
+	 * 	['name' => 'Kate', 'age' => 23],
+	 * 	['name' => 'John', 'age' => 25],
+	 * 	['name' => 'Kim', 'age' => 38],
+	 * ];
+	 * 	#	
+	 * $index = Php::smda($Users, 'age', 9); // => 0 (Pete)
+	 * 	
+	 * works only when all element has this prop
+	 */
 	public static function smda(
 		array $arr,
 		string|int $prop,
@@ -628,14 +625,13 @@ string $encoding = 'UTF-8'
 		return $index;
 	}
 
-	#
-	#	Returns index of element in multi-dimensional array that has max or min value of a property
-	#	(s=search, m=multi, d=dimensional, a=array, in m='mode')
-	#
-	#	Example
-	#	$index = Php::smdam($Users, 'age', 'max'); // => 3 (Kim)
-	#		
-
+	/**
+	 * Returns index of element in multi-dimensional array that has 
+	 * max or min value of a property
+	 * (s=search, m=multi, d=dimensional, a=array, in m='mode')
+	 * Example
+	 * $index = Php::smdam($Users, 'age', 'max'); // => 3 (Kim)
+	 */
 	public static function smdam(
 		array $arr,
 		string|int $prop,
@@ -682,10 +678,9 @@ string $encoding = 'UTF-8'
 		return $arr;
 	}
 
-	#
-	#	(o=order,m=multi, d=dimensional, a=array)
-	#
-
+	/**
+	 * (o=order,m=multi, d=dimensional, a=array)
+	 */
 	public static function oma(
 		array &$arr,
 		string|int $col,
@@ -700,12 +695,11 @@ string $encoding = 'UTF-8'
 		array_multisort($sort_col, $dir, $arr);
 	}
 
-	#
-	#	Deletes element with specific value
-	#	(a=array: d=delete, e=element, with v=value)
-	#	source: https://stackoverflow.com/questions/7225070/php-array-delete-by-value-not-key
-	#
-
+	/**
+	 * Deletes element with specific value
+	 * (a=array: d=delete, e=element, with v=value)
+	 * @source https://stackoverflow.com/questions/7225070/php-array-delete-by-value-not-key
+	 */
 	public static function a_dev(
 		array &$arr,
 		mixed $value
@@ -717,12 +711,11 @@ string $encoding = 'UTF-8'
 		$arr = array_values($arr);
 	}
 
-	#
-	#	Deletes elements with specific value of key
-	#	(m=multi, d=dimensional, a=array: d=delete, e=element)
-	#	source: https://stackoverflow.com/questions/4466159/delete-element-from-multidimensional-array-based-on-value
-	#
-
+	/**
+	 * Deletes elements with specific value of key
+	 * (m=multi, d=dimensional, a=array: d=delete, e=element)
+	 * @source https://stackoverflow.com/questions/4466159/delete-element-from-multidimensional-array-based-on-value
+	 */
 	public static function mda_de(array $arr, int|string $key, mixed $value): array
 	{
 		foreach ($arr as $k => $e) {

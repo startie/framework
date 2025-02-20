@@ -227,25 +227,24 @@ class Model
 	public static function update($params): int
 	{
 		$calledModelClass = get_called_class();
-		#
-		#	Vars
+		
+		// Vars
 
 		$debug = 0;
 		$die = 0;
-		$test = 0;
+		$test = (bool) ($params['test'] ?? false);
 
-		extract($params);
+		$set = $params['insert'] ?? $params['set'] ?? $params['fields'] ?? [];
+		$where = $params['where'] ?? [];
+		$having = $params['having'] ?? [];
 
-		#
-		#	Checks
-
-		if (!isset($where)) {
+		// Checks
+		if ($where === []) {
 			throw new Exception("Dangerous: no where for update");
 			//die(); // after throw die is not reachable
 		}
 
-		#
-		#	SQL generate
+		// SQL generate
 
 		$sql = "";
 
@@ -317,6 +316,7 @@ class Model
 
 	/**
 	 * Deletes rows and returns count of affected rows
+* Return 0 if in test mode
 	 */
 	public static function delete($params): int
 	{
@@ -519,15 +519,15 @@ class Model
 	#
 	#
 
-	/*
-		Return an array of columns
-		[
-			['columnName', 'columnValue', 'valueType'],
-			['columnName', 'columnValue', 'valueType'],
-			['columnName', 'columnValue', 'valueType'],
-		]
-		
-		Подойдёт для вставки в методы create и update
+	/**
+	 * 		Returns an array of columns
+		* [
+	 * 				['columnName', 'columnValue', 'valueType'],
+* 				['columnName', 'columnValue', 'valueType'],
+* 				['columnName', 'columnValue', 'valueType'],
+		* ]
+	 * 		
+	 * 		Подойдёт для вставки в методы create и update
 	*/
 	public static function rows($exceptions = NULL)
 	{

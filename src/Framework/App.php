@@ -64,6 +64,9 @@ public static string $DIR_APP;
         return self::$root . "/$path";
     }
 
+    /**
+     * Returns empty string if version was not found
+     */
     public static function getCurrentVersion(): string
     {
         $version = exec('git describe --tags --abbrev=0');
@@ -72,6 +75,9 @@ public static string $DIR_APP;
         return $version;
     }
 
+    /**
+     * Returns empty string if date was not found
+     */
     public static function getLastUpdateDate(): string
     {
         $commitDate = new \DateTime(trim(exec('git log -n1 --pretty=%ci HEAD')));
