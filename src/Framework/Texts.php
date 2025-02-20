@@ -105,6 +105,7 @@ class Texts
 		foreach ($arr as $v) {
 			$vArr[] = self::get("$v");
 		}
+
 		return call_user_func_array('array_merge', $vArr);
 	}
 
@@ -138,7 +139,6 @@ class Texts
 
 			return $v;
 		} else {
-
 			throw new \Startie\Exception("Texts on $fullPath doesn't exists");
 		}
 	}
