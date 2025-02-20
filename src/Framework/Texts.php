@@ -38,7 +38,11 @@ class Texts
 		$textsPath = App::path("backend/Texts/");
 		$textsFiles = scandir($textsPath);
 		foreach ($textsFiles as $textsFile) {
-			if ($textsFile !== "." && $textsFile !== "..") {
+			if (
+				$textsFile !== "."
+				&& $textsFile !== ".."
+				&& $textsFile !== ".DS_Store"
+			) {
 				$textsPaths[] = "{$textsFile}/$LanguageCode";
 			}
 		}
