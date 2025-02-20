@@ -6,24 +6,35 @@ use Startie\Dump;
 /**
  * Shortcut for `Dump::make()`
  */
-function d($result = null, $die = 0, $msg = null, $trace = null): void
-{
+function d(
+    mixed $result = null,
+    bool $die = false,
+    string $msg = "",
+    bool $trace = false
+): void {
     Dump::make($result, $die, $msg, $trace);
 }
 
 /**
  * Shortcut for `Dump::make()`
  */
-function dump($result = null, $die = 0, $msg = null, $trace = null): void
-{
+function dump(
+    mixed $result = null,
+    bool $die = false,
+    string $msg = "",
+    bool $trace = false
+): void {
     Dump::make($result, $die, $msg, $trace);
 }
 
 /**
  * Shortcut for `Dump::made()`
  */
-function dd($result = null, $msg = null, $trace = null): void
-{
+function dd(
+    mixed $result = null,
+    string $msg = "",
+    bool $trace = false
+): void {
     Dump::made($result, $msg, $trace);
 }
 
@@ -38,14 +49,14 @@ function t(string $str = "", string $fallback = ""): string
 /**
  * Shortcut for `View::r()`
  */
-function view($name, array $data = [], bool $trimSpaces = false)
+function view(string $name, array $data = [], bool $trimSpaces = false): string
 {
     return \Startie\View::r($name, $data, $trimSpaces);
 }
 /**
  * Shortcut for `View::r()`
  */
-function v($name, array $data = [], bool $trimSpaces = false): string
+function v(string $name, array $data = [], bool $trimSpaces = false): string
 {
     return \Startie\View::r($name, $data, $trimSpaces);
 }
@@ -63,9 +74,9 @@ function title(string $title): void
  */
 function url(
     string $routeExpression,
-    $controllerParams = null,
-    $queryParams = null,
-    $arraishQueryParams = false
+    array|null $controllerParams = null,
+    array|null $queryParams = null,
+    bool $arraishQueryParams = false
 ): string {
     return \Startie\Url::controller(
         $routeExpression,
@@ -78,8 +89,11 @@ function url(
 /**
  * Shortcut for `Template::return()`
  */
-function template($templatePath, $data, $csrf = null): string
-{
+function template(
+    string $templatePath,
+    array $data,
+    string|null $csrf = null
+): string {
     return \Startie\Template::return($templatePath, $data, $csrf);
 }
 

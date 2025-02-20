@@ -60,7 +60,7 @@ class View
         string $name,
         array $data = [],
         bool|null $trimSpaces = NULL
-    ) {
+    ): string {
         return self::return($name, $data, $trimSpaces);
     }
 

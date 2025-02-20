@@ -167,9 +167,9 @@ class Dump
      */
     public static function make(
         mixed $result,
-        int|bool $die = false,
+        bool $die = false,
         string $message = "",
-        bool|int|null $trace = false
+        bool $trace = false
     ): void {
         self::requireBoot();
         $backTrace = "";
@@ -202,10 +202,10 @@ class Dump
 
         if (self::hasAccess()) {
             Dump::pre($result, $message . $backTrace);
-            if ((bool) $trace) {
+            if ($trace) {
                 Dump::pre(debug_backtrace());
             }
-            if ((bool) $die) {
+            if ($die) {
                 die();
             }
         }
@@ -216,13 +216,11 @@ class Dump
      */
     public static function made(
         mixed $result,
-        string|null $message = null,
-        int|null $trace = 0
+        string $message = "",
+        bool $trace = false
     ): void {
         self::requireBoot();
-        $message ??= "";
-        Dump::make($result, 1, $message, $trace);
-        
+        Dump::make($result, true, $message, $trace);
         die();
     }
 
