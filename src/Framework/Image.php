@@ -28,7 +28,7 @@ class Image
 			return 0;
 		}
 
-		# quality is a value from 0 (worst) to 100 (best)
+		// Quality is a value from 0 (worst) to 100 (best)
 		imagejpeg($imageTmp, $outputImage, $quality);
 		imagedestroy($imageTmp);
 

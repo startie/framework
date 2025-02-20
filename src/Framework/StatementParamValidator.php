@@ -15,7 +15,7 @@ class StatementParamValidator
 
     public static function join(array $params): true
     {
-        foreach ($params as $table => $rulesArray) {
+        foreach ($params as $rulesArray) {
             if (!is_array($rulesArray)) {
                 throw new Exception(
                     'Params of `$join` should be an array'
@@ -92,7 +92,7 @@ class StatementParamValidator
                 throw new Exception(
                     'First element of `$values` should be an array'
                 );
-            };
+            }
 
             /*
                 Protection from:
@@ -113,9 +113,11 @@ class StatementParamValidator
                         throw new Exception(
                             'Part should be a string or integer for ' . $column
                         );
-                    };
-                };
-            };
+                    }
+                }
+            }
         }
+
+        return null;
     }
 }

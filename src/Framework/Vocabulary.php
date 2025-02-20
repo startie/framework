@@ -27,6 +27,7 @@ class Vocabulary
 						$vArrfied[$x]['id'] = $i;
 						$vArrfied[$x]['name'] = Php::mb_ucfirst($value);
 					}
+
 					return $vArrfied;
 				}
 			}
@@ -34,7 +35,6 @@ class Vocabulary
 
 			return $v;
 		} else {
-
 			throw new \Exception("Vocabulary on $fullPath doesn't exists");
 		}
 	}
@@ -54,6 +54,7 @@ class Vocabulary
 				true
 			);
 		}
+
 		return $arr;
 	}
 
@@ -75,6 +76,7 @@ class Vocabulary
 		foreach ($arr as $v) {
 			$vArr[] = Vocabulary::get("$v");
 		}
+
 		return call_user_func_array('array_merge', $vArr);
 	}
 }

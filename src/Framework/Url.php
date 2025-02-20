@@ -4,7 +4,7 @@ namespace Startie;
 
 class Url
 {
-	use \Startie\Bootable;
+	use Bootable;
 
 	public static string $ROOT;
 
@@ -16,7 +16,7 @@ class Url
 
 	public static function defineConstants(): void
 	{
-		/* Load */
+		// Load
 
 		// • protocol
 
@@ -232,7 +232,7 @@ class Url
 			$uri = Url::app(
 				$foundedUrl,
 				$queryParams,
-				NULL,
+				null,
 				$arraishQueryParams
 			);
 
@@ -273,7 +273,10 @@ class Url
 	{
 		Url::requireBoot();
 
-		$url = APP_PROTOCOL . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+		$url = App::$APP_PROTOCOL
+			. ($_SERVER['HTTP_HOST'] ?? "")
+			. ($_SERVER['REQUEST_URI'] ?? "");
+
 		return $url;
 	}
 
@@ -281,7 +284,8 @@ class Url
 	 * 
 	 * Get query params as an array.
 	 * 
-	 * Gives a structured represantation of the current query string or values of certain param.
+	 * Gives a structured represantation of the current query string 
+	 * or values of certain param.
 	 *
 	 * @param string|null $param If it is presented returns only that values 
 	 * that belongs to a certain param.
@@ -298,14 +302,14 @@ class Url
 
 		// 1. Query string
 		// a) Use current query string 
-		if ($queryString === NULL) {
+		if ($queryString === null) {
 			$queryString = $_SERVER['QUERY_STRING'] ?? '';
 		}
 
 		// b) Use passed
 		else {
 			// If there is a question mark ...
-			if (strpos($queryString, "?") !== -1) {
+			if (strpos($queryString, "?") !== false) {
 				// ... percieve it as a full url
 				$url = $queryString;
 				// ... and delete part before '?'

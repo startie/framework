@@ -8,6 +8,7 @@ class Svg
 	{
 		$filePath = App::$PUBLIC_DIR . $path . '.svg';
 		$file = file_get_contents($filePath);
+
 		return $file;
 	}
 

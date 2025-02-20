@@ -9,7 +9,9 @@ class Model
 {
 	use \Startie\Bootable;
 
-	public static $config;
+	public static array $config;
+
+	public static mixed $storage;
 
 	public static array $columnTypes;
 
@@ -46,8 +48,9 @@ class Model
 
 	/**
 	 * Creates a row in the table and returns it's id
+	 * Returns 0 if in test mode
 	 */
-	public static function create(array $params): int|string
+	public static function create(array $params): int
 	{
 		#
 		#	Vars
@@ -116,6 +119,8 @@ class Model
 		} catch (PDOException $e) {
 			self::processPdoException($e, $sql, $sqlBeforeBinding);
 		}
+
+		return 0;
 	}
 
 	/**
@@ -229,9 +234,8 @@ class Model
 		$calledModelClass = get_called_class();
 
 		// Vars
-
-		$debug = 0;
-		$die = 0;
+		$debug = (bool) ($params['debug'] ?? false);
+		$die = (bool) ($params['die'] ?? false);
 		$test = (bool) ($params['test'] ?? false);
 
 		$set = $params['insert'] ?? $params['set'] ?? $params['fields'] ?? [];
@@ -241,15 +245,17 @@ class Model
 		// Checks
 		if ($where === []) {
 			throw new Exception("Dangerous: no where for update");
-			//die(); // after throw die is not reachable
 		}
 
 		// SQL generate
 		$sql = "";
 		$table = str_replace("Models\\", "", $calledModelClass);
-		$sql .= StatementBuilder::update($table);
 
-		$set = $insert ?? $fields ?? $set;
+		// if (!is_string($table)) {
+		// 	throw new \Exception("Table name should be string");
+		// }
+
+		$sql .= StatementBuilder::update($table);
 
 		StatementBuilder::set($sql, $set);
 		StatementBuilder::where($sql, $where);
@@ -278,10 +284,7 @@ class Model
 		$columnTypes = $calledModelClass::$columnTypes ?? [];
 
 		QueryBinder::set($sth, $sql, $set, $columnTypes);
-
-		if (isset($where)) {
-			QueryBinder::clause($sth, $sql, $where);
-		}
+		QueryBinder::clause($sth, $sql, $where);
 
 		if (isset($having)) {
 			QueryBinder::clause($sth, $sql, $having);
@@ -310,20 +313,22 @@ class Model
 		} catch (PDOException $e) {
 			self::processPdoException($e, $sql, $sqlBeforeBinding);
 		}
+
+		return 0;
 	}
 
 	/**
 	 * Deletes rows and returns count of affected rows
-* Return 0 if in test mode
+	 * Return 0 if in test mode
 	 */
 	public static function delete(array $params): int
 	{
 		#
 		#	Vars
 
-		$debug = 0;
-		$die = 0;
-		$test = 0;
+		$debug = false;
+		$die = false;
+		$test = false;
 
 		extract($params);
 
@@ -379,6 +384,8 @@ class Model
 		} catch (PDOException $e) {
 			self::processPdoException($e, $sql, $sqlBeforeBinding);
 		}
+
+		return 0;
 	}
 
 	#
@@ -395,7 +402,7 @@ class Model
 		string|null $customSelect = null
 	): int {
 		$select = $params['select'] ?? '';
-		if ($customSelect) {
+		if (!is_null($customSelect)) {
 			$select = ["count($customSelect) as count"];
 		} else {
 			$select = ["count(*) as count"];
@@ -454,6 +461,7 @@ class Model
 	 * ]);
 	 * ```
 	 * 
+	 * @psalm-suppress all
 	 * @deprecated 0.30.10
 	 */
 	public static function where(
@@ -480,7 +488,7 @@ class Model
 	 * 		'column' => [[$val, 'TYPE']]
 	 * ]);
 	 * ```
-	 * 
+	 * @psalm-suppress all
 	 * @deprecated
 	 */
 	public static function field(
@@ -505,8 +513,8 @@ class Model
 	}
 
 	/**
-	 * 
-	 * @deprecated
+	 * @psalm-suppress all
+	 * @deprecated In 1.0.0 will be deleted
 	 */
 	public static function cnt(string $column): int
 	{
@@ -525,12 +533,12 @@ class Model
 	#
 
 	/**
-	 * 		Returns an array of columns
-		* [
-	 * 				['columnName', 'columnValue', 'valueType'],
-* 				['columnName', 'columnValue', 'valueType'],
-* 				['columnName', 'columnValue', 'valueType'],
-		* ]
+	 * Returns an array of columns
+	 * [
+	 * 	['columnName', 'columnValue', 'valueType'],
+	 * 	['columnName', 'columnValue', 'valueType'],
+	 * 	['columnName', 'columnValue', 'valueType'],
+	 * ]
 	 * 		
 	 * Подойдёт для вставки в методы create и update
 	 */
@@ -613,6 +621,7 @@ class Model
 	 * Check if there is a value in some global array with specified key
 	 * If it is presented, add this value to $where
 	 * 
+	 * @psalm-suppress all
 	 * @deprecated 0.19.20 use whereFromInput instead
 	 */
 	public static function isWhereInput($where, $global, $type, $keyInGlobal, $keyInWhere)
@@ -687,7 +696,15 @@ class Model
 		return $e;
 	}
 
-	public static function c($entities, $params = [])
+	/**
+	 * Placeholder
+	 */
+	public static function complete(array $entity, array $params): array
+	{
+		return $entity;
+	}
+
+	public static function c(array $entities, array $params = []): array
 	{
 		foreach ($entities as &$entity) {
 			$entity = static::complete($entity, $params);

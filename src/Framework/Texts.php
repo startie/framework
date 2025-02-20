@@ -96,6 +96,10 @@ class Texts
 			}
 		}
 
+		if (is_array($phrase)) {
+			throw new \Exception('Phrase can not be array');
+		}
+
 		return $phrase;
 	}
 
@@ -159,8 +163,7 @@ class Texts
 		} else {
 			$result = $t[$target]
 				?? $t[str_replace(" ", "_", $target)]
-				?? $fallback
-				?? "";
+				?? $fallback;
 		}
 
 		return $result;

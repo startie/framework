@@ -49,7 +49,10 @@ class Db
 		$envindex = 'DB_EXCLUDE_FUNCTIONS';
 
 		if (isset($_ENV[$envindex])) {
-			Db::$excludeFunctions = explode(",", $_ENV[$envindex]);
+			$functionsToExclude = $_ENV[$envindex];
+			if (is_string($functionsToExclude)) {
+				Db::$excludeFunctions = explode(",", $functionsToExclude);
+			}
 		}
 	}
 
@@ -60,6 +63,8 @@ class Db
 	{
 		if (isset($name)) {
 			return Db::$config[$name];
+		} else {
+			return "";
 		}
 	}
 
@@ -68,7 +73,11 @@ class Db
 		if ($driver === "mysql") {
 			try {
 				$connection = new \PDO($dsn);
-				$connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+				$connection->setAttribute(
+					\PDO::ATTR_ERRMODE,
+					\PDO::ERRMODE_EXCEPTION
+				);
+
 				return $connection;
 			} catch (\PDOException $e) {
 				$errorText = "Failed to connect to database." . PHP_EOL;
@@ -76,7 +85,8 @@ class Db
 
 				if (Dev::isSecretMode()) {
 					$errorText .= "Hi developer!"
-						. "Check your connection credentionals and if the database is running."
+						. "Check your connection credentionals "
+						. "and if the database is running."
 						. PHP_EOL . PHP_EOL
 						. $e->getMessage()
 						. PHP_EOL
@@ -116,15 +126,21 @@ class Db
 
 		switch ($driver) {
 			case 'sqlite':
+				if (!isset($path)) {
+					throw new Exception("Path is required for SQLite");
+				}
 				$dsn = "sqlite:$path";
 				break;
 
 			case 'mysql':
-				$dsn = "mysql:host=$host;port=$port;dbname=$name;charset=$charset;user=$user;password=$password";
+				$dsn = "mysql:host=$host;port=$port;dbname=$name;"
+					. "charset=$charset;user=$user;password=$password";
+
 				break;
 
 			case 'pgsql':
-				$dsn = "pgsql:host=$host;port=$port;dbname=$name;charset=$charset;user=$user;password=$password";
+				$dsn = "pgsql:host=$host;port=$port;dbname=$name;"
+					. "charset=$charset;user=$user;password=$password";
 
 			default:
 				throw new \Startie\Exception("Unsupported DB driver: $driver");
@@ -136,29 +152,37 @@ class Db
 	public static function debugStart(
 		bool|int $debug = false,
 		mixed $object = null
-	): void 	{
-		if ($debug) Dump::start($object);
+	): void {
+		if ((bool) $debug === false) {
+			Dump::start($object);
+		}
 	}
 
 	public static function debugContinue(
 		bool|int $debug = false,
 		mixed $object = null
-	): void 	{
-		if ($debug) Dump::next($object);
+	): void {
+		if ((bool) $debug === false) {
+			Dump::next($object);
+		}
 	}
 
 	public static function debugEnd(
 		bool|int $debug = false,
 		mixed $object = null
-	): void 	{
-		if ($debug) Dump::end($object);
+	): void {
+		if ((bool) $debug === false) {
+			Dump::end($object);
+		}
 	}
 
 	public static function debug(
 		bool|int $debug = false,
 		mixed $object = null,
 		string $message = ""
-	): void 	{
-		if ($debug) Dump::make($object, $die = 0, $msg);
+	): void {
+		if ((bool) $debug) {
+			Dump::make($object, $die = false, $message);
+		}
 	}
 }

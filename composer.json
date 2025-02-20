@@ -27,6 +27,6 @@
     },
     "scripts": {
         "test": "phpunit",
-        "a": "vendor/bin/phpstan analyse src/Framework"
+        "a": "vendor/bin/psalm"
     }
 }

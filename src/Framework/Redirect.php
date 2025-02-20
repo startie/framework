@@ -48,7 +48,7 @@ class Redirect
         if (Session::has('urlBeforeLogin')) {
             Redirect::to(Session::get('urlBeforeLogin'));
         } else {
-            if (!empty($alternativeUrl)) {
+            if ($alternativeUrl !== null && $alternativeUrl !== "") {
                 Redirect::page($alternativeUrl);
             } else {
                 if (isset($_ENV['REDIRECT_DEFAULT_URL'])) {
@@ -62,16 +62,16 @@ class Redirect
 
     public static function referer(string|null $redirectUrl = null): void
     {
-        if (!$RedirectUrl) {
-            $RedirectUrl = Redirect::getReferer();
+        if ($redirectUrl === null) {
+            $redirectUrl = Redirect::getReferer();
         }
 
-        Redirect::to($RedirectUrl);
+        Redirect::to($redirectUrl);
     }
 
     public static function getReferer(): string
     {
-        return $_SERVER["HTTP_REFERER"];
+        return $_SERVER["HTTP_REFERER"] ?? "";
     }
 
     /**

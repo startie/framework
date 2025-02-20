@@ -71,16 +71,21 @@ class Sanitize
 	 * ```
 	 *
 	 * @param  mixed $var
-	 * @return string
 	 * 
 	 * TODO: test
 	 */
 	public static function str($var): string
 	{
-		return filter_var($var, FILTER_UNSAFE_RAW);
+		$result = filter_var($var, FILTER_UNSAFE_RAW);
+
+		if ($result === false) {
+			$result = "";
+		}
+
+		return $result;
 	}
 
-	public static function string($var): string
+	public static function string(mixed $var): string|false
 	{
 		return self::str($var);
 	}
@@ -93,13 +98,18 @@ class Sanitize
 	 * ```
 	 * 
 	 * @param  mixed $var
-	 * @return string
 	 * 
 	 * TODO: test
 	 */
 	public static function email($var): string
 	{
-		return filter_var($var, FILTER_SANITIZE_EMAIL);
+		$result = filter_var($var, FILTER_SANITIZE_EMAIL);
+
+		if ($result === false) {
+			$result = "";
+		}
+
+		return $result;
 	}
 
 	/**
@@ -110,13 +120,18 @@ class Sanitize
 	 * ```
 	 * 
 	 * @param  mixed $var
-	 * @return string
 	 * 
 	 * TODO: test
 	 */
 	public static function url($var): string
 	{
-		return filter_var($var, FILTER_SANITIZE_URL);
+		$result = filter_var($var, FILTER_SANITIZE_URL);
+
+		if ($result === false) {
+			$result = "";
+		}
+
+		return $result;
 	}
 
 	/**

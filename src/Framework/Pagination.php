@@ -64,7 +64,7 @@ class Pagination
 			$this->offset = $this->page * $this->per - $this->per;
 		}
 		$this->totalEntities = $EntitiesCount;
-		$this->totalPages = ceil($this->totalEntities / $this->per);
+		$this->totalPages = (int) ceil($this->totalEntities / $this->per);
 
 		/* Urls */
 
@@ -171,8 +171,8 @@ class Pagination
 		}
 		# /Counting bounderies
 
-		$startPage = $this->page - $previousPagesCount;
-		$endPage = $this->page + $nextPagesCount;
+		$startPage = $this->page - ($previousPagesCount ?? 0);
+		$endPage = $this->page + ($nextPagesCount ?? 0);
 
 		# Generating links
 		$this->links = [];

@@ -27,14 +27,14 @@ class Template
                     'extension' => '.mst'
                 ]
             ),
-            'escape' => function ($value) use ($templatePath, $data) {
+            'escape' => function (mixed $value) use ($templatePath, $data) {
                 if (is_array($value)) {
-                    $valueAsExport = var_export($value, true);
                     throw new \Startie\Exception(
                         "One of the values passed to the template `$templatePath`"
                             . " is an array, but expected a string."
                     );
                 }
+
                 return htmlspecialchars($value, ENT_COMPAT, 'UTF-8');
             },
         ]);

@@ -39,7 +39,7 @@ class QueryBinder
                  */
                 $typeIsNullable = str_ends_with($type ?? "", "|NULL");
                 if ($typeIsNullable) {
-                    $type = str_replace("|NULL", "", $type);
+                    $type = str_replace("|NULL", "", $type ?? "");
                 }
                 if (($value === NULL) && $typeIsNullable) {
                     $type = "NULL";
@@ -51,7 +51,7 @@ class QueryBinder
                 );
 
                 // Bind type
-                if (!Sql::startsWithBacktick($value)) {
+                if (!Sql::startsWithBacktick($value ?? "")) {
                     if (!is_null($type)) {
                         self::validateType($type, $column);
 
@@ -94,8 +94,8 @@ class QueryBinder
                     Earlier NULL was replaced with "" but in case of DATE type 
                     it leads to DBMS stopped working.
                 */
-                $value = $data[1] ?? NULL;
-                $type = $data[2] ?? $columnTypes[$column] ?? NULL;
+                $value = $data[1] ?? null;
+                $type = $data[2] ?? $columnTypes[$column] ?? null;
 
                 /*
                     Nullable check
@@ -107,8 +107,9 @@ class QueryBinder
                 $typeIsNullable = str_ends_with($type ?? "", "|NULL");
 
                 if ($typeIsNullable) {
-                    $type = str_replace("|NULL", "", $type);
+                    $type = str_replace("|NULL", "", $type ?? "");
                 }
+
                 if (($value === NULL) && $typeIsNullable) {
                     $type = "NULL";
                 }
@@ -116,7 +117,7 @@ class QueryBinder
                 $placeholder = StatementBuilder::generatePlaceholder($column);
 
                 // Bind type
-                if (!Sql::startsWithBacktick($value)) {
+                if (!Sql::startsWithBacktick($value ?? "")) {
                     if (!is_null($type)) {
                         $type = self::validateType($type, $column);
 
@@ -185,6 +186,10 @@ class QueryBinder
                     // Remove dot from table name
                     $columnFiltered = str_replace('.', '', $column);
 
+                    if (is_array($columnFiltered)) {
+                        throw new \Exception('A colum cannot be an array');
+                    }
+
                     $placeholder =  StatementBuilder::generatePlaceholder(
                         $columnFiltered,
                         $i
@@ -226,6 +231,10 @@ class QueryBinder
                         );
 
                         $columnFiltered = str_replace('.', '', $column);
+
+                        if (is_array($columnFiltered)) {
+                            throw new \Exception('A colum cannot be an array');
+                        }
 
                         $placeholder = StatementBuilder::generatePlaceholder(
                             $columnFiltered,
@@ -304,6 +313,7 @@ class QueryBinder
         string $placeholder,
         int|string|null|float $value,
     ): string {
+        $value = (string) $value; // for concatenation
         $sql = str_replace($placeholder, '"' . $value . '"', $sql);
 
         return $sql;
@@ -315,6 +325,7 @@ class QueryBinder
         string $placeholder,
         int|string|null|float $value,
     ): string {
+        $value = (string) $value; // for concatenation
         $replace = '"' . $value . '"';
         $pos = strpos($sql, $placeholder);
         if ($pos !== false) {

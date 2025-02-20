@@ -10,12 +10,10 @@ class Mst
 			$array[0]['first'] = 1;
 			$array[0]['isFirst'] = 1;
 
-				# Last
-				$arr[count($arr) - 1]['last'] = 1;
-				$arr[count($arr) - 1]['isLast'] = 1;
-			}
+			$array[count($array) - 1]['last'] = 1;
+			$array[count($array) - 1]['isLast'] = 1;
 		}
 
-		return $arr;
+		return $array;
 	}
 }

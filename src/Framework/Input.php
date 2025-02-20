@@ -24,7 +24,9 @@ class Input
 				throw new Exception(
 					"'SanitizeTypeDefault' is not defined in config for 'Startie\Input'"
 				);
-			}
+			} 
+
+			self::$SanitizeTypeDefault = self::$config['SanitizeTypeDefault'];
 		} else {
 			throw new Exception(
 				"Config path for `Input` was not found: "

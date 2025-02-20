@@ -38,9 +38,6 @@ class Exception extends \Exception
      * ```php
      * throw \Startie\Exception::create($e);
      * ```
-     *
-     * @param  mixed $e
-     * @return \Startie\Exception
      */
     public static function create(
         PDOException $e,

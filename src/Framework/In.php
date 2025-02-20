@@ -17,8 +17,6 @@ class In
      * @param array $if Array of 3 values: 0 – value for equality check; 1 – true case substitute; 2 – false case substitute
      * @param string[] $processing Functions to call on value.
      * @param array[] $replacements String replacements.
-     * 
-     * @return mixed
      */
     public static function e(
         string $global,
@@ -104,6 +102,13 @@ class In
 
     /**
      * Short-hand method
+     */
+    public static function env(
+        string $key,
+        string $sanitizeType = '',
+        array $if = [],
+        array $processing = [],
+        array $replacements = []
     ): mixed {
         return In::e(
             "env",
@@ -113,13 +118,6 @@ class In
             $processing,
             $replacements
         );
-        string $key,
-        string $sanitizeType = '',
-        array $if = [],
-        array $processing = [],
-        array $replacements = []
-    ): mixed     {
-        return In::e("env", $key, $sanitizeType, $if, $processing, $replacements);
     }
 
     /**

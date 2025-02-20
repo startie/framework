@@ -16,7 +16,7 @@ class Form
 {
     public static function open(string $method = '', string $action = ''): void
     {
-        "<form method='$method' action='$action'>";
+        echo "<form method='$method' action='$action'>";
     }
 
     public static function text(string $name, string $value): void

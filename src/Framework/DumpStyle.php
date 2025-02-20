@@ -37,6 +37,9 @@ class DumpStyle
 
     private static bool $hasArray = false;
 
+    /**
+     * @psalm-suppress all
+     */
     public static function var_dump(
         mixed $var,
         bool $return = false,
@@ -121,7 +124,8 @@ class DumpStyle
      * like booleans and resources. Supports collapsable arrays and objects
      * as well.
      *
-     * @param  mixed $var The variable to dump
+     * @psalm-suppress all
+     * @param mixed $var The variable to dump
      * @return string
      */
     public static function var_dump_plain(
@@ -249,14 +253,15 @@ class DumpStyle
             }
             $html .= ']</span>';
         }
+
         return $html;
     }
 
     /**
      * Convert entities, while preserving already-encoded entities.
-     *
-     * @param  string $string The text to be converted
-     * @return string
+     * 
+     * @psalm-suppress all
+     * @param string $string The text to be converted
      */
     public static function htmlentities(
         string $string,
@@ -265,28 +270,47 @@ class DumpStyle
         if ($preserve_encoded_entities) {
             // @codeCoverageIgnoreStart
             if (defined('HHVM_VERSION')) {
-                $translation_table = get_html_translation_table(HTML_ENTITIES, ENT_QUOTES);
+                $translation_table = get_html_translation_table(
+                    HTML_ENTITIES,
+                    ENT_QUOTES
+                );
             } else {
-                $translation_table = get_html_translation_table(HTML_ENTITIES, ENT_QUOTES, self::mbInternalEncoding());
+                $translation_table = get_html_translation_table(
+                    HTML_ENTITIES,
+                    ENT_QUOTES,
+                    self::mbInternalEncoding()
+                );
             }
             // @codeCoverageIgnoreEnd
             $translation_table[chr(38)] = '&';
-            return preg_replace('/&(?![A-Za-z]{0,4}\w{2,3};|#[0-9]{2,3};)/', '&amp;', strtr($string, $translation_table));
+            return preg_replace(
+                '/&(?![A-Za-z]{0,4}\w{2,3};|#[0-9]{2,3};)/',
+                '&amp;',
+                strtr($string, $translation_table)
+            );
         }
-        return htmlentities($string, ENT_QUOTES, self::mbInternalEncoding());
+
+        return htmlentities(
+            $string,
+            ENT_QUOTES,
+            self::mbInternalEncoding()
+        );
     }
 
     /**
      * Wrapper to prevent errors if the user doesn't have the mbstring
      * extension installed.
-     *
-     * @param  string $encoding
-     * @return string
+     * @psalm-suppress all
+     * @param string $encoding
      */
-    protected static function mbInternalEncoding($encoding = NULL)
+    protected static function mbInternalEncoding(string|null $encoding = NULL): string|true
     {
+        $encoding ??= "";
+
         if (function_exists('mb_internal_encoding')) {
-            return $encoding ? mb_internal_encoding($encoding) : mb_internal_encoding();
+            return $encoding !== ""
+                ? mb_internal_encoding($encoding)
+                : mb_internal_encoding();
         }
         // @codeCoverageIgnoreStart
         return 'UTF-8';

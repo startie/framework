@@ -44,7 +44,6 @@ class View
         }
 
         ob_start();
-        global $t;
 
         extract($data);
         require($path);
@@ -100,13 +99,20 @@ class View
     public static function render(string $name, array $data = []): void
     {
         $path = App::path("backend/Views/{$name}.php");
+        
         global $t;
+        
         if (!isset($data['t'])) {
             $data['t'] = $t;
         } else {
             // $data['t'] = array_merge($data['t'], $t);
         }
+        
         extract($data);
+
+        if (!file_exists($path)) {
+            throw new \Exception("Path `$path` doesn't exist");
+        }
         require($path);
     }
 

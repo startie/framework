@@ -84,12 +84,11 @@ class Php
 
 	/**
 	 * @source https://stackoverflow.com/questions/5225971/is-it-possible-to-get-list-of-defined-namespaces
-	*/
-
+	 */
 	public static function namespaceExists(string $namespace): bool
 	{
 		$namespace .= "\\";
-		foreach (get_declared_classes() as $name)
+		foreach (get_declared_classes() as $name) {
 			if (strpos($name, $namespace) === 0) return true;
 		}
 
@@ -112,7 +111,6 @@ class Php
 		$superGlobalVariableName = strtoupper($superGlobalVariableName);
 
 		switch ($superGlobalVariableName) {
-
 			case 'COOKIE':
 				if (isset($_COOKIE[$needleName])) {
 					return true;
@@ -159,6 +157,8 @@ class Php
 				if (isset($_SESSION[$needleName])) {
 					return true;
 				}
+				return false;
+			default:
 				return false;
 		}
 	}
@@ -223,16 +223,13 @@ class Php
 		}
 	}
 
-	#
-	#	Supports: COOKIE, ENV, GET, POST, SERVER
-	#	Doesn't: FILES, REQUEST, SESSION
-	#
-
 	/**
 	 * Supports: COOKIE, ENV, GET, POST, SERVER
 	 * Does not support: FILES, REQUEST, SESSION
 	 * 
 	 * Wrapper around `filter_input()`
+	 * @psalm-suppress all
+	 * @deprecated Since 0.46.0
 	 */
 	public static function input(
 		string $glob,
@@ -314,7 +311,7 @@ class Php
 	public static function mb_ucfirst(
 		string $string,
 		string $encoding = "UTF-8"
-	): string 	{
+	): string {
 		$strlen = mb_strlen($string, $encoding);
 		$firstChar = mb_substr($string, 0, 1, $encoding);
 		$then = mb_substr($string, 1, $strlen - 1, $encoding);
@@ -326,12 +323,12 @@ class Php
 	 * @source https://gist.github.com/MakStashkevich/31f5cb7b229bc735aeaa89a6796327ce
 	 */
 	public static function mb_str_pad(
-string $input,
-int $pad_length,
-string $pad_string = "\x20",
-int $pad_type = STR_PAD_RIGHT,
-string $encoding = 'UTF-8'
-	): string 	{
+		string $input,
+		int $pad_length,
+		string $pad_string = "\x20",
+		int $pad_type = STR_PAD_RIGHT,
+		string $encoding = 'UTF-8'
+	): string {
 		$input_length = mb_strlen($input, $encoding);
 		$pad_string_length = mb_strlen($pad_string, $encoding);
 
@@ -356,6 +353,10 @@ string $encoding = 'UTF-8'
 				$left_pad = floor($num_pad_chars / 2);
 				$right_pad = $num_pad_chars - $left_pad;
 				break;
+		}
+
+		if (!isset($left_pad) || !isset($right_pad)) {
+			throw new \Exception('The left pad or the right pad are undefined');
 		}
 
 		$result = '';
@@ -384,7 +385,7 @@ string $encoding = 'UTF-8'
 	public static function transliterate(
 		string|null $textcyr = null,
 		string|null $textlat = null
-	): string|null 	{
+	): string|null {
 		$cyr = array(
 			'ж',
 			'ч',
@@ -447,6 +448,7 @@ string $encoding = 'UTF-8'
 			'Ь',
 			'Я'
 		);
+
 		$lat = array(
 			'zh',
 			'ch',
@@ -509,9 +511,14 @@ string $encoding = 'UTF-8'
 			'X',
 			'Q'
 		);
-		if ($textcyr) return str_replace($cyr, $lat, $textcyr);
-		else if ($textlat) return str_replace($lat, $cyr, $textlat);
-		else return null;
+
+		if ($textcyr !== null && $textcyr !== "") {
+			return str_replace($cyr, $lat, $textcyr);
+		} elseif ($textlat !== null && $textlat !== "") {
+			return str_replace($lat, $cyr, $textlat);
+		} else {
+			return null;
+		}
 	}
 
 	public function strpos_recursive(
@@ -519,23 +526,40 @@ string $encoding = 'UTF-8'
 		string $needle,
 		int $offset = 0,
 		array &$results = []
-	): array 	{
+	): array {
 		$offset = strpos($haystack, $needle, $offset);
+
 		if ($offset === false) {
 			return $results;
 		} else {
 			$results[] = $offset;
-			return self::strpos_recursive($haystack, $needle, ($offset + 1), $results);
+			return self::strpos_recursive(
+				$haystack,
+				$needle,
+				($offset + 1),
+				$results
+			);
 		}
 	}
 
-	public static function hash($length)
-	{
-		// src: https://stackoverflow.com/questions/4356289/php-random-string-generator
-*/
+	/**
+	 * @source https://stackoverflow.com/questions/4356289/php-random-string-generator
+	 */
 	public static function hash(int $length): string
 	{
-		return substr(str_shuffle(str_repeat($x = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', ceil($length / strlen($x)))), 1, $length);
+		return substr(
+			str_shuffle(
+				str_repeat(
+					$x = '0123456789'
+						. 'abcdefghijklmnopqrstuvwxyz'
+						. 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+
+					(int) ceil($length / strlen($x))
+				)
+			),
+			1,
+			$length
+		);
 	}
 
 	#
@@ -553,7 +577,7 @@ string $encoding = 'UTF-8'
 		string|null $str = null
 	): bool {
 		if (isset($arr[$key])) {
-			if ($str) {
+			if ($str !== null) {
 				if ($key == $str) {
 					return true;
 				}
@@ -571,7 +595,7 @@ string $encoding = 'UTF-8'
 		array $arr,
 		int|string $index,
 		int $value = 1
-	): array 	{
+	): array {
 		foreach ($arr as &$item) {
 			$item[$index] = $value;
 		}
@@ -595,7 +619,6 @@ string $encoding = 'UTF-8'
 				}
 			} else {
 				$element[key($flag)] = current($flag);
-				#Dump::made($element);
 			}
 		}
 
@@ -652,27 +675,27 @@ string $encoding = 'UTF-8'
 			throw new Exception('No values in array for this prop');
 		}
 
-		if ($mode == 'max') {
-			$val = max(
-				array_column($arr, $prop)
-			);
+		if ($mode == 'max') {	
+			$val = max($allValues);
+		} elseif ($mode == 'min') {
+			$val = min($allValues);
+		} else {
+			throw new \Exception('Unknown mode');
 		}
 
-		if ($mode == 'min') {
-			$val = min(
-				array_column($arr, $prop)
-			);
+		if (!isset($val)) {
+			return -1;
 		}
 
 		$index = Php::smda($arr, $prop, $val);
+
 		return $index;
 	}
 
-	#
-	# 	set element with prop=val as first
-	# 	(s=set, e=element, f=first, m=multi, d=dimensional, a=array)
-	#
-
+	/**
+	 * Sets element with prop=val as first
+	 * (s=set, e=element, f=first, m=multi, d=dimensional, a=array)
+	 */
 	public static function sefmda(
 		array &$arr,
 		string|int $prop,
@@ -694,7 +717,7 @@ string $encoding = 'UTF-8'
 		array &$arr,
 		string|int $col,
 		int $dir = SORT_ASC
-	): void 	{
+	): void {
 		$sort_col = [];
 		foreach ($arr as $key => $row) {
 			if (isset($row[$col])) {
@@ -775,7 +798,11 @@ string $encoding = 'UTF-8'
 			}
 		}
 
-		return ['index' => $closestIndex, 'word' => $closest, 'distance' => $shortest];
+		return [
+			'index' => $closestIndex ?? null,
+			'word' => $closest ?? null,
+			'distance' => $shortest
+		];
 
 		// echo "Вы ввели: $str\n";
 		// if ($shortest == 0) {
@@ -790,7 +817,6 @@ string $encoding = 'UTF-8'
 		$PlaceIdStr = "$num";
 		$PlaceIdStrLength = strlen($PlaceIdStr);
 
-		//$step = $step;
 		$stepStr = "$step";
 		$stepLength = strlen($stepStr);
 
@@ -801,8 +827,9 @@ string $encoding = 'UTF-8'
 		} else {
 			$subLength = $PlaceIdStrLength - $stepLength;
 			$number = substr($PlaceIdStr, 0, $subLength) . "$step";
-			$number = $number * 1;
 		}
+
+		$number = (int) $number;
 
 		return $number;
 	}
@@ -815,7 +842,7 @@ string $encoding = 'UTF-8'
 
 	public static function getNowTime(): string
 	{
-		$current_timestamp_fndate = date("U");
+		$current_timestamp_fndate = (int) date("U");
 		# 10-03-2019 12:11:32
 		//$date_from_timestamp = date("d-m-Y H:i:s",$current_timestamp_fndate);
 		# 12:11:32
@@ -834,7 +861,7 @@ string $encoding = 'UTF-8'
 		string $source,
 		string $destination,
 		int $quality
-	): void 	{
+	): void {
 		$info = getimagesize($source);
 
 		if ($info['mime'] == 'image/jpeg') {
@@ -845,15 +872,25 @@ string $encoding = 'UTF-8'
 			$image = imagecreatefrompng($source);
 		}
 
-		imagejpeg($image, $destination, $quality);
+		if (isset($image)) {
+			if ($image !== false) {
+				imagejpeg($image, $destination, $quality);
+			}
+		}
 	}
 
 	public static function curl(string $url, string $post = ""): string|bool
 	{
 		$ch = curl_init($url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3');
-		if ($post) {
+
+		curl_setopt(
+			$ch,
+			CURLOPT_USERAGENT,
+			'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3'
+		);
+
+		if ($post !== "") {
 			curl_setopt($ch, CURLOPT_POST, 1);
 			curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
 		}

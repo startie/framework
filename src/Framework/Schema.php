@@ -2,18 +2,8 @@
 
 namespace Startie;
 
-use MySql;
-
 class Schema
 {
-    /**
-     * @deprecated 0.30.0 Use `Sql::hasBackticks()`
-     */
-    public static function hasBackticks($expression)
-    {
-        return Sql::startsWithBacktick($expression);
-    }
-
     // TODO: transfer to the new class Mysql
     // TODO: rename to jsonRegExp
     // since 5.6
@@ -30,14 +20,6 @@ class Schema
         $result .= "`";
 
         return $result;
-    }
-
-    /**
-     * @deprecated 0.30.0 Use `Sql::like()`
-     */
-    public static function like($value): string
-    {
-        return Sql::like($value);
     }
 
     public function truncateTable(string $table): void
@@ -61,6 +43,9 @@ class Schema
         return $query . "\n";
     }
 
+    /**
+     * @psalm-suppress ForbiddenCode
+     */
     public static function showTable(string $table): void
     {
         global $dbh;
@@ -74,7 +59,9 @@ class Schema
 
             $results = $dbh->query($sql);
             echo "<pre>";
-            var_dump($results->fetchAll(PDO::FETCH_ASSOC));
+            var_dump(
+                $results->fetchAll(\PDO::FETCH_ASSOC)
+            );
             echo "</pre>";
         } catch (Exception $e) {
             echo $e->getMessage();
@@ -88,21 +75,41 @@ class Schema
         try {
             $results = $dbh->query($sql);
             if ($type == 'fetch') {
-                return $results->fetchAll(PDO::FETCH_ASSOC);
-            }
-            if ($type == 'count') {
+                return $results->fetchAll(\PDO::FETCH_ASSOC);
+            } elseif ($type == 'count') {
                 return $results->rowCount();
+            } else {
+                throw new \Exception('Unknown type of fetch: `' . $type . '`');
             }
         } catch (Exception $e) {
-            echo $e->getMessage();
+            throw new $e;
         }
     }
 
     /**
+     * @psalm-suppress all
      * @deprecated 0.30.0 Use Sql::ts()
      */
     public static function ts(): string
     {
         return Sql::ts();
+    }
+
+    /**
+     * @psalm-suppress all
+     * @deprecated 0.30.0 Use `Sql::like()`
+     */
+    public static function like(string|int $value): string
+    {
+        return Sql::like($value);
+    }
+
+    /**
+     * @psalm-suppress all
+     * @deprecated 0.30.0 Use `Sql::hasBackticks()`
+     */
+    public static function hasBackticks(string $expression): bool
+    {
+        return Sql::startsWithBacktick($expression);
     }
 }

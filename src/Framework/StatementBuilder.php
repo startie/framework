@@ -61,15 +61,15 @@ class StatementBuilder
 
         $sql .= " ";
 
-        if (isset($join)) {
-            foreach ($join as $tableName => $joinParams) {
-                $joinType = $joinParams[2] ?? NULL;
-                $joinType = self::resolveJoinType($joinType);
-
+        if ($join !== []) {
+            foreach ($join as $table => $joinParams) {
                 $leftColumn = $joinParams[0];
                 $rightColumn = $joinParams[1];
 
-                $sql .= "$joinType JOIN $tableName ON $leftColumn = $rightColumn";
+                $type = $joinParams[2] ?? NULL;
+                $type = self::resolveJoinType($type);
+
+                $sql .= "$type JOIN $table ON $leftColumn = $rightColumn";
                 $sql .= "\n";
             }
 
@@ -106,7 +106,7 @@ class StatementBuilder
         $sql .= "{$type} \t 1 = 1 ";
         $sql .= "\n";
 
-        if (isset($params)) {
+        if ($params !== []) {
             foreach ($params as $columnName => $columnValuesArr) {
                 $sql .= "\t AND ( ";
                 foreach ($columnValuesArr as $i => $columnValueData) {
@@ -344,6 +344,7 @@ class StatementBuilder
         foreach ($set as $index => $data) {
             $col = $data[0];
             $val = $data[1] ?? "";
+            $val = (string) $val;
 
             // With backticks
             if (Sql::startsWithBacktick($val)) {
@@ -398,6 +399,7 @@ class StatementBuilder
         foreach ($insert as $insertItem) {
             $column = $insertItem[0];
             $value = $insertItem[1] ?? "";
+            $value = (string) $value;
 
             // With backticks
             if (Sql::startsWithBacktick($value)) {
@@ -473,6 +475,8 @@ class StatementBuilder
         string $column,
         int|string|null $index = ""
     ): string {
+        $index = (string) $index;
+
         $placeholder = ":{$column}{$index}";
         return $placeholder;
     }

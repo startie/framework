@@ -17,7 +17,7 @@ class Dump
         self::$isBooted = true;
 
         // Load access property
-        if ($callback) {
+        if (is_callable($callback)) {
             self::$hasAccess = $callback();
         } else {
             self::$hasAccess = true;
@@ -40,13 +40,14 @@ class Dump
 
     /**
      * For browser network debugging and PHP console
+     * @psalm-suppress ForbiddenCode
      */
     public static function __pre(mixed $var, string $message = "")
     {
         self::requireBoot();
         if (self::$hasAccess) {
             var_dump($var);
-            echo $msg . "\n";
+            echo $message . PHP_EOL;
         }
     }
 
@@ -61,7 +62,7 @@ class Dump
     ) {
         self::requireBoot();
         if (self::hasAccess()) {
-            Dump::__pre($result, $msg);
+            Dump::__pre($result, $message);
             if ($trace) {
                 Dump::pre(debug_backtrace());
             }
@@ -78,12 +79,13 @@ class Dump
         int $trace = 0
     ): void {
         self::requireBoot();
-        Dump::__make($result, 1, $msg, $trace);
+        Dump::__make($result, 1, $message, $trace);
         die();
     }
 
     /**
      * For a simple debugging
+     * @psalm-suppress ForbiddenCode
      */
     public static function _pre(
         mixed $var,
@@ -92,7 +94,7 @@ class Dump
         self::requireBoot();
         if (self::hasAccess()) {
             echo "<pre>";
-            echo $msg . "\n";
+            echo $message . "\n";
             var_dump($var);
             echo "</pre>";
         }
@@ -112,8 +114,8 @@ class Dump
         self::requireBoot();
         $backTrace = "";
         $backTrace .= "<mark>";
-        $backTrace .= "[" . debug_backtrace()[1]['line'] . "]";
-        $backTrace .= " " . debug_backtrace()[1]['file'];
+        $backTrace .= "[" . ($debug_backtrace[1]['line'] ?? "") . "]";
+        $backTrace .= " " . ($debug_backtrace[1]['file'] ?? "");
         $backTrace .= "</mark>";
         $backTrace .= "<br>";
 
@@ -145,11 +147,14 @@ class Dump
     public static function pre(
         mixed $var,
         string|null $message = null
-    ): void     {
+    ): void {
         self::requireBoot();
+
+        $message ??= "";
+
         if (self::hasAccess()) {
             echo "<pre>";
-            echo $msg . "\n";
+            echo $message . "\n";
             DumpStyle::var_dump($var);
             echo "</pre>";
         }
@@ -196,11 +201,13 @@ class Dump
         }
 
         if (self::hasAccess()) {
-            Dump::pre($result, $msg . $backTrace);
-            if ($trace) {
+            Dump::pre($result, $message . $backTrace);
+            if ((bool) $trace) {
                 Dump::pre(debug_backtrace());
             }
-            if ($die) die();
+            if ((bool) $die) {
+                die();
+            }
         }
     }
 
@@ -213,7 +220,9 @@ class Dump
         int|null $trace = 0
     ): void {
         self::requireBoot();
-        Dump::make($result, 1, $msg, $trace);
+        $message ??= "";
+        Dump::make($result, 1, $message, $trace);
+        
         die();
     }
 

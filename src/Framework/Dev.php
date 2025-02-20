@@ -40,19 +40,21 @@ class Dev
 
 	public static function globals(): array|null
 	{
-		if (Access::is('developers')) {
-			$globalsArr = array(
-				'$_COOKIE' => $_COOKIE,
-				'$_ENV' => $_ENV,
-				'$_FILES' => $_FILES,
-				'$_GET' => $_GET,
-				'$_POST' => $_POST,
-				'$_REQUEST' => $_REQUEST,
-				'$_SERVER' => $_SERVER,
-				'$_SESSION' => $_SESSION,
-			);
-			return $globalsArr;
+		if (!Access::is('developers')) {
+			return null;
 		}
+		$globalsArr = [
+			'$_COOKIE' => $_COOKIE,
+			'$_ENV' => $_ENV,
+			'$_FILES' => $_FILES,
+			'$_GET' => $_GET,
+			'$_POST' => $_POST,
+			'$_REQUEST' => $_REQUEST,
+			'$_SERVER' => $_SERVER,
+			'$_SESSION' => $_SESSION,
+		];
+
+		return $globalsArr;
 	}
 
 	public static function isSecretMode(): bool
@@ -100,7 +102,6 @@ class Dev
 		$result = "";
 
 		if (Access::is('developers') || Dev::isSecretMode()) {
-			// TODO: delete bootstrap dependecy
 			$result .= "<div id='DevLoadCounter' class='container-fluid text-muted'>";
 			$result .= number_format(microtime(true) - $start_time, 2) . "s";
 			$result .= "</div>";

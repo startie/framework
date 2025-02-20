@@ -99,10 +99,10 @@ class Config
 	 */
 	public static function defineRegionConstants(): void
 	{
-// Constants
-		// 		define('DATE_TIMEZONE', $_ENV['DATE_TIMEZONE']);
-// 		define('TIMEZONE', $_ENV['TIMEZONE']);
-// 		define('LOCALE', $_ENV['LOCALE']);
+		// Constants
+		// define('DATE_TIMEZONE', $_ENV['DATE_TIMEZONE']);
+		// define('TIMEZONE', $_ENV['TIMEZONE']);
+		// define('LOCALE', $_ENV['LOCALE']);
 
 		App::$DATE_TIMEZONE = $_ENV['DATE_TIMEZONE'];
 		App::$TIMEZONE = $_ENV['TIMEZONE'];
@@ -111,7 +111,11 @@ class Config
 		$_ENV['DATE_DEFAULT_TIMEZONE'] ??= "";
 
 		if ($_ENV['DATE_DEFAULT_TIMEZONE'] !== "") {
-		date_default_timezone_set($_ENV['DATE_DEFAULT_TIMEZONE']);
+			date_default_timezone_set(
+				$_ENV['DATE_DEFAULT_TIMEZONE']
+			);
+		}
+
 		setlocale(LC_ALL, $_ENV['LOCALE']);
 	}
 }

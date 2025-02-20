@@ -30,7 +30,9 @@ class Sql
      */
     public static function hasBacktick(string|int $val): bool
     {
-        if (str_contains($val ?? '', '`')) {
+        $val = strval($val);
+
+        if (str_contains($val, '`')) {
             return true;
         } else {
             return false;
@@ -42,7 +44,6 @@ class Sql
      */
     public static function startsWithBacktick(string|int $val): bool
     {
-        $val = $val ?? '';
         $val = strval($val);
 
         if (strpos($val, '`') === 0) {

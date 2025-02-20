@@ -10,7 +10,11 @@ class Procedure
 	): void {
 		extract($data);
 		$path = App::path("backend/Procedures/{$name}.php");
-		global $t;
+
+		if (!file_exists($path)) {
+			throw new \Exception("Path doesn't exists");
+		}
+		
 		require($path);
 	}
 

@@ -99,7 +99,11 @@ class Errors
             $whoops->pushHandler($handler);
             $whoops->register();
         } else if (Errors::$handler === "Startie") {
-            set_error_handler("Startie\Errors::errorHandler");
+            $errorHandlerAsArray = ["Startie\Errors", "errorHandler"];
+            $errorHandler = "Startie\Errors::errorHandler";
+            if (is_callable($errorHandlerAsArray)) {
+                set_error_handler($errorHandler);
+            }
             set_exception_handler("Startie\Errors::exceptionHandler");
             register_shutdown_function("Startie\Errors::shutdownFunction");
         }
@@ -143,7 +147,7 @@ class Errors
         */
 
         if (Errors::$handler === 'Startie') {
-            if (ini_get('display_errors')) {
+            if (ini_get('display_errors') !== false) {
                 if (isset($LogId)) {
                     $errorHTML = Errors::make(
                         $inputException,
@@ -204,13 +208,13 @@ class Errors
             }
 
             // Show error message for production
-            if ($_ENV["MODE_DEV"] === 0) {
+            if ($_ENV["MODE_DEV"] === "0") {
                 $errorText = "Please send a link to the page to support";
                 echo Errors::make($errorText);
             }
 
             // Show error message in dev mode
-            elseif ($_ENV['MODE_DEV'] === 1) {
+            elseif ($_ENV['MODE_DEV'] === "1") {
                 $errorText = $error['message'] . " "
                     . $error['file']
                     . " [" . $error['line'] . "]";

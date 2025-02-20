@@ -88,19 +88,13 @@ class Router
             "backend/routs/",
         ];
 
-        $rootDir = null;
-
         foreach ($dirsToCheck as $dirToCheck) {
-            $rootDir = App::path($dirToCheck);
-
-            if (file_exists($rootDir)) {
+            if (file_exists(App::path($dirToCheck))) {
                 return $dirToCheck;
             }
         }
 
-        if ($rootDir === null) {
-            throw new \Startie\Exception("Routes root dir is not found");
-        }
+        throw new \Startie\Exception("Routes root dir is not found");
     }
 
     public static function getRoutes(): array
@@ -133,9 +127,12 @@ class Router
 
         foreach ($routeFiles as $routeFile) {
             if ($routeFile !== "." && $routeFile !== "..") {
-                $routeContent = require "{$rootPathAbsolute}{$routeFile}";
+                $routePath = $rootPathAbsolute . $routeFile;
+                if (file_exists($routePath)) {
+                    $routeContent = require $routePath;
 
-                $routes = array_merge($routeContent, $routes);
+                    $routes = array_merge($routeContent, $routes);
+                }
             }
         }
 
@@ -148,20 +145,25 @@ class Router
     ): array {
         $routes = [];
 
-        $routerConfig = require $routerConfigPath;
+        if (file_exists($routerConfigPath)) {
+            $routerConfig = require $routerConfigPath;
 
-        if (!is_array($routerConfig)) {
-            throw new \Startie\Exception(
-                "File $routerConfigPath should return an array"
-            );
-        } else if (is_array($routerConfig)) {
-            foreach ($routerConfig as $routesFileName) {
-                $routesFilePath = App::path(
-                    "{$routesRoot}{$routesFileName}.php"
+
+            if (!is_array($routerConfig)) {
+                throw new \Startie\Exception(
+                    "File $routerConfigPath should return an array"
                 );
+            } else {
+                foreach ($routerConfig as $routesFileName) {
+                    $routesFilePath = App::path(
+                        "{$routesRoot}{$routesFileName}.php"
+                    );
 
-                $routesFileContent = require $routesFilePath;
-                $routes = array_merge($routesFileContent, $routes);
+                    if (file_exists($routesFilePath)) {
+                        $routesFileContent = require $routesFilePath;
+                        $routes = array_merge($routesFileContent, $routes);
+                    }
+                }
             }
         }
 
@@ -180,6 +182,10 @@ class Router
         // Delete domain (for sites like http://localhost:8080/startie-project/)
         if (In::env('DOMAIN') !== "/") {
             $requestedPath = str_replace(In::env('DOMAIN'), "", $requestedPath);
+        }
+
+        if (is_array($requestedPath)) {
+            throw new \Exception('requestedPath cannot be array');
         }
 
         $location = Url::cleanFromQueryString($requestedPath);
@@ -209,7 +215,7 @@ class Router
     public static function find(
         array $routes,
         string $pathToFind
-    ) {
+    ): array {
         // Prepare and mutate data of each route for search
         $parsedRoutes = Router::parseRoutes($routes);
 
@@ -222,7 +228,7 @@ class Router
     /**
      * @tested
      */
-    public static function parseRoutes($routes)
+    public static function parseRoutes(array $routes): array
     {
         $result = [];
 
@@ -381,7 +387,7 @@ class Router
 
         /* Title */
 
-        if (isset($route->title)) {
+        if ($route->title !== "") {
             $title = "<title>$route->title</title>";
         }
 
@@ -433,30 +439,34 @@ class Router
         /* Fill blocks */
 
         if ($route->layout) {
-            $Config = require App::path("backend/Config/Layout/Common.php");
-            $ConfigBlocks = $Config['blocks'];
+            $layoutPath = App::path("backend/Config/Layout/Common.php");
 
-            $ConfigBlocks['content'] = $content;
-            $ConfigBlocks['title'] = $title;
+            if (file_exists($layoutPath)) {
+                $Config = require $layoutPath;
+                $ConfigBlocks = $Config['blocks'];
 
-            foreach ($ConfigBlocks as $BlockLabel => $BlockContent) {
-                $layout = str_replace(
-                    "{{{$BlockLabel}}}",
-                    $BlockContent ?? "",
-                    $layout
-                );
+                $ConfigBlocks['content'] = $content ?? "";
+                $ConfigBlocks['title'] = $title ?? "";
+
+                foreach ($ConfigBlocks as $BlockLabel => $BlockContent) {
+                    $layout = str_replace(
+                        "{{{$BlockLabel}}}",
+                        $BlockContent ?? "",
+                        $layout ?? ""
+                    );
+                }
             }
         }
 
         if ($route->layout) {
-            echo $layout;
+            echo $layout ?? "";
         } else {
-            echo $content;
+            echo $content ?? "";
         }
     }
 
 
-    public static function bootstrap(Route $route)
+    public static function bootstrap(Route $route): void
     {
         if ($route->type) {
             $RouteTypeUCFirst = ucfirst(strtolower($route->type));
@@ -476,7 +486,7 @@ class Router
 
     public static function middles(Route $route): void
     {
-        if (isset($route->middles)) {
+        if ($route->middles !== "") {
             $middlesStr = str_replace(" ", "", $route->middles);
 
             if ($middlesStr !== "") {
@@ -524,25 +534,27 @@ class Router
         $ConfigRouterPagesPath = App::path("backend/Config/Router/Pages.php");
 
         if (file_exists($ConfigRouterPagesPath)) {
-            $ConfigRouterPages = require App::path(
-                "backend/Config/Router/Pages.php"
-            );
+            $routerConfigPath = App::path("backend/Config/Router/Pages.php");
 
-            if (isset($ConfigRouterPages[$code])) {
-                if (isset($ConfigRouterPages[$code]['view'])) {
-                    $view = $ConfigRouterPages[$code]['view'];
+            if (file_exists($routerConfigPath)) {
+                $ConfigRouterPages = require $routerConfigPath;
+
+                if (isset($ConfigRouterPages[$code])) {
+                    if (isset($ConfigRouterPages[$code]['view'])) {
+                        $view = $ConfigRouterPages[$code]['view'];
+                    } else {
+                        throw new \Startie\Exception(
+                            "View for '$code' error not found"
+                        );
+                    }
                 } else {
                     throw new \Startie\Exception(
-                        "View for '$code' error not found"
+                        "Configuration for '$code' not found"
                     );
                 }
-            } else {
-                throw new \Startie\Exception(
-                    "Configuration for '$code' not found"
-                );
-            }
 
-            echo View::r($view);
+                echo View::r($view);
+            }
         } else {
             throw new \Startie\Exception(
                 "Error page for code '$code' is not cofigured in 'backend/Config/Router/Pages.php'"

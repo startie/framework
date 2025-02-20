@@ -6,11 +6,16 @@ use InvalidArgumentException;
 
 class File
 {
-	public static function downloadFromUrl(string $url)
+	public static function downloadFromUrl(string $url): string
 	{
 		$ch = curl_init($url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
 		$data = curl_exec($ch);
+		if (is_bool($data)) {
+			$data = "";
+		}
+
 		curl_close($ch);
 
 		return $data;
@@ -32,11 +37,10 @@ class File
 		file_put_contents($path, $data);
 	}
 
-	function initDirPath($desiredPath)
+	function initDirPath(string $desiredPath): void
 	{
 		if (is_dir($desiredPath)) {
 			throw new Exception("Path already exists.");
-			return false;
 		}
 
 		$parts = explode('/', $desiredPath);
@@ -51,6 +55,9 @@ class File
 		}
 	}
 
+	/**
+	 * Return boolean depending on success
+	 */
 	public static function saveFromPath(string $path1, string $path2): bool
 	{
 		// Create path if it doesn't exist
@@ -90,7 +97,7 @@ class File
 
 		while ($read < $filesize && ($buffer = fread($remote, $filesize - $read))) {
 			$read += strlen($buffer);
-			if (fwrite($local, $buffer) === FALSE) {
+			if (fwrite($local, $buffer) === false) {
 				echo "Unable to write to local file: $path \n";
 				break;
 			}
@@ -166,9 +173,9 @@ class File
 		return $info;
 	}
 
-	#
-	#	deletes directory on path and all inside it
-
+	/**
+	 * Deletes directory on path and all inside it
+	 */
 	public static function deleteDir(string $path): void
 	{
 		if (!is_dir($path)) {
@@ -195,14 +202,12 @@ class File
 	 */
 	public static function createTempFromString(string $data): string
 	{
-		# 	Создать временный файл
-
+		// Создать временный файл
 		$temporaryFile = tmpfile();
 		$meta = stream_get_meta_data($temporaryFile);
 		$temporaryFilePath = $meta['uri'];
 
-		#   Сохранить скачанный как временный файл
-
+		// Сохранить скачанный как временный файл
 		file_put_contents($temporaryFilePath, $data);
 
 		return $temporaryFilePath;
