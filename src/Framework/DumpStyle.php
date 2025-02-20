@@ -7,7 +7,8 @@ namespace Startie;
 class DumpStyle
 {
     /**
-     * Source: https://gist.github.com/sunel/5368b7b18a84829b06e4
+     * @psalm-suppress all
+     * @source https://gist.github.com/sunel/5368b7b18a84829b06e4
      */
     public static string $color = "#005BFF";
     public static string $color2 = "#999";

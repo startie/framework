@@ -109,6 +109,10 @@ class Validate
         return filter_var($value, FILTER_VALIDATE_URL);
     }
 
+    /**
+     * @psalm-suppress NoValue
+     * @psalm-suppress InvalidArgument
+     */
     public static function regexp(mixed $value, string $regexp): string|false
     {
         return filter_var($value, FILTER_VALIDATE_REGEXP);

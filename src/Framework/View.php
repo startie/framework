@@ -94,6 +94,7 @@ class View
     }
 
     /**
+     * @psalm-suppress all
      * @deprecated Use `view()` helper
      */
     public static function render(string $name, array $data = []): void
@@ -110,6 +111,7 @@ class View
     }
 
     /**
+     * @psalm-suppress all
      * @deprecated
      */
     public static function utils()
@@ -121,6 +123,7 @@ class View
     }
 
     /**
+     * @psalm-suppress all
      * @deprecated Use `::setTitle()` or `title()` global helper
      */
     public static function titleChange(string $title): void

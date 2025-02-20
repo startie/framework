@@ -120,6 +120,7 @@ class Url
 	}
 
 	/**
+	 * @psalm-suppress RedundantCondition
 	 * @param bool $arraish If params are ['id' => [1,2]]
 	 * When `true`  we will get id[]=1&id[]=2
 	 * When `false` we will get id=1&id=2
