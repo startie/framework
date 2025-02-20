@@ -39,8 +39,9 @@ class Redirect
     /**
      * @param string|null $alternativeUrl Alternative URL, if `urlBeforeLogin` is not set in session
      */
-    public static function beforeLogin(string|null $alternativeUrl = null)
-    {
+    public static function beforeLogin(
+        string|null $alternativeUrl = null
+    ): void {
         if (Session::has('urlBeforeLogin')) {
             Redirect::to(Session::get('urlBeforeLogin'));
         } else {

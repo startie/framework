@@ -4,12 +4,12 @@ namespace Startie;
 
 class Words
 {
-	public static function pluralCategory($count)
+	public static function pluralCategory(int $count): string
 	{
 		$mod10  = $count % 10;
 		$mod100 = $count % 100;
 
-		if (is_int($count) && $mod10 == 1 && $mod100 != 11) {
+		if ($mod10 == 1 && $mod100 != 11) {
 			return 'one';
 		} elseif (($mod10 > 1 && $mod10 < 5) && ($mod100 < 12 || $mod100 > 14)) {
 			return 'few';
@@ -20,7 +20,7 @@ class Words
 		}
 	}
 
-	public static function count($vocabPath, $count)
+	public static function count(string $vocabPath, int $count): string
 	{
 		$vocab = Vocabulary::get("Words/$vocabPath");
 		$pluralCategory = self::pluralCategory($count);

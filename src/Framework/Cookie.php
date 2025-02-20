@@ -4,12 +4,15 @@ namespace Startie;
 
 class Cookie
 {
-    public static function is($var)
+    public static function is(string $var): bool
     {
         return isset($_COOKIE[$var]);
     }
 
-    public static function get($var, $type = "raw")
+    /**
+     * @return mixed|false Returns cookie value of `false` when it doesn't exist
+     */
+    public static function get(string $var, string $type = "raw")
     {
         if (Cookie::is($var)) {
             return Input::cookie($var, $type);
@@ -17,8 +20,12 @@ class Cookie
         return false;
     }
 
-    public static function set($key, $value, $minutes = 0, $domain = "")
-    {
+    public static function set(
+        string $key,
+        string $value,
+        int $minutes = 0,
+        string $domain = ""
+    ): void {
         if (!$domain) {
             $domain = '/';
         };
@@ -33,7 +40,7 @@ class Cookie
         }
     }
 
-    public static function delete($key)
+    public static function delete(string $key): void
     {
         setcookie($key, "", time() - 3600, "/");
     }

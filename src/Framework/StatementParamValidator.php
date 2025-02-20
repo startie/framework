@@ -13,7 +13,7 @@ class StatementParamValidator
         };
     }
 
-    public static function join(array $params)
+    public static function join(array $params): true
     {
         foreach ($params as $table => $rulesArray) {
             if (!is_array($rulesArray)) {
@@ -36,7 +36,7 @@ class StatementParamValidator
         return true;
     }
 
-    public static function where(array $params)
+    public static function where(array $params): null
     {
         foreach ($params as $column => $values) {
             /*

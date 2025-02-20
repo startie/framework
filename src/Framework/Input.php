@@ -6,15 +6,15 @@ class Input
 {
 	use \Startie\Bootable;
 
-	public static function boot()
+	public static function boot(): void
 	{
 		self::$isBooted = true;
 		self::loadConfig();
 	}
 
-	public static $SanitizeTypeDefault;
+	public static string $SanitizeTypeDefault;
 
-	public static function loadConfig()
+	public static function loadConfig(): void
 	{
 		$configPath = App::path("backend/Config/Input/*.php");
 
@@ -36,11 +36,11 @@ class Input
 	/**
 	 * Checks if the superglobal array certain key.
 	 *
-	 * @param  string $glob
-	 * @param  string $name
+	 * @param string $glob
+	 * @param string $name
 	 * @return boolean
 	 */
-	public static function is($glob, $name)
+	public static function is(string $glob, string $name)
 	{
 		self::requireBoot();
 
@@ -100,7 +100,7 @@ class Input
 		return false;
 	}
 
-	public static function isEmpty($glob, $exclude)
+	public static function isEmpty(mixed $glob, array $exclude): bool|int
 	{
 		self::requireBoot();
 
@@ -122,8 +122,11 @@ class Input
 		return $isGetEmpty;
 	}
 
-	private static function g($var, $SanitizeType, $glob)
-	{
+	private static function g(
+		mixed $var,
+		string $SanitizeType,
+		mixed $glob
+	): mixed {
 		if (!$SanitizeType) {
 			$SanitizeType = self::$config['SanitizeTypeDefault'];
 		};
@@ -152,8 +155,10 @@ class Input
 	 * Gets a value from $_COOKIE variable specified by key
 	 * is required by Model::isWhereInput
 	 */
-	public static function cookie($var, $SanitizeType)
-	{
+	public static function cookie(
+		mixed $var,
+		string $SanitizeType
+	): mixed {
 		self::requireBoot();
 		return self::g($var, $SanitizeType, $_COOKIE);
 	}
@@ -162,7 +167,7 @@ class Input
 	 * Gets a value from $_ENV variable specified by key
 	 * is required by Model::isWhereInput
 	 */
-	public static function env($var, $SanitizeType)
+	public static function env(mixed $var, string $SanitizeType): mixed
 	{
 		self::requireBoot();
 		return self::g($var, $SanitizeType, $_ENV);
@@ -172,7 +177,7 @@ class Input
 	 * Gets a value from $_FILES variable specified by key
 	 * is required by Model::isWhereInput
 	 */
-	public static function files($var, $SanitizeType)
+	public static function files(mixed $var, string $SanitizeType): mixed
 	{
 		self::requireBoot();
 		return self::g($var, $SanitizeType, $_FILES);
@@ -182,7 +187,7 @@ class Input
 	 * Gets a value from $_GET variable specified by key
 	 * is required by Model::isWhereInput
 	 */
-	public static function get($var, $SanitizeType)
+	public static function get(mixed $var, string $SanitizeType): mixed
 	{
 		self::requireBoot();
 
@@ -193,7 +198,7 @@ class Input
 	 * Gets a value from $_POST variable specified by key
 	 * is required by Model::isWhereInput
 	 */
-	public static function post($var, $SanitizeType)
+	public static function post(mixed $var, string $SanitizeType): mixed
 	{
 		self::requireBoot();
 		return self::g($var, $SanitizeType, $_POST);
@@ -203,7 +208,7 @@ class Input
 	 * Gets a value from $_REQUEST variable specified by key
 	 * is required by Model::isWhereInput
 	 */
-	public static function request($var, $SanitizeType)
+	public static function request(mixed $var, string $SanitizeType): mixed
 	{
 		self::requireBoot();
 		return self::g($var, $SanitizeType, $_REQUEST);
@@ -213,7 +218,7 @@ class Input
 	 * Gets a value from $_SERVER variable by key
 	 * is required by Model::isWhereInput
 	 */
-	public static function server($var, $SanitizeType)
+	public static function server(mixed $var, string $SanitizeType): mixed
 	{
 		self::requireBoot();
 		return self::g($var, $SanitizeType, $_SERVER);
@@ -223,7 +228,7 @@ class Input
 	 * Gets a value from $_SESSION variable by key
 	 * is required by Model::isWhereInput
 	 */
-	public static function session($var, $SanitizeType)
+	public static function session(mixed $var, string $SanitizeType): mixed
 	{
 		self::requireBoot();
 		return self::g($var, $SanitizeType, $_SESSION);

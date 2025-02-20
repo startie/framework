@@ -10,8 +10,11 @@ use Startie\Url;
 
 class Template
 {
-    public static function return(string $templatePath, $data, $csrf = null)
-    {
+    public static function return(
+        string $templatePath,
+        array $data,
+        string $csrf = null
+    ): string {
         /*
             Initialize Mustache engine
         */
@@ -83,8 +86,11 @@ class Template
      * 
      * @deprecated Use helper `template()`
      */
-    public static function r($templatePath, $data, $csrf = NULL)
-    {
+    public static function r(
+        string $templatePath,
+        array $data,
+        string|null $csrf = null
+    ): string {
         return self::return($templatePath, $data, $csrf);
     }
 
@@ -93,8 +99,11 @@ class Template
      * 
      * @deprecated Use helper `template()`
      */
-    public static function render($templatePath, $data, $csrf = NULL)
-    {
+    public static function render(
+        string $templatePath,
+        array $data,
+        string|null $csrf = null
+    ): void {
         echo self::return($templatePath, $data, $csrf);
     }
 }

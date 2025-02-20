@@ -8,15 +8,15 @@ class Errors
 {
     use \Startie\Bootable;
 
-    public static $handler;
+    public static string $handler;
 
-    public static function boot()
+    public static function boot(): void
     {
         self::$isBooted = true;
         self::loadConfig();
     }
 
-    public static function loadConfig()
+    public static function loadConfig(): void
     {
         $defaultConfig = [
             'ini' => [
@@ -55,7 +55,7 @@ class Errors
     /**
      * This method loads config file a set everything up
      */
-    public static function init()
+    public static function init(): void
     {
         /*
             Set ini
@@ -86,7 +86,7 @@ class Errors
     /**
      * Register handlers
      */
-    public static function registerHandlers()
+    public static function registerHandlers(): void
     {
         if (Errors::$handler === "Whoops") {
             $handler = new \Whoops\Handler\PrettyPageHandler;
@@ -106,15 +106,19 @@ class Errors
     /**
      * Method that converts all errors to exceptions
      */
-    public static function errorHandler($level, $message, $file = '', $line = 0)
-    {
+    public static function errorHandler(
+        int $level,
+        string $message,
+        string $file = '',
+        int $line = 0
+    ): void {
         throw new \ErrorException($message, 0, $level, $file, $line);
     }
 
     /**
      * Method to call when an uncaught exception occurs
      *
-     * @param  mixed $e
+     * @param mixed $inputException
      * @return void
      */
     public static function exceptionHandler($inputException)
@@ -182,7 +186,7 @@ class Errors
         }
     }
 
-    public static function shutdownFunction()
+    public static function shutdownFunction(): void
     {
         // If there was an error and it was fatal
         if (
@@ -229,7 +233,7 @@ class Errors
         }
     }
 
-    public static function make($message, $addition = "")
+    public static function make(string $message, string $addition = ""): string
     {
         $html = "
             <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no' />

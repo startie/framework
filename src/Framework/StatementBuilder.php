@@ -82,7 +82,7 @@ class StatementBuilder
     /**
      * @tested
      */
-    public static function resolveJoinType($joinType)
+    public static function resolveJoinType(string|null $joinType): string
     {
         if (!is_null($joinType)) {
             $joinType = strtoupper($joinType);
@@ -232,7 +232,7 @@ class StatementBuilder
     public static function generateBindedClauses(
         string $column,
         string $sign,
-        $index
+        int|string $index
     ): string {
         $sql = "";
 
@@ -250,7 +250,7 @@ class StatementBuilder
 
     // TODO: test
     public static function validateSignAndValue(
-        int|string $data,
+        int|string|null $data,
         array $columnValuesArr
     ): int|string {
         if (is_null($data)) {
@@ -278,7 +278,7 @@ class StatementBuilder
     }
 
     // TODO: test
-    public static function group(string &$sql, array $group): void
+    public static function group(string &$sql, array|null $group): void
     {
         if (isset($group) && !empty($group)) {
             $sql .= "\n";
@@ -311,7 +311,7 @@ class StatementBuilder
     }
 
     // TODO: test
-    public static function limit(string &$sql, $limit): void
+    public static function limit(string &$sql, int|string|null $limit): void
     {
         if (isset($limit)) {
             $sql .= "\n";
@@ -322,7 +322,7 @@ class StatementBuilder
     }
 
     // TODO: test
-    public static function offset(string &$sql, $offset): void
+    public static function offset(string &$sql, int|string|null $offset): void
     {
         if (isset($offset)) {
             $sql .= "\n";
@@ -369,8 +369,11 @@ class StatementBuilder
     /**
      * @tested
      */
-    public static function insert(string &$sql, array $insert, string $table)
-    {
+    public static function insert(
+        string &$sql,
+        array $insert,
+        string $table
+    ): void {
         $sql .= " INSERT INTO {$table} ";
 
         #
@@ -447,7 +450,7 @@ class StatementBuilder
      * Generates: `LIKE '%$value%'`
      * TODO: test
      */
-    public static function like($value): string
+    public static function like(string|int $value): string
     {
         $result = "";
 

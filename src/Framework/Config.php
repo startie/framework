@@ -21,7 +21,7 @@ class Config
 		Config::defineRegionConstants();
 	}
 
-	public static function get($name)
+	public static function get(string $name): array
 	{
 		$stage = strtolower(Config::$stage);
 		$machine = strtolower(Config::$machine);
@@ -41,7 +41,7 @@ class Config
 		}
 	}
 
-	public static function loadEnv()
+	public static function loadEnv(): void
 	{
 		if (isset($_ENV['MACHINE'])) {
 			self::$machine = $_ENV['MACHINE'];

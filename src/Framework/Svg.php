@@ -4,14 +4,14 @@ namespace Startie;
 
 class Svg
 {
-	public static function pdir($path)
+	public static function pdir(string $path): string
 	{
 		$filePath = PUBLIC_DIR . $path . '.svg';
 		$file = file_get_contents($filePath);
 		return $file;
 	}
 
-	public static function p($url)
+	public static function p(string $url): void
 	{
 		$fileUrl = PUBLIC_DIR . $url . '.svg';
 
@@ -25,7 +25,7 @@ class Svg
 		}
 	}
 
-	public static function html($url)
+	public static function html(string $url): void
 	{
 		$fileUrl = PUBLIC_URL . $url . '.svg';
 

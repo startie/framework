@@ -6,9 +6,9 @@ use Startie\Config;
 
 class Asseter
 {
-	public static $jsPrefix;
-	public static $cssPrefix;
-	public static string $root;
+	public static string $jsPrefix;
+	public static string $cssPrefix;
+	public static string|null $root;
 	public static string $hash = "";
 
 	public static function init()
@@ -16,7 +16,10 @@ class Asseter
 		self::loadConfig();
 	}
 
-	public static function loadConfig()
+	/**
+	 * @throws \Exception
+	 */
+	public static function loadConfig(): void
 	{
 		$config = Config::get("Asseter");
 
@@ -24,7 +27,7 @@ class Asseter
 			if (isset($config['prefixes']['js'])) {
 				self::$jsPrefix = $config['prefixes']['js'];
 			} else {
-				throw new Exception(
+				throw new \Exception(
 					"`js` prefix for Asseter is not configured"
 				);
 			}
@@ -32,18 +35,18 @@ class Asseter
 			if (isset($config['prefixes']['css'])) {
 				self::$cssPrefix = $config['prefixes']['css'];
 			} else {
-				throw new Exception(
+				throw new \Exception(
 					"`css` prefix for Asseter is not configured"
 				);
 			}
 		} else {
-			throw new Exception("`prefixes` for Asseter is not configured");
+			throw new \Exception("`prefixes` for Asseter is not configured");
 		}
 
 		if (isset($config['root'])) {
 			self::$root = $config['root'];
 		} else {
-			throw new Exception("`root` for Asseter is not configured");
+			throw new \Exception("`root` for Asseter is not configured");
 		}
 	}
 
@@ -106,7 +109,7 @@ class Asseter
 		return $hash;
 	}
 
-	public static function getRootUrl()
+	public static function getRootUrl(): string
 	{
 		if (isset(self::$root)) {
 			return trim(URL_APP, "/") . self::$root;
@@ -176,7 +179,7 @@ class Asseter
 		echo "<link rel='stylesheet' href='{$assetUrl}'>";
 	}
 
-	public static function isExternal($path)
+	public static function isExternal(string $path): bool
 	{
 		if (
 			str_starts_with($path, "https://")
@@ -192,7 +195,7 @@ class Asseter
 	/**
 	 * @deprecated
 	 */
-	public static function getJsHash()
+	public static function getJsHash(): string
 	{
 		return self::resolveHash();
 	}

@@ -6,13 +6,13 @@ class Logger
 {
     use \Startie\Bootable;
 
-    public static function boot()
+    public static function boot(): void
     {
         self::$isBooted = true;
         self::loadConfig();
     }
 
-    public static function loadConfig()
+    public static function loadConfig(): void
     {
         self::$config = \Startie\Config::get("Logs");
 
@@ -32,13 +32,13 @@ class Logger
         }
     }
 
-    public static function toFile($text)
+    public static function toFile(string $text): void
     {
         $text = (new \DateTime())->format(\DATE_ATOM) . PHP_EOL . $text;
         error_log($text, 3, \Startie\App::path("/php-error.log"));
     }
 
-    public static function storage()
+    public static function storage(): string
     {
         $name = Logger::$config['storage']['name']; // e.g 'logs', 'common', etc.
         if (!empty(Db::$connections)) {

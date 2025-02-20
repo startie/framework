@@ -4,16 +4,16 @@ namespace Startie;
 
 class Dev
 {
-	public static $start = 0;
-	public static $stop = 0;
+	public static int|float $start = 0;
+	public static int|float $stop = 0;
 
-	public static function start()
+	public static function start(): void
 	{
 		static::$start = 0;
 		static::$start = microtime(true);
 	}
 
-	public static function stop()
+	public static function stop(): void
 	{
 		static::$stop = 0;
 		static::$stop = microtime(true);
@@ -25,7 +25,7 @@ class Dev
 	/**
 	 * @param array $global Global array
 	 */
-	public static function renderGlobal($global)
+	public static function renderGlobal($global): void
 	{
 		ksort($global, SORT_NATURAL | SORT_FLAG_CASE);
 
@@ -53,7 +53,7 @@ class Dev
 		}
 	}
 
-	public static function isSecretMode()
+	public static function isSecretMode(): bool
 	{
 		if ($_ENV['MODE_DEV']) {
 			if (isset($_ENV['DEV_SECRET_MODE_KEY'])) {
@@ -72,7 +72,7 @@ class Dev
 	/**
 	 * @deprecated
 	 */
-	public static function is()
+	public static function is(): bool
 	{
 		if (Access::is('developers') || $_ENV['MODE_DEV']) {
 			return true;
@@ -81,8 +81,11 @@ class Dev
 		}
 	}
 
-	public static function sed($search, $replace, $filePath)
-	{
+	public static function sed(
+		string $search,
+		string $replace,
+		string $filePath
+	): void {
 		$search = str_replace("/", "\/", $search);
 		$replace = str_replace("/", "\/", $replace);
 		$filePath = str_replace("/", "\/", $filePath);
@@ -90,7 +93,7 @@ class Dev
 		echo "sed -i '' 's/$search/$replace/g' $filePath";
 	}
 
-	public static function counter($start_time)
+	public static function counter(int|float $start_time): string
 	{
 		$result = "";
 

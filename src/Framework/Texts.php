@@ -57,7 +57,7 @@ class Texts
 		 * But don't delete it from source code of a framework
 		 * for backward compatability
 		 */
-		function t(string $target = "", string $fallback = "")
+		function t(string $target = "", string $fallback = ""): string
 		{
 			return \Startie\Texts::translate($target, $fallback);
 		}
@@ -72,13 +72,16 @@ class Texts
 	/**
 	 * @deprecated Use `boot()`
 	 */
-	public static function init()
+	public static function init(): void
 	{
 		self::boot();
 	}
 
-	public static function getPhrase($path, $phrase, $params = [])
-	{
+	public static function getPhrase(
+		string $path,
+		string $phrase,
+		array $params = []
+	): string {
 		$vocab = self::get($path);
 		$phrase = $vocab[$phrase];
 
@@ -96,7 +99,7 @@ class Texts
 		return $phrase;
 	}
 
-	public static function collect($arr)
+	public static function collect(array $arr): mixed
 	{
 		$vArr = [];
 		foreach ($arr as $v) {
@@ -105,7 +108,7 @@ class Texts
 		return call_user_func_array('array_merge', $vArr);
 	}
 
-	public static function get($path, $params = [])
+	public static function get(string $path, array $params = []): array
 	{
 		$v = "";
 		$fullPath = App::path("backend/Texts/{$path}.json");
@@ -140,8 +143,10 @@ class Texts
 		}
 	}
 
-	public static function translate(string $target = "", string $fallback = "")
-	{
+	public static function translate(
+		string $target = "",
+		string $fallback = ""
+	): string {
 		if ($fallback === "" && self::$config['autoFallback']) {
 			$fallback = $target;
 		}

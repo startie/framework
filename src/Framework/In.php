@@ -20,8 +20,14 @@ class In
      * 
      * @return mixed
      */
-    public static function e($global, $key, $sanitizeType, $if = [], $processing = [], $replacements = [])
-    {
+    public static function e(
+        string $global,
+        string $key,
+        string $sanitizeType,
+        array $if = [],
+        array $processing = [],
+        array $replacements = []
+    ): mixed {
         /*
 			fix name
 		*/
@@ -79,64 +85,104 @@ class In
     /**
      * Short-hand method
      */
-    public static function cookie($key, $sanitizeType = '', $if = [], $processing = [], $replacements = [])
-    {
+    public static function cookie(
+        string $key,
+        string $sanitizeType = '',
+        array $if = [],
+        array $processing = [],
+        array $replacements = []
+    ): mixed     {
         return In::e("cookie", $key, $sanitizeType, $if, $processing, $replacements);
     }
 
     /**
      * Short-hand method
      */
-    public static function env($key, $sanitizeType = '', $if = [], $processing = [], $replacements = [])
-    {
+    public static function env(
+        string $key,
+        string $sanitizeType = '',
+        array $if = [],
+        array $processing = [],
+        array $replacements = []
+    ): mixed     {
         return In::e("env", $key, $sanitizeType, $if, $processing, $replacements);
     }
 
     /**
      * Short-hand method
      */
-    public static function files($key, $sanitizeType = '', $if = [], $processing = [], $replacements = [])
-    {
+    public static function files(
+        string $key,
+        string $sanitizeType = '',
+        array $if = [],
+        array $processing = [],
+        array $replacements = []
+    ): mixed     {
         return In::e("files", $key, $sanitizeType, $if, $processing, $replacements);
     }
 
     /**
      * Short-hand method
      */
-    public static function get($key, $sanitizeType = '', $if = [], $processing = [], $replacements = [])
-    {
+    public static function get(
+        string $key,
+        string $sanitizeType = '',
+        array $if = [],
+        array $processing = [],
+        array $replacements = []
+    ): mixed     {
         return In::e("get", $key, $sanitizeType, $if, $processing, $replacements);
     }
 
     /**
      * Short-hand method
      */
-    public static function post($key, $sanitizeType = '', $if = [], $processing = [], $replacements = [])
-    {
+    public static function post(
+        string $key,
+        string $sanitizeType = '',
+        array $if = [],
+        array $processing = [],
+        array $replacements = []
+    ): mixed     {
         return In::e("post", $key, $sanitizeType, $if, $processing, $replacements);
     }
 
     /**
      * Short-hand method
      */
-    public static function request($key, $sanitizeType = '', $if = [], $processing = [], $replacements = [])
-    {
+    public static function request(
+        string $key,
+        string $sanitizeType = '',
+        array $if = [],
+        array $processing = [],
+        array $replacements = []
+    ): mixed     {
         return In::e("request", $key, $sanitizeType, $if, $processing, $replacements);
     }
 
     /**
      * Short-hand method
      */
-    public static function server($key, $sanitizeType = '', $if = [], $processing = [], $replacements = [])
-    {
+    public static function server(
+        string $key,
+        string $sanitizeType = '',
+        array $if = [],
+        array $processing = [],
+        array $replacements = []
+    ): mixed     {
         return In::e("server", $key, $sanitizeType, $if, $processing, $replacements);
     }
 
     /**
      * Short-hand method
      */
-    public static function session($key, $sanitizeType = '', $if = [], $processing = [], $replacements = [])
-    {
+    public static function session(
+        string $key,
+        string $sanitizeType = '',
+        array $if = [],
+        array $processing = [],
+        array $replacements = []
+    ): mixed     {
         return In::e("session", $key, $sanitizeType, $if, $processing, $replacements);
     }
 }

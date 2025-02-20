@@ -4,7 +4,7 @@ namespace Startie;
 
 class Layout
 {
-	public static function return($name, array $data = [])
+	public static function return(string $name, array $data = []): string
 	{
 		if (!$name) {
 			return "";
@@ -25,7 +25,7 @@ class Layout
 		return $content;
 	}
 
-	public static function block($name)
+	public static function block(string $name): string
 	{
 		return "{{{$name}}}";
 	}

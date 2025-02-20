@@ -23,7 +23,7 @@ class Sanitize
 			filter_var($var, FILTER_SANITIZE_NUMBER_INT)
 		);
 	}
-	public static function integer($var): int
+	public static function integer(mixed $var): int
 	{
 		return self::int($var);
 	}
@@ -58,7 +58,7 @@ class Sanitize
 	}
 
 	// TODO: test
-	public static function double($var): float
+	public static function double(mixed $var): float
 	{
 		return self::float($var);
 	}

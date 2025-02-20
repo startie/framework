@@ -6,15 +6,15 @@ use PDOException;
 
 class Exception extends \Exception
 {
-    public $object;
-    public $type;
+    public string $object;
+    public string $type;
 
     public function __construct(
         string $message,
         string $type = "error",
         string $object = "php",
         int|string $code = 0,
-        $previous = NULL
+        \Throwable|null $previous = NULL
     ) {
         parent::__construct($message, intval($code), $previous);
 
@@ -22,12 +22,12 @@ class Exception extends \Exception
         $this->object = $object;
     }
 
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
 
-    public function getObject()
+    public function getObject(): string
     {
         return $this->object;
     }
@@ -42,8 +42,10 @@ class Exception extends \Exception
      * @param  mixed $e
      * @return \Startie\Exception
      */
-    public static function create(PDOException $e, $sql)
-    {
+    public static function create(
+        PDOException $e,
+        string $sql
+    ): \Startie\Exception {
         $message = $e->getMessage()
             . ". "
             . $sql;

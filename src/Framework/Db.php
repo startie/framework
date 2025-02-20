@@ -6,8 +6,8 @@ class Db
 {
 	use \Startie\Bootable;
 
-	public static $connections = [];
-	public static $excludeFunctions;
+	public static array $connections = [];
+	public static array $excludeFunctions;
 
 	public static function boot(): void
 	{
@@ -51,14 +51,14 @@ class Db
 		}
 	}
 
-	public static function config($name = NULL)
+	public static function config(string|null $name = null): string
 	{
 		if (isset($name)) {
 			return Db::$config[$name];
 		}
 	}
 
-	public static function connect(string $dsn, string $driver)
+	public static function connect(string $dsn, string $driver): \PDO|null
 	{
 		if ($driver === "mysql") {
 			try {
@@ -128,23 +128,32 @@ class Db
 		return $dsn;
 	}
 
-	public static function debugStart($debug = 0, $object = NULL)
-	{
+	public static function debugStart(
+		bool|int $debug = false,
+		mixed $object = null
+	): void 	{
 		if ($debug) Dump::start($object);
 	}
 
-	public static function debugContinue($debug = 0, $object = NULL)
-	{
+	public static function debugContinue(
+		bool|int $debug = false,
+		mixed $object = null
+	): void 	{
 		if ($debug) Dump::next($object);
 	}
 
-	public static function debugEnd($debug = 0, $object = NULL)
-	{
+	public static function debugEnd(
+		bool|int $debug = false,
+		mixed $object = null
+	): void 	{
 		if ($debug) Dump::end($object);
 	}
 
-	public static function debug($debug = 0, $object = NULL, $msg = "")
-	{
+	public static function debug(
+		bool|int $debug = false,
+		mixed $object = null,
+		string $message = ""
+	): void 	{
 		if ($debug) Dump::make($object, $die = 0, $msg);
 	}
 }

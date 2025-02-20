@@ -10,15 +10,15 @@ class Auth
 {
 	use \Startie\Bootable;
 
-	public static $config;
+	public static array $config;
 
-	public static function boot()
+	public static function boot(): void
 	{
 		self::$isBooted = true;
 		self::loadConfig();
 	}
 
-	public static function loadConfig()
+	public static function loadConfig(): void
 	{
 		self::$config = Config::get('Auth');
 	}
@@ -27,7 +27,7 @@ class Auth
 	# 		$params = ['uid', 'ServiceId'];
 	#
 
-	public static function make($params)
+	public static function make(array $params): void
 	{
 		$UserId = Users::getIdByProfileUid($params);
 
@@ -58,7 +58,7 @@ class Auth
 		// }
 	}
 
-	public static function isWithService($serviceName): bool
+	public static function isWithService(string $serviceName): bool
 	{
 		if (Session::has('auth')) {
 			foreach (Session::get('auth') as $authEntity) {
@@ -72,10 +72,7 @@ class Auth
 		return false;
 	}
 
-	/**
-	 * @return integer|bool
-	 */
-	public static function getIdInService($serviceName)
+	public static function getIdInService(string $serviceName): int|bool
 	{
 		if (Session::has('auth')) {
 			if (Session::has('auth')) {
@@ -93,7 +90,7 @@ class Auth
 	 * Requires authentication
 	 *
 	 * @deprecated
-	 * @return void
+	 * @return never
 	 */
 	public static function ask()
 	{

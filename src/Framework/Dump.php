@@ -8,9 +8,9 @@ class Dump
 {
     use \Startie\Bootable;
 
-    public static $hasAccess;
+    public static bool $hasAccess;
 
-    public static function boot($callback = NULL)
+    public static function boot(callable $callback = null): void
     {
         self::$isBooted = true;
 
@@ -22,13 +22,13 @@ class Dump
         }
     }
 
-    public static function hasAccess()
+    public static function hasAccess(): bool
     {
         self::requireBoot();
         return self::$hasAccess;
     }
 
-    public static function e($var)
+    public static function e(mixed $var): void
     {
         self::requireBoot();
         echo "<pre>";
@@ -39,7 +39,7 @@ class Dump
     /**
      * For browser network debugging and PHP console
      */
-    public static function __pre($var, $msg = "")
+    public static function __pre(mixed $var, string $message = "")
     {
         self::requireBoot();
         if (self::$hasAccess) {
@@ -51,8 +51,12 @@ class Dump
     /**
      * For browser network debugging and PHP console
      */
-    public static function __make($result, $die = 0, $msg = "", $trace = 0)
-    {
+    public static function __make(
+        mixed $result,
+        int $die = 0,
+        string $message = "",
+        int $trace = 0
+    ) {
         self::requireBoot();
         if (self::hasAccess()) {
             Dump::__pre($result, $msg);
@@ -66,8 +70,11 @@ class Dump
     /**
      * For browser network debugging and PHP console
      */
-    public static function __made($result, $msg = "", $trace = 0)
-    {
+    public static function __made(
+        mixed $result,
+        string $message = "",
+        int $trace = 0
+    ): void {
         self::requireBoot();
         Dump::__make($result, 1, $msg, $trace);
         die();
@@ -76,8 +83,10 @@ class Dump
     /**
      * For a simple debugging
      */
-    public static function _pre($var, $msg = "")
-    {
+    public static function _pre(
+        mixed $var,
+        string $message = ""
+    ): void {
         self::requireBoot();
         if (self::hasAccess()) {
             echo "<pre>";
@@ -90,8 +99,14 @@ class Dump
     /**
      * For a simple debugging
      */
-    public static function _make($result, $die = 0, $msg = "", $trace = 0)
-    {
+    public static function _make(
+        mixed $result,
+        int $die = 0,
+        string $msg = "",
+        int $trace = 0
+    ): void {
+        $debug_backtrace = debug_backtrace();
+
         self::requireBoot();
         $backTrace = "";
         $backTrace .= "<mark>";
@@ -112,8 +127,11 @@ class Dump
     /**
      * For a simple debugging
      */
-    public static function _made($result, $msg = "", $trace = 0)
-    {
+    public static function _made(
+        mixed $result,
+        string $msg = "",
+        int $trace = 0
+    ): void {
         self::requireBoot();
         Dump::_make($result, 1, $msg, $trace);
         die();
@@ -122,8 +140,10 @@ class Dump
     /**
      * For a complex debugging
      */
-    public static function pre($var, $msg = "")
-    {
+    public static function pre(
+        mixed $var,
+        string|null $message = null
+    ): void     {
         self::requireBoot();
         if (self::hasAccess()) {
             echo "<pre>";
@@ -138,8 +158,12 @@ class Dump
      * 
      * TODO: remove vscode openning hardcode
      */
-    public static function make($result, $die = 0, $msg = "", $trace = 0)
-    {
+    public static function make(
+        mixed $result,
+        int|bool $die = false,
+        string $message = "",
+        bool|int|null $trace = false
+    ): void {
         self::requireBoot();
         $backTrace = "";
 
@@ -181,8 +205,11 @@ class Dump
     /**
      * For a complex debugging
      */
-    public static function made($result, $msg = "", $trace = 0)
-    {
+    public static function made(
+        mixed $result,
+        string|null $message = null,
+        int|null $trace = 0
+    ): void {
         self::requireBoot();
         Dump::make($result, 1, $msg, $trace);
         die();
@@ -191,7 +218,7 @@ class Dump
     /**
      * Start debugging with the openning for <pre>
      */
-    public static function start($var)
+    public static function start(mixed $var): void
     {
         self::requireBoot();
         if (self::hasAccess()) {
@@ -204,7 +231,7 @@ class Dump
     /**
      * Continue debugging
      */
-    public static function next($var)
+    public static function next(mixed $var): void
     {
         self::requireBoot();
         if (self::hasAccess()) {
@@ -216,7 +243,7 @@ class Dump
     /**
      * End debugging
      */
-    public static function end($var)
+    public static function end(mixed $var): void
     {
         self::requireBoot();
         if (self::hasAccess()) {

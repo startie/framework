@@ -20,7 +20,7 @@ class Sql
      * 
      * @tested
      */
-    public static function q($expression)
+    public static function q(string $expression): string
     {
         return "`$expression`";
     }
@@ -28,7 +28,7 @@ class Sql
     /**
      * @tested
      */
-    public static function hasBacktick($val)
+    public static function hasBacktick(string|int $val): bool
     {
         if (str_contains($val ?? '', '`')) {
             return true;
@@ -40,7 +40,7 @@ class Sql
     /**
      * @tested
      */
-    public static function startsWithBacktick($val)
+    public static function startsWithBacktick(string|int $val): bool
     {
         $val = $val ?? '';
         $val = strval($val);
@@ -55,21 +55,21 @@ class Sql
     /**
      * @tested
      */
-    public static function ts()
+    public static function ts(): string
     {
         return Sql::q(
             MySql::ts()
         );
     }
 
-    public static function isNull()
+    public static function isNull(): string
     {
         return Sql::q(
             'IS NULL'
         );
     }
 
-    public static function isNotNull()
+    public static function isNotNull(): string
     {
         return Sql::q(
             'IS NOT NULL'
@@ -79,7 +79,7 @@ class Sql
     /**
      * @tested
      */
-    public static function like($value)
+    public static function like(string|int $value): string
     {
         return Sql::q(
             StatementBuilder::like($value)
@@ -89,7 +89,7 @@ class Sql
     /**
      * @tested
      */
-    public static function regexp($pattern)
+    public static function regexp(string $pattern): string
     {
         $query = "";
 

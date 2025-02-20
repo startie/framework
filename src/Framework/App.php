@@ -11,7 +11,7 @@ class App
 
     public static float $initializedAt;
 
-    public static function init(string $root)
+    public static function init(string $root): void
     {
         self::$root = $root;
         self::$initializedAt = microtime(true);
@@ -43,7 +43,7 @@ class App
         return self::$root . "/$path";
     }
 
-    public static function getCurrentVersion()
+    public static function getCurrentVersion(): string
     {
         $version = exec('git describe --tags --abbrev=0');
         $version = trim($version);
@@ -51,7 +51,7 @@ class App
         return $version;
     }
 
-    public static function getLastUpdateDate()
+    public static function getLastUpdateDate(): string
     {
         $commitDate = new \DateTime(trim(exec('git log -n1 --pretty=%ci HEAD')));
         $commitDate->setTimezone(new \DateTimeZone('UTC'));

@@ -4,7 +4,9 @@ namespace Startie;
 
 class Vocabulary
 {
-	public static function get(string $path, array $params = [])
+	public array $collection;
+
+	public static function get(string $path, array $params = []): array
 	{
 		$v = "";
 		$fullPath = App::path("backend/Vocabularies/{$path}.json");
@@ -37,7 +39,7 @@ class Vocabulary
 		}
 	}
 
-	public static function getFolder(string $path)
+	public static function getFolder(string $path): array
 	{
 		$dirPath = STORAGE_DIR . "vocabularies/$path";
 		$vocabularyNames = scandir($dirPath);
@@ -50,9 +52,7 @@ class Vocabulary
 		return $arr;
 	}
 
-	public $collection;
-
-	function __construct($name, $lang)
+	function __construct(string $name, string $lang)
 	{
 		if (!$lang) {
 			$lang = Cookie::get('LanguageCode');
@@ -60,7 +60,7 @@ class Vocabulary
 		$this->collection = json_decode(file_get_contents(STORAGE_DIR . "vocabularies/$name.json"), true);
 	}
 
-	public static function collect($arr)
+	public static function collect(array $arr): array
 	{
 		$vArr = [];
 		foreach ($arr as $v) {

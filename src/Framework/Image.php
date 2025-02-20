@@ -4,9 +4,12 @@ namespace Startie;
 
 class Image
 {
-	public static function convertImage($originalImage, $outputImage, $quality = 100)
-	{
-		# jpg, png, gif or bmp?
+	public static function convertImage(
+		string $originalImage,
+		null|string $outputImage,
+		int $quality = 100
+	): int {
+		// Check jpg, png, gif or bmp
 		$exploded = explode('.', $originalImage);
 		$ext = $exploded[count($exploded) - 1];
 

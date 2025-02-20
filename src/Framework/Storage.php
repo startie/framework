@@ -4,14 +4,16 @@ namespace Startie;
 
 class Storage
 {
-    public static function pdo($dsn, $texts)
+    /**
+     * @throws \PDOException
+     */
+    public static function pdo(string $dsn, string $texts): \PDO
     {
         try {
             $pdo = new \PDO($dsn);
             return $pdo;
         } catch (\PDOException $e) {
-            echo $texts; // ?
-            die($e);
+            throw $e;
         }
     }
 }

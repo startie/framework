@@ -14,28 +14,29 @@ namespace Startie;
 
 class Form
 {
-    public static function open($method = '', $action = '')
+    public static function open(string $method = '', string $action = ''): void
     {
         "<form method='$method' action='$action'>";
     }
 
-    public static function text($name, $value)
+    public static function text(string $name, string $value): void
     {
         echo "<input name='$name' value='$value'>";
     }
 
-    public static function submit()
+    public static function submit(): void
     {
         echo "<input type='submit'>";
     }
 
-    public static function end()
+    public static function end(): void
     {
         echo "</form>";
     }
 
-    public static function hiddenQueryParams($exceptIndexes = [])
-    {
+    public static function hiddenQueryParams(
+        array $exceptIndexes = []
+    ): array {
         $params = Url::getQueryParams();
         unset($params['url']);
 
@@ -61,8 +62,9 @@ class Form
         return $newParams;
     }
 
-    public static function renderQueryParamsAsHidden($exceptIndexes = [])
-    {
+    public static function renderQueryParamsAsHidden(
+        array $exceptIndexes = []
+    ): void {
         $hiddenParams = self::hiddenQueryParams($exceptIndexes);
         foreach ($hiddenParams as $param) {
             $name = $param['name'];

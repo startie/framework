@@ -23,12 +23,12 @@ class Session
     /**
      * @deprecated
      */
-    public static function is(string $var)
+    public static function is(string $var): bool
     {
         return self::has($var);
     }
 
-    public static function get(string $var = "", string $type = "raw")
+    public static function get(string $var = "", string $type = "raw"): mixed
     {
         if ($var !== "") {
             if (Session::has($var)) {
@@ -43,17 +43,17 @@ class Session
         return $_SESSION;
     }
 
-    public static function set($key, $value): void
+    public static function set(string|int $key, mixed $value): void
     {
         $_SESSION[$key] = $value;
     }
 
-    public static function push($key, $value): void
+    public static function push(string|int $key, mixed $value): void
     {
         $_SESSION[$key][] = $value;
     }
 
-    public static function delete($var): void
+    public static function delete(string|int $var): void
     {
         unset($_SESSION[$var]);
     }

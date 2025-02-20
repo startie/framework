@@ -4,8 +4,8 @@ namespace Startie;
 
 trait Bootable
 {
-    public static $isBooted = false;
-    public static $config;
+    public static bool $isBooted = false;
+    public static array $config;
 
     abstract static function boot();
 

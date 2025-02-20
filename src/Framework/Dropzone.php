@@ -11,12 +11,12 @@ class Dropzone
 	 * TODO: create `::initParams()` like `::initImages()`
 	 */
 	public static function init(
-		$e,
-		$class,
-		$params,
-		$imagesIndex,
-		$imagesParams
-	) {
+		array $e,
+		string $class,
+		array $params,
+		int $imagesIndex,
+		array $imagesParams
+	): array {
 		$e['Dropzone']['class'] = $class;
 
 		$e['Dropzone']['params'] = [];
@@ -36,9 +36,9 @@ class Dropzone
 	}
 
 	public static function initImages(
-		$images,
-		$params
-	) {
+		array $images,
+		array $params
+	): array {
 		foreach ($images as &$image) {
 			$paramsStr = "";
 			foreach ($params as $param) {

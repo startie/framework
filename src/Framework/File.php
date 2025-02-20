@@ -51,7 +51,7 @@ class File
 		}
 	}
 
-	public static function saveFromPath($path1, $path2)
+	public static function saveFromPath(string $path1, string $path2): bool
 	{
 		// Create path if it doesn't exist
 		$parts = explode('/', $path2);
@@ -67,8 +67,13 @@ class File
 		return move_uploaded_file($path1, $path2);
 	}
 
-	public static function saveFromSsh($ip, $userName, $pwd, $imagePath, $path)
-	{
+	public static function saveFromSsh(
+		string $ip,
+		string $userName,
+		string $pwd,
+		string $imagePath,
+		string $path
+	): void {
 		$connection = ssh2_connect($ip);
 		ssh2_auth_password($connection, $userName, $pwd);
 
@@ -95,9 +100,9 @@ class File
 	}
 
 	public static function getFolders(
-		$path,
-		$exclude = ['..', '.', '.git', '_']
-	) {
+		string $path,
+		array $exclude = ['..', '.', '.git', '_']
+	): array {
 		$files = array_diff(scandir($path), $exclude);
 		$dirs = [];
 
@@ -110,7 +115,7 @@ class File
 		return $dirs;
 	}
 
-	public static function getPermissions($path)
+	public static function getPermissions(string $path): string
 	{
 		$perms = fileperms($path);
 
@@ -164,7 +169,7 @@ class File
 	#
 	#	deletes directory on path and all inside it
 
-	public static function deleteDir($path)
+	public static function deleteDir(string $path): void
 	{
 		if (!is_dir($path)) {
 			throw new InvalidArgumentException("$path must be a directory");

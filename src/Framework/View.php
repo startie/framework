@@ -18,7 +18,7 @@ class View
         self::$isBooted = true;
     }
 
-    public static function loadConfig()
+    public static function loadConfig(): void
     {
         try {
             self::$config = Config::get('View');
@@ -31,10 +31,10 @@ class View
     }
 
     public static function return(
-        $name,
+        string $name,
         array $data = [],
         bool|null $trimSpaces = NULL
-    ) {
+    ): string {
         $trimSpaces = $trimSpaces ?? self::$config['trimSpaces'] ?? false;
 
         $path = App::path("backend/Views/{$name}.php");
@@ -58,7 +58,7 @@ class View
     }
 
     public static function r(
-        $name,
+        string $name,
         array $data = [],
         bool|null $trimSpaces = NULL
     ) {
@@ -69,7 +69,7 @@ class View
      * Fixes spaces
      * experimental, not tested well, there is a risk of spoiling view
      */
-    public static function trim($content)
+    public static function trim(string $content): string
     {
         // d($content);
         $content = str_replace("\n", "", $content);
@@ -114,7 +114,7 @@ class View
      */
     public static function utils()
     {
-        function v($a, $b = [])
+        function v(mixed $a, mixed $b = [])
         {
             return View::r($a, $b);
         }

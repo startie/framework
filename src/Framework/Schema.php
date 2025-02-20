@@ -18,7 +18,7 @@ class Schema
     // TODO: rename to jsonRegExp
     // since 5.6
     // alnum = letter or digit
-    public static function regexpSearch($field, $query)
+    public static function regexpSearch(string $field, string $query): string
     {
         $query = mb_strtolower($query);
 
@@ -40,7 +40,7 @@ class Schema
         return Sql::like($value);
     }
 
-    public function truncateTable($table)
+    public function truncateTable(string $table): void
     {
         global $dbh;
 
@@ -51,17 +51,17 @@ class Schema
         try {
             $dbh->exec($sql);
             // echo "Table '$table' trucated successfully!";
-        } catch (PDOException $e) {
+        } catch (\PDOException $e) {
             echo $e->getMessage();
         }
     }
 
-    public static function n($query)
+    public static function n(string $query): string
     {
         return $query . "\n";
     }
 
-    public static function showTable($table)
+    public static function showTable(string $table): void
     {
         global $dbh;
 
@@ -81,7 +81,7 @@ class Schema
         }
     }
 
-    public static function e($sql, $type = 'fetch')
+    public static function e(string $sql, string $type = 'fetch'): mixed
     {
         global $dbh;
 
@@ -101,7 +101,7 @@ class Schema
     /**
      * @deprecated 0.30.0 Use Sql::ts()
      */
-    public static function ts()
+    public static function ts(): string
     {
         return Sql::ts();
     }

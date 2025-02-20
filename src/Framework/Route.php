@@ -6,18 +6,18 @@ use Startie\App;
 
 class Route
 {
-    public $type;
-    public $middles;
-    public $title;
-    public $layout;
-    public $class;
-    public $method;
-    public $classMethodExecution;
-    public $classFull;
-    public $controllerNamespacedClass;
-    public $controllerFilePath;
+    public string $type;
+    public string $middles;
+    public string $title;
+    public string $layout;
+    public string $class;
+    public string $method;
+    public string $classMethodExecution;
+    public string $classFull;
+    public string $controllerNamespacedClass;
+    public string $controllerFilePath;
 
-    public function __construct($config)
+    public function __construct(array $config)
     {
         $this->type = $config['type'] ?? "";
         $this->middles = $config['middles'] ?? "";

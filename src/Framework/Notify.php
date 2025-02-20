@@ -11,7 +11,7 @@ class Notify
 	 * - 'warning' or 'alert'
 	 * - 'danger'
 	 */
-	public static function add(string $text, string $type)
+	public static function add(string $text, string $type): void
 	{
 		$messageData = ['text' => $text, 'type' => $type];
 		Session::push('Notify', $messageData);
@@ -20,7 +20,7 @@ class Notify
 	/**
 	 * Will render a notification
 	 */
-	public static function check()
+	public static function check(): void
 	{
 		if (Session::has('Notify')) {
 			foreach (Session::get('Notify') as $number => &$notification) {
@@ -44,7 +44,7 @@ class Notify
 	 * Example: 
 	 * `::display(['text' => 'Hello', 'type' => 'success'])`
 	 */
-	public static function display($params)
+	public static function display(array $params): void
 	{
 		if (empty($params['type'])) {
 			$params['type'] = "info";

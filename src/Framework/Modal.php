@@ -73,7 +73,7 @@ class Modal
 	 * 'action' example: 'edit'
 	 * 'idIndex' example: 'PublicationId'
 	 * 
-	 * @return Entity with additional keys:
+	 * @return array Entity with additional keys:
 	 * - <Action>ModalButtonClass example: EditModalButtonClass
 	 * - <Action>ModalId, example: EditModalId
 	 * Each key will contain a string

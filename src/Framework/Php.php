@@ -14,7 +14,7 @@ class Php
 	# 	Checks if variable is set and has a certain value
 	#
 
-	public static function isve($var, $val = NULL)
+	public static function isve(mixed $var, mixed $val = null): bool
 	{
 		if (isset($var)) {
 			if ($val) {
@@ -33,7 +33,7 @@ class Php
 	#	todo: support for double, float
 	#
 
-	public static function hasInCommon($one, $two)
+	public static function hasInCommon(mixed $one, mixed $two): bool
 	{
 		# Array
 		if (is_array($one) && is_array($two)) {
@@ -84,7 +84,7 @@ class Php
 		source: https://stackoverflow.com/questions/5225971/is-it-possible-to-get-list-of-defined-namespaces
 	*/
 
-	public static function namespaceExists($namespace)
+	public static function namespaceExists(string $namespace): bool
 	{
 		$namespace .= "\\";
 		foreach (get_declared_classes() as $name)
@@ -163,7 +163,7 @@ class Php
 	# 	Checks if (super) global has a variable with ceratain value is exists
 	#
 
-	public static function isgve($glob, $var, $value)
+	public static function isgve(mixed $glob, string $var, mixed $value): bool
 	{
 		$glob = strtoupper($glob);
 
@@ -226,8 +226,11 @@ class Php
 	/**
 	 * Wrapper around `filter_input()`
 	 */
-	public static function input($glob, $variableName, $type)
-	{
+	public static function input(
+		string $glob,
+		string $variableName,
+		string $type
+	): mixed 	{
 		$glob = strtoupper($glob);
 
 		$superGlobalHasVariable = Php::isg($glob, $variableName);
@@ -300,8 +303,10 @@ class Php
 	#
 	#
 
-	public static function mb_ucfirst($string, $encoding = "UTF-8")
-	{
+	public static function mb_ucfirst(
+		string $string,
+		string $encoding = "UTF-8"
+	): string 	{
 		$strlen = mb_strlen($string, $encoding);
 		$firstChar = mb_substr($string, 0, 1, $encoding);
 		$then = mb_substr($string, 1, $strlen - 1, $encoding);
@@ -311,8 +316,13 @@ class Php
 	/**
 	 * @source https://gist.github.com/MakStashkevich/31f5cb7b229bc735aeaa89a6796327ce
 	 */
-	public static function mb_str_pad(string $input, int $pad_length, string $pad_string = "\x20", int $pad_type = STR_PAD_RIGHT, string $encoding = 'UTF-8')
-	{
+	public static function mb_str_pad(
+string $input,
+int $pad_length,
+string $pad_string = "\x20",
+int $pad_type = STR_PAD_RIGHT,
+string $encoding = 'UTF-8'
+	): string 	{
 		$input_length = mb_strlen($input, $encoding);
 		$pad_string_length = mb_strlen($pad_string, $encoding);
 
@@ -351,7 +361,7 @@ class Php
 		return $result;
 	}
 
-	public static function isJson($string)
+	public static function isJson(string|null $string): bool
 	{
 		if (isset($string)) {
 			json_decode($string);
@@ -362,8 +372,10 @@ class Php
 		}
 	}
 
-	public static function transliterate($textcyr = NULL, $textlat = NULL)
-	{
+	public static function transliterate(
+		string|null $textcyr = null,
+		string|null $textlat = null
+	): string|null 	{
 		$cyr = array(
 			'ж',
 			'ч',
@@ -493,8 +505,12 @@ class Php
 		else return null;
 	}
 
-	public function strpos_recursive($haystack, $needle, $offset = 0, &$results = array())
-	{
+	public function strpos_recursive(
+		string $haystack,
+		string $needle,
+		int $offset = 0,
+		array &$results = []
+	): array 	{
 		$offset = strpos($haystack, $needle, $offset);
 		if ($offset === false) {
 			return $results;
@@ -507,6 +523,9 @@ class Php
 	public static function hash($length)
 	{
 		// src: https://stackoverflow.com/questions/4356289/php-random-string-generator
+*/
+	public static function hash(int $length): string
+	{
 		return substr(str_shuffle(str_repeat($x = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', ceil($length / strlen($x)))), 1, $length);
 	}
 
@@ -520,8 +539,11 @@ class Php
 	# 	Checks if array has a key [with certain value]
 	#
 
-	public static function isake($arr, $key, $str = NULL)
-	{
+	public static function isake(
+		array $arr,
+		string $key,
+		string|null $str = null
+	): bool 	{
 		if (isset($arr[$key])) {
 			if ($str) {
 				if ($key == $str) {
@@ -538,8 +560,11 @@ class Php
 	#	Flags each element of $collection
 	#
 
-	public static function mark($arr, $index, $value = 1)
-	{
+	public static function mark(
+		array $arr,
+		int|string $index,
+		int $value = 1
+	): array 	{
 		foreach ($arr as &$item) {
 			$item[$index] = $value;
 		}
@@ -551,8 +576,12 @@ class Php
 	#	Makes flagged $collection[$property] with $value
 	#
 
-	public static function flag($collection, $property, $value, $flag = ['selected' => 'selected'])
-	{
+	public static function flag(
+		array $collection,
+		string|int $property,
+		mixed $value,
+		array $flag = ['selected' => 'selected']
+	): array 	{
 		foreach ($collection as $i => &$element) {
 			if ($property != "") {
 				if ($element[$property] == $value) {
@@ -586,8 +615,11 @@ class Php
 	#	works only when all element has this prop
 	#						
 
-	public static function smda($arr, $prop, $val)
-	{
+	public static function smda(
+		array $arr,
+		string|int $prop,
+		mixed $val
+	): int 	{
 		$index = array_search($val, array_column($arr, $prop));
 		if ($index === false) {
 			$index = -1;
@@ -604,8 +636,17 @@ class Php
 	#	$index = Php::smdam($Users, 'age', 'max'); // => 3 (Kim)
 	#		
 
-	public static function smdam($arr, $prop, $mode)
-	{
+	public static function smdam(
+		array $arr,
+		string|int $prop,
+		string $mode
+	): int {
+		$allValues = array_column($arr, $prop);
+
+		if ($allValues === []) {
+			throw new Exception('No values in array for this prop');
+		}
+
 		if ($mode == 'max') {
 			$val = max(
 				array_column($arr, $prop)
@@ -627,8 +668,11 @@ class Php
 	# 	(s=set, e=element, f=first, m=multi, d=dimensional, a=array)
 	#
 
-	public static function sefmda(&$arr, $prop, $val)
-	{
+	public static function sefmda(
+		array &$arr,
+		string|int $prop,
+		mixed $val
+	): array 	{
 
 		$i = Php::smda($arr, $prop, $val);
 		$el = $arr[$i];
@@ -642,8 +686,11 @@ class Php
 	#	(o=order,m=multi, d=dimensional, a=array)
 	#
 
-	public static function oma(&$arr, $col, $dir = SORT_ASC)
-	{
+	public static function oma(
+		array &$arr,
+		string|int $col,
+		int $dir = SORT_ASC
+	): void 	{
 		$sort_col = [];
 		foreach ($arr as $key => $row) {
 			if (isset($row[$col])) {
@@ -659,8 +706,10 @@ class Php
 	#	source: https://stackoverflow.com/questions/7225070/php-array-delete-by-value-not-key
 	#
 
-	public static function a_dev(&$arr, $value)
-	{
+	public static function a_dev(
+		array &$arr,
+		mixed $value
+	): void 	{
 		if (($key = array_search($value, $arr)) !== false) {
 			unset($arr[$key]);
 		}
@@ -674,7 +723,7 @@ class Php
 	#	source: https://stackoverflow.com/questions/4466159/delete-element-from-multidimensional-array-based-on-value
 	#
 
-	public static function mda_de($arr, $key, $value)
+	public static function mda_de(array $arr, int|string $key, mixed $value): array
 	{
 		foreach ($arr as $k => $e) {
 			if (isset($e[$key])) {
@@ -692,7 +741,7 @@ class Php
 	#
 	#
 
-	public static function lev($str, $arr)
+	public static function lev(string $str, array $arr): array
 	{
 		// кратчайшее расстояние пока еще не найдено
 		$shortest = -1;
@@ -734,7 +783,7 @@ class Php
 		// }
 	}
 
-	public static function numRange($num, $step)
+	public static function numRange(string $num, string $step): int
 	{
 		$PlaceIdStr = "$num";
 		$PlaceIdStrLength = strlen($PlaceIdStr);
@@ -762,7 +811,7 @@ class Php
 	#
 	#
 
-	public static function getNowTime()
+	public static function getNowTime(): string
 	{
 		$current_timestamp_fndate = date("U");
 		# 10-03-2019 12:11:32
@@ -778,8 +827,11 @@ class Php
 	#
 	#
 
-	public static function compressImage($source, $destination, $quality)
-	{
+	public static function compressImage(
+		string $source,
+		string $destination,
+		int $quality
+	): void 	{
 		$info = getimagesize($source);
 
 		if ($info['mime'] == 'image/jpeg') {
@@ -793,7 +845,7 @@ class Php
 		imagejpeg($image, $destination, $quality);
 	}
 
-	public static function curl($url, $post = NULL)
+	public static function curl(string $url, string $post = ""): string|bool
 	{
 		$ch = curl_init($url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -816,13 +868,13 @@ class Php
 	#
 	#
 
-	public static function mysqlDatetimeToHtml($mysqlStr)
+	public static function mysqlDatetimeToHtml(string $mysqlStr): string
 	{
 		$mysqlStr[10] = "T";
 		return $mysqlStr;
 	}
 
-	public static function mysqlHtmlToDatetime($htmlStr)
+	public static function mysqlHtmlToDatetime(string $htmlStr): string
 	{
 		$htmlStr[10] = " ";
 		return $htmlStr;

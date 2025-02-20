@@ -13,7 +13,7 @@ class QueryBinder
     public static function set(
         PDOStatement &$sth,
         string &$sql,
-        array $set,
+        array|null $set,
         array $columnTypes = [],
     ): array {
         $log = [];
@@ -77,7 +77,7 @@ class QueryBinder
     public static function insert(
         PDOStatement &$sth,
         string &$sql,
-        array $insert,
+        array|null $insert = null,
         array $columnTypes = [],
     ): array {
         $log = [];
@@ -142,8 +142,8 @@ class QueryBinder
     public static function clause(
         PDOStatement &$sth,
         string &$sql,
-        array $clause
-    ): array {
+        array|null $clause = null
+    ): array|null {
         $log = [];
 
         if (!isset($clause)) {
@@ -277,7 +277,7 @@ class QueryBinder
     /**
      * @tested
      */
-    public static function validateType(string $type, $column)
+    public static function validateType(string $type, string $column): string
     {
         $type = self::fixType($type);
 

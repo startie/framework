@@ -11,7 +11,7 @@ class Validate
     
     */
 
-    public static function str($value): bool
+    public static function str(mixed $value): bool
     {
         return is_string($value);
     }
@@ -19,12 +19,12 @@ class Validate
     /**
      * Alias for `Validate::str()`
      */
-    public static function string($value): bool
+    public static function string(mixed $value): bool
     {
         return Validate::str($value);
     }
 
-    public static function int($value): bool
+    public static function int(mixed $value): bool
     {
         return is_int($value);
     }
@@ -32,7 +32,7 @@ class Validate
     /**
      * Alias for `Validate::int()`
      */
-    public static function integer($value): bool
+    public static function integer(mixed $value): bool
     {
         return Validate::int($value);
     }
@@ -40,12 +40,12 @@ class Validate
     /**
      * Alias for `Validate::int()`
      */
-    public static function number($value): bool
+    public static function number(mixed $value): bool
     {
         return Validate::int($value);
     }
 
-    public static function numeric($value): bool
+    public static function numeric(mixed $value): bool
     {
         return is_numeric($value);
     }
@@ -56,7 +56,7 @@ class Validate
 
     */
 
-    public static function boolean($value): bool|null
+    public static function boolean(mixed $value): bool|null
     {
         return filter_var(
             $value,
@@ -69,7 +69,7 @@ class Validate
      * Even if $value will be a string, float will be returned
      * @tested
      */
-    public static function float($value): float|false
+    public static function float(mixed $value): float|false
     {
         $temp_var = str_replace(".", ",", $value);
 
@@ -84,27 +84,27 @@ class Validate
         );
     }
 
-    public static function intStr($value): int|false
+    public static function intStr(mixed $value): int|false
     {
         return filter_var($value, FILTER_VALIDATE_INT);
     }
 
-    public static function ip($value): string|false
+    public static function ip(mixed $value): string|false
     {
         return filter_var($value, FILTER_VALIDATE_IP);
     }
 
-    public static function mac($value): string|false
+    public static function mac(mixed $value): string|false
     {
         return filter_var($value, FILTER_VALIDATE_MAC);
     }
 
-    public static function email($value): string|false
+    public static function email(mixed $value): string|false
     {
         return filter_var($value, FILTER_VALIDATE_EMAIL);
     }
 
-    public static function url($value): string|false
+    public static function url(mixed $value): string|false
     {
         return filter_var($value, FILTER_VALIDATE_URL);
     }
@@ -125,7 +125,7 @@ class Validate
      * 
      * @tested
      */
-    public static function bool($value): int
+    public static function bool(mixed $value): int
     {
         return intval(
             filter_var($value, FILTER_VALIDATE_BOOLEAN)

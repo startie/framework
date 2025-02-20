@@ -4,16 +4,20 @@ namespace Startie;
 
 class Procedure
 {
-	public static function inc($name, array $data = [])
-	{
+	public static function inc(
+		string $name,
+array $data = []
+	): void 	{
 		extract($data);
 		$path = App::path("backend/Procedures/{$name}.php");
 		global $t;
 		require($path);
 	}
 
-	public static function return($name, array $data = [])
-	{
+	public static function return(
+		string $name,
+array $data = []
+	): string 	{
 		$path = App::path("backend/Procedures/{$name}.php");
 
 		if (is_file($path)) {

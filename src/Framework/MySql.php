@@ -12,7 +12,7 @@ class MySql
     /**
      * @tested
      */
-    public static function ts()
+    public static function ts(): string
     {
         return "UTC_TIMESTAMP()";
     }

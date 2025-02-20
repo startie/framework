@@ -6,15 +6,15 @@ class Url
 {
 	use \Startie\Bootable;
 
-	public static $ROOT;
+	public static string $ROOT;
 
-	public static function boot()
+	public static function boot(): void
 	{
 		Url::$isBooted = true;
 		Url::defineConstants();
 	}
 
-	public static function defineConstants()
+	public static function defineConstants(): void
 	{
 		/* Load */
 
@@ -69,9 +69,9 @@ class Url
 	 */
 	public static function app(
 		string $path = "",
-		array|null $queryParams = NULL,
-		array|null $fragmentParams = NULL,
-		$arraishQueryParams = false
+		array|null $queryParams = null,
+		array|null $fragmentParams = null,
+		bool $arraishQueryParams = false
 	): string {
 		Url::requireBoot();
 
@@ -119,8 +119,8 @@ class Url
 	 * When `false` we will get id=1&id=2
 	 */
 	public static function buildParams(
-		$params = NULL,
-		$arraish = false
+		array|null $params = null,
+		bool $arraish = false
 	): string {
 		$result = "";
 
@@ -177,18 +177,13 @@ class Url
 
 	/**
 	 * Url from controller expression
-	 *
-	 * @param  string $routeExpression
-	 * @param  null|array $ControllerParams
-	 * @param  null|array $queryParams
-	 * @return string
 	 */
 	public static function controller(
-		$routeExpression,
-		$ControllerParams = NULL,
-		$queryParams = NULL,
-		$arraishQueryParams = false
-	) {
+		string $routeExpression,
+		array|null $ControllerParams = null,
+		array|null $queryParams = null,
+		bool $arraishQueryParams = false
+	): string {
 		$foundedUrl = "";
 
 		$routes = Router::getRoutes();
@@ -240,19 +235,13 @@ class Url
 
 	/**
 	 * Shortcut alias for method controller()
-	 *
-	 * @param null|array $ControllerParams
-	 * @param null|array $queryParams
-	 * @param bool $arraishQueryParams
-	 * @return string
 	 */
-
 	public static function c(
 		string $routeExpression,
-		$controllerParams = NULL,
-		$queryParams = NULL,
-		$arraishQueryParams = false
-	) {
+		array|null $controllerParams = null,
+		array|null $queryParams = null,
+		bool $arraishQueryParams = false
+	): string {
 		return Url::controller(
 			$routeExpression,
 			$controllerParams,
@@ -288,8 +277,8 @@ class Url
 	 * @return array
 	 */
 	public static function getQueryParams(
-		string|null $param = NULL,
-		string $queryString = NULL,
+		string|null $param = null,
+		string|null $queryString = null,
 		bool $decoded = false,
 		string $part = "query"
 	): array {
@@ -453,7 +442,7 @@ class Url
 		return $url;
 	}
 
-	public static function cleanFromQueryString($path)
+	public static function cleanFromQueryString(string $path): string
 	{
 		$questionMarkPosition = mb_strpos($path, '?');
 

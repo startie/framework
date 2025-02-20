@@ -4,8 +4,8 @@ namespace Startie;
 
 class Access
 {
-	const PROVIDERS_NAMESPACE = '\\Providers\\';
-	public static $providers = [];
+	const string PROVIDERS_NAMESPACE = '\\Providers\\';
+	public static array $providers = [];
 
 	/**
 	 * Load providers from .env and init corresponding classes
@@ -51,7 +51,7 @@ class Access
 	/**
 	 * @throws \Startie\Exception
 	 */
-	public static function is($group, $UserId = NULL)
+	public static function is(string $group, int $UserId = null): bool
 	{
 		// Unify group string
 		$group = strtolower($group);
