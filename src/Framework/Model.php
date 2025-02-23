@@ -126,6 +126,8 @@ class Model
 	/**
 	 * Returns an array of rows (arrays) for corresponding entities
 	 * Returns an empty array if there are no entries with specified params
+	 * 
+	 * @return array<array>
 	 */
 	public static function read(array $params = []): array
 	{
