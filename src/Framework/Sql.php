@@ -28,7 +28,7 @@ class Sql
     /**
      * @tested
      */
-    public static function hasBacktick(string|int $val): bool
+    public static function hasBacktick(string|int|float $val): bool
     {
         $val = strval($val);
 
@@ -42,11 +42,11 @@ class Sql
     /**
      * @tested
      */
-    public static function startsWithBacktick(string|int $val): bool
+    public static function startsWithBacktick(string|int|float $value): bool
     {
-        $val = strval($val);
+        $value = strval($value);
 
-        if (strpos($val, '`') === 0) {
+        if (strpos($value, '`') === 0) {
             return true;
         } else {
             return false;
@@ -80,7 +80,7 @@ class Sql
     /**
      * @tested
      */
-    public static function like(string|int $value): string
+    public static function like(string|int|float $value): string
     {
         return Sql::q(
             StatementBuilder::like($value)

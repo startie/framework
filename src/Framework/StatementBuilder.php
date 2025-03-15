@@ -452,7 +452,7 @@ class StatementBuilder
      * Generates: `LIKE '%$value%'`
      * TODO: test
      */
-    public static function like(string|int $value): string
+    public static function like(string|int|float $value): string
     {
         $result = "";
 
