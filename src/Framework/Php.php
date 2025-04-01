@@ -879,7 +879,7 @@ class Php
 		}
 	}
 
-	public static function curl(string $url, string $post = ""): string|bool
+	public static function curl(string $url, string|array $post = ""): string|bool
 	{
 		$ch = curl_init($url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
