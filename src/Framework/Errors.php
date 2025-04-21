@@ -178,7 +178,7 @@ class Errors
             ||
             // If accessToken was provided
             In::get(
-                Errors::$config['accessToken']['key']
+                Errors::$config['accessToken']['key'] ?? ""
             ) === Errors::$config['accessToken']['value']
         ) {
             if (Errors::$handler === 'Startie') {
