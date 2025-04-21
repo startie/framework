@@ -16,7 +16,7 @@
     ],
     "minimum-stability": "stable",
     "require": {
-        "php": "~8.3.0",
+        "php": "^8.3.0",
         "mustache/mustache": "~2.5",
         "vlucas/phpdotenv": "^5.4",
         "filp/whoops": "^2.14"

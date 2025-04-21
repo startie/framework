@@ -150,12 +150,12 @@ class Errors
             if (ini_get('display_errors') !== false) {
                 if (isset($LogId)) {
                     $errorHTML = Errors::make(
-                        $inputException,
+                        $inputException->getMessage(),
                         "Log #$LogId was generated."
                     );
                 } else {
                     $errorHTML = Errors::make(
-                        $inputException,
+                        $inputException->getMessage(),
                         "No log was generated."
                     );
                 }
