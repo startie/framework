@@ -39,7 +39,7 @@ class Output
         // self::requireBoot();
 
         if (isset(self::$config['error'])) {
-            $errorConfig = self::$config['error'][$code];
+            $errorConfig = self::$config['error'][$code] ?? [];
 
             if (isset($errorConfig['view'])) {
                 echo view($errorConfig['view']);
